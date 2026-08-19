@@ -7,7 +7,9 @@ import { StoreProvider } from './store/StoreProvider.tsx'
 import { CountdownView } from './tools/countdown/CountdownView.tsx'
 import { HomeView } from './tools/home/HomeView.tsx'
 import { IntervalView } from './tools/interval/IntervalView.tsx'
+import { MetronomeView } from './tools/metronome/MetronomeView.tsx'
 import { StopwatchView } from './tools/stopwatch/StopwatchView.tsx'
+import { WorldClockView } from './tools/world/WorldClockView.tsx'
 
 /**
  * The shell: store and one shared clock underneath, the routed tool on top.
@@ -51,6 +53,10 @@ function Shell() {
             <StopwatchView />
           ) : route === 'interval' ? (
             <IntervalView />
+          ) : route === 'metronome' ? (
+            <MetronomeView />
+          ) : route === 'world' ? (
+            <WorldClockView />
           ) : (
             <Placeholder name={tool.name} />
           )}

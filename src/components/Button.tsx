@@ -14,6 +14,8 @@ interface ButtonProps {
   variant?: Variant
   type?: 'button' | 'submit'
   title?: string
+  /** Overrides the accessible name when the visible content is an icon. */
+  ariaLabel?: string
   disabled?: boolean
   className?: string
 }
@@ -25,6 +27,7 @@ export function Button({
   variant = 'ghost',
   type = 'button',
   title,
+  ariaLabel,
   disabled,
   className = '',
 }: ButtonProps) {
@@ -33,6 +36,7 @@ export function Button({
       type={type}
       onClick={onClick}
       title={title}
+      aria-label={ariaLabel}
       disabled={disabled}
       className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40 ${STYLES[variant]} ${className}`}
     >
