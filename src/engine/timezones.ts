@@ -54,7 +54,14 @@ export function zonedParts(timeZone: string, date: Date): ZonedParts {
 /** The zone's offset from UTC at that instant, minute-exact. */
 export function offsetMs(timeZone: string, date: Date): number {
   const parts = zonedParts(timeZone, date)
-  const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second)
+  const asUTC = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  )
   // formatToParts works at second precision; round away the milliseconds.
   return Math.round((asUTC - date.getTime()) / 60_000) * 60_000
 }

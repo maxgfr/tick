@@ -15,7 +15,9 @@ export function notificationPermission(): NotificationPermission | 'unsupported'
   return window.Notification.permission
 }
 
-export async function requestNotificationPermission(): Promise<NotificationPermission | 'unsupported'> {
+export async function requestNotificationPermission(): Promise<
+  NotificationPermission | 'unsupported'
+> {
   if (!notificationsSupported()) return 'unsupported'
   try {
     return await window.Notification.requestPermission()

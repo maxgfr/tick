@@ -11,8 +11,8 @@ export function HomeView() {
       <header className="pt-10 pb-6">
         <h1 className="text-4xl font-bold tracking-tight">tick</h1>
         <p className="mt-1 text-sm" style={{ color: 'var(--ink-2)' }}>
-          Timers for the everyday: countdowns, intervals, beats and clocks. Everything
-          runs on your device — no account, no server, no tracking.
+          Timers for the everyday: countdowns, intervals, beats and clocks. Everything runs on your
+          device — no account, no server, no tracking.
         </p>
       </header>
 

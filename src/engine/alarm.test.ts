@@ -37,10 +37,7 @@ describe('nextTrigger', () => {
 
   it('skips disabled days', () => {
     // Enabled Tue/Wed/Thu; from Monday 08:00 at 07:30 → Tuesday.
-    const trigger = nextTrigger(
-      { time: '07:30', days: [2, 3, 4], enabled: true },
-      MONDAY_8AM,
-    )
+    const trigger = nextTrigger({ time: '07:30', days: [2, 3, 4], enabled: true }, MONDAY_8AM)
     expect(trigger).toBe(TUESDAY_730.getTime())
   })
 

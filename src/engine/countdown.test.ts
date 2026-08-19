@@ -14,9 +14,7 @@ describe('remainingMs', () => {
   })
 
   it('reads the frozen value while paused', () => {
-    expect(
-      remainingMs({ totalMs: 5 * MIN, pausedRemainingMs: 42_000 }, NOW + 999),
-    ).toBe(42_000)
+    expect(remainingMs({ totalMs: 5 * MIN, pausedRemainingMs: 42_000 }, NOW + 999)).toBe(42_000)
   })
 
   it('shows the full duration before the first start', () => {

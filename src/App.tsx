@@ -4,6 +4,7 @@ import { TOOLS } from './app/tools.ts'
 import { TickerProvider } from './hooks/useNow.tsx'
 import { useStore } from './store/context.ts'
 import { StoreProvider } from './store/StoreProvider.tsx'
+import { CountdownView } from './tools/countdown/CountdownView.tsx'
 import { HomeView } from './tools/home/HomeView.tsx'
 
 /**
@@ -42,7 +43,7 @@ function Shell() {
           </p>
         </header>
         <section aria-label={`${tool.name} tool`} className="py-8">
-          <p style={{ color: 'var(--ink-3)' }}>Under construction — milestone in progress.</p>
+          {route === 'countdown' ? <CountdownView /> : <Placeholder name={tool.name} />}
         </section>
       </main>
     )
@@ -50,3 +51,7 @@ function Shell() {
 
   return <HomeView />
 }
+
+const Placeholder = ({ name }: { name: string }) => (
+  <p style={{ color: 'var(--ink-3)' }}>{name} is under construction — milestone in progress.</p>
+)

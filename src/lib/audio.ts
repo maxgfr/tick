@@ -74,13 +74,7 @@ const tone = (t: Tone): void => {
 }
 
 export type Signal =
-  | 'countdown-done'
-  | 'phase-work'
-  | 'phase-rest'
-  | 'phase-end'
-  | 'alarm'
-  | 'beat'
-  | 'beat-down'
+  'countdown-done' | 'phase-work' | 'phase-rest' | 'phase-end' | 'alarm' | 'beat' | 'beat-down'
 
 const SIGNALS: Record<Signal, readonly Tone[]> = {
   // A rising triad — the oven-timer "it is ready".

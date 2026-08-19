@@ -55,10 +55,7 @@ export function parseDuration(input: string): number | null {
  * Countdown readout: "6:30" under an hour, "2:05:00" from an hour up, tenths
  * optional for the stopwatch. Rounds to the nearest displayed unit.
  */
-export function formatClock(
-  ms: number,
-  opts?: { tenths?: boolean; forceHours?: boolean },
-): string {
+export function formatClock(ms: number, opts?: { tenths?: boolean; forceHours?: boolean }): string {
   const rounded = opts?.tenths ? ms : Math.ceil(ms / SECOND) * SECOND
   const totalSeconds = Math.floor(rounded / SECOND)
   const tenths = Math.floor((rounded % SECOND) / 100)

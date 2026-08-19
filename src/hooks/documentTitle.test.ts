@@ -31,9 +31,9 @@ describe('buildTitle', () => {
 
   it('a running interval outranks countdowns', () => {
     const timers = [running('Tea', MIN)]
-    expect(
-      buildTitle({ timers, interval: { phase: 'work', remainingMs: 12_000 } }, NOW),
-    ).toBe('WORK · 0:12 · tick')
+    expect(buildTitle({ timers, interval: { phase: 'work', remainingMs: 12_000 } }, NOW)).toBe(
+      'WORK · 0:12 · tick',
+    )
   })
 
   it('a ringing alarm outranks everything', () => {

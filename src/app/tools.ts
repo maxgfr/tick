@@ -62,5 +62,4 @@ export const TOOLS: readonly Tool[] = [
   },
 ]
 
-export const toolByKey = (key: string): Tool | undefined =>
-  TOOLS.find((tool) => tool.key === key)
+export const toolByKey = (key: string): Tool | undefined => TOOLS.find((tool) => tool.key === key)

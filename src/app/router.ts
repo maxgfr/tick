@@ -33,8 +33,7 @@ export const ROUTES: readonly RouteName[] = [
   'settings',
 ]
 
-export const routeToHash = (route: RouteName): string =>
-  route === 'home' ? '#/' : `#/${route}`
+export const routeToHash = (route: RouteName): string => (route === 'home' ? '#/' : `#/${route}`)
 
 export function parseHash(hash: string): RouteName {
   const head = hash.replace(/^#\/?/, '').split('/')[0] ?? ''

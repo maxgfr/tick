@@ -134,7 +134,10 @@ export function reducer(state: AppState, action: Action): AppState {
       if (runningSince === undefined) return state
       return {
         ...state,
-        stopwatch: { ...state.stopwatch, laps: [...laps, accumulatedMs + (action.now - runningSince)] },
+        stopwatch: {
+          ...state.stopwatch,
+          laps: [...laps, accumulatedMs + (action.now - runningSince)],
+        },
       }
     }
     case 'stopwatch/reset':
@@ -182,7 +185,10 @@ export function reducer(state: AppState, action: Action): AppState {
         ? state
         : { ...state, world: { zoneIds: [...state.world.zoneIds, action.zoneId] } }
     case 'world/remove':
-      return { ...state, world: { zoneIds: state.world.zoneIds.filter((z) => z !== action.zoneId) } }
+      return {
+        ...state,
+        world: { zoneIds: state.world.zoneIds.filter((z) => z !== action.zoneId) },
+      }
     case 'world/move': {
       const index = state.world.zoneIds.indexOf(action.zoneId)
       const target = index + action.delta

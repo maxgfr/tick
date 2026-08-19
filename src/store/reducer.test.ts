@@ -12,14 +12,24 @@ const state = (overrides?: Partial<AppState>): AppState => ({
 
 describe('countdown', () => {
   it('adds a timer, already running', () => {
-    const next = reducer(state(), { type: 'countdown/add', label: 'Egg', durationMs: 6 * MIN + 30_000, now: NOW })
+    const next = reducer(state(), {
+      type: 'countdown/add',
+      label: 'Egg',
+      durationMs: 6 * MIN + 30_000,
+      now: NOW,
+    })
     const timer = next.countdown.timers[0]
     expect(timer).toMatchObject({ label: 'Egg', totalMs: 390_000, endAt: NOW + 390_000 })
     expect(timer!.id).toBeTruthy()
   })
 
   it('starts, pauses and resumes a timer through the engine', () => {
-    const added = reducer(state(), { type: 'countdown/add', label: 'Tea', durationMs: 5 * MIN, now: NOW })
+    const added = reducer(state(), {
+      type: 'countdown/add',
+      label: 'Tea',
+      durationMs: 5 * MIN,
+      now: NOW,
+    })
     const id = added.countdown.timers[0]!.id
 
     const paused = reducer(added, { type: 'countdown/pause', id, now: NOW + MIN })
@@ -40,7 +50,12 @@ describe('countdown', () => {
   })
 
   it('restarts from the original duration', () => {
-    const added = reducer(state(), { type: 'countdown/add', label: 'X', durationMs: 2 * MIN, now: NOW })
+    const added = reducer(state(), {
+      type: 'countdown/add',
+      label: 'X',
+      durationMs: 2 * MIN,
+      now: NOW,
+    })
     const id = added.countdown.timers[0]!.id
     const restarted = reducer(added, { type: 'countdown/restart', id, now: NOW + 90_000 })
     expect(restarted.countdown.timers[0]).toMatchObject({ endAt: NOW + 90_000 + 2 * MIN })
@@ -70,7 +85,12 @@ describe('countdown', () => {
   })
 
   it('refuses to add a zero-duration timer', () => {
-    const next = reducer(state(), { type: 'countdown/add', label: 'Ghost', durationMs: 0, now: NOW })
+    const next = reducer(state(), {
+      type: 'countdown/add',
+      label: 'Ghost',
+      durationMs: 0,
+      now: NOW,
+    })
     expect(next.countdown.timers).toHaveLength(0)
   })
 })
@@ -175,7 +195,9 @@ describe('metronome, world clock, alarms, settings', () => {
 describe('reducer hygiene', () => {
   it('returns the same reference for an unknown action', () => {
     const initial = state()
-    expect(reducer(initial, { type: 'nonsense' } as unknown as Parameters<typeof reducer>[1])).toBe(initial)
+    expect(reducer(initial, { type: 'nonsense' } as unknown as Parameters<typeof reducer>[1])).toBe(
+      initial,
+    )
   })
 
   it('never mutates the previous state', () => {

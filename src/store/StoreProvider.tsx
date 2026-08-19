@@ -17,10 +17,8 @@ const localZone = (): string => {
  * typing cheap; the pagehide flush means a closed tab has already saved.
  */
 export function StoreProvider({ children }: { children: React.ReactNode }): React.ReactElement {
-  const [state, dispatch] = useReducer(
-    reducer,
-    undefined,
-    (): AppState => loadState(globalThis.localStorage?.getItem(STORAGE_KEY) ?? null, localZone()),
+  const [state, dispatch] = useReducer(reducer, undefined, (): AppState =>
+    loadState(globalThis.localStorage?.getItem(STORAGE_KEY) ?? null, localZone()),
   )
 
   const stateRef = useRef(state)
