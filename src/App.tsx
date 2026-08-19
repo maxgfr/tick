@@ -6,6 +6,8 @@ import { useStore } from './store/context.ts'
 import { StoreProvider } from './store/StoreProvider.tsx'
 import { CountdownView } from './tools/countdown/CountdownView.tsx'
 import { HomeView } from './tools/home/HomeView.tsx'
+import { IntervalView } from './tools/interval/IntervalView.tsx'
+import { StopwatchView } from './tools/stopwatch/StopwatchView.tsx'
 
 /**
  * The shell: store and one shared clock underneath, the routed tool on top.
@@ -43,7 +45,15 @@ function Shell() {
           </p>
         </header>
         <section aria-label={`${tool.name} tool`} className="py-8">
-          {route === 'countdown' ? <CountdownView /> : <Placeholder name={tool.name} />}
+          {route === 'countdown' ? (
+            <CountdownView />
+          ) : route === 'stopwatch' ? (
+            <StopwatchView />
+          ) : route === 'interval' ? (
+            <IntervalView />
+          ) : (
+            <Placeholder name={tool.name} />
+          )}
         </section>
       </main>
     )
