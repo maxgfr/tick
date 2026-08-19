@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+
+/*
+  Design tokens — scaffold state.
+  The visual identity pass owns this file; these values only guarantee the app
+  is legible and consistent until then.
+*/
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #f2f2f0;
+  --surface: #ffffff;
+  --surface-2: #e9e9e6;
+  --ink: #1a1a1c;
+  --ink-2: #55555c;
+  --ink-3: #8a8a92;
+  --line: #d8d8d4;
+  --accent: #c2410c;
+  --accent-ink: #ffffff;
+  --good: #15803d;
+  --warn: #b45309;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0b0b0c;
+  --surface: #141416;
+  --surface-2: #1e1e21;
+  --ink: #f0f0ee;
+  --ink-2: #a8a8b0;
+  --ink-3: #6e6e76;
+  --line: #2a2a2e;
+  --accent: #ea580c;
+  --accent-ink: #0b0b0c;
+  --good: #4ade80;
+  --warn: #fbbf24;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --bg: #0b0b0c;
+    --surface: #141416;
+    --surface-2: #1e1e21;
+    --ink: #f0f0ee;
+    --ink-2: #a8a8b0;
+    --ink-3: #6e6e76;
+    --line: #2a2a2e;
+    --accent: #ea580c;
+    --accent-ink: #0b0b0c;
+    --good: #4ade80;
+    --warn: #fbbf24;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Digits that don't dance: every timer readout uses tabular figures. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>tick — local-first timers</title>
+    <meta
+      name="description"
+      content="Countdowns, stopwatch, intervals, metronome, world clock, duration calculator, alarms and a fullscreen display. Everything runs in your browser — no account, no server, no tracking."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/tick/favicon.svg" />
+    <link rel="apple-touch-icon" href="/tick/apple-touch-icon-180x180.png" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f2f0" media="(prefers-color-scheme: light)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- No crawler tricks, no preview, no third party. The app is for one person: whoever holds the device. -->
+    <meta name="robots" content="index, follow" />
+    <meta name="referrer" content="no-referrer" />
+  </head>
+  <body>
+    <!--
+      THESIS: A timer is a promise you make to a future moment — the app's whole job
+      is to keep it exactly, then get out of the way.
+      OWN-WORLD: placeholder — the visual identity pass owns this section.
+      FIRST VIEWPORT: the tool grid, with whatever is running shown live.
+    -->
+    <div id="root"></div>
+    <noscript>
+      tick runs entirely in your browser, so it needs JavaScript. Nothing is sent anywhere —
+      enabling it does not expose you to any server.
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
