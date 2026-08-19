@@ -1,14 +1,30 @@
 import { useRoute } from './app/router.ts'
+import { useThemeEffect } from './app/theme.ts'
 import { TOOLS } from './app/tools.ts'
+import { TickerProvider } from './hooks/useNow.tsx'
+import { useStore } from './store/context.ts'
+import { StoreProvider } from './store/StoreProvider.tsx'
 import { HomeView } from './tools/home/HomeView.tsx'
 
 /**
- * The shell: nav across the top, the routed tool underneath. Providers slot in
- * between the shell and the tools as the runtime grows (store, ticker) — the
- * layout does not change shape when they do.
+ * The shell: store and one shared clock underneath, the routed tool on top.
+ * Tools read `now` from the ticker and their slice from the store — neither
+ * provider changes shape as tools are added.
  */
 export function App() {
+  return (
+    <StoreProvider>
+      <TickerProvider>
+        <Shell />
+      </TickerProvider>
+    </StoreProvider>
+  )
+}
+
+function Shell() {
   const route = useRoute()
+  const { settings } = useStore()
+  useThemeEffect(settings.theme)
 
   if (route === 'home') return <HomeView />
 
