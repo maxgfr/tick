@@ -123,18 +123,30 @@ export function reducer(state: AppState, action: Action): AppState {
           timers: state.countdown.timers.filter((timer) => timer.id !== action.id),
         },
       }
+    // `endAt` and `pausedRemainingMs` are mutually exclusive by the engine's own
+    // contract, and each transition returns only the one it sets. Spreading
+    // that over the old timer left the other behind — and since `remainingMs`
+    // reads `pausedRemainingMs` first, a resumed countdown stayed frozen on the
+    // value it was paused at, for good. Clearing both first is what makes the
+    // invariant hold no matter which field a transition happens to return.
     case 'countdown/start':
       return mapTimer(state, action.id, (timer) => ({
-        ...omit(timer, 'firedAt'),
+        ...omit(timer, 'firedAt', 'endAt', 'pausedRemainingMs'),
         ...start(timer, action.now),
       }))
     case 'countdown/pause':
-      return mapTimer(state, action.id, (timer) => ({ ...timer, ...pause(timer, action.now) }))
+      return mapTimer(state, action.id, (timer) => ({
+        ...omit(timer, 'endAt', 'pausedRemainingMs'),
+        ...pause(timer, action.now),
+      }))
     case 'countdown/resume':
-      return mapTimer(state, action.id, (timer) => ({ ...timer, ...resume(timer, action.now) }))
+      return mapTimer(state, action.id, (timer) => ({
+        ...omit(timer, 'endAt', 'pausedRemainingMs'),
+        ...resume(timer, action.now),
+      }))
     case 'countdown/restart':
       return mapTimer(state, action.id, (timer) => ({
-        ...omit(timer, 'firedAt'),
+        ...omit(timer, 'firedAt', 'endAt', 'pausedRemainingMs'),
         ...start(timer, action.now),
       }))
     case 'countdown/fired':

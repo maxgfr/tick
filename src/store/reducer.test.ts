@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { remainingMs } from '../engine/countdown.ts'
 import { beatPositionAt } from '../engine/metronome.ts'
 import { defaultState, reducer } from './reducer.ts'
 import type { AppState } from './types.ts'
@@ -409,5 +410,47 @@ describe('meeting', () => {
     expect(shared.meeting.durationMin).toBe(45)
     expect(shared.meeting.participants[0]?.label).toBe('Ana')
     expect(shared.meeting.participants[0]?.id).not.toBe('shared-0')
+  })
+})
+
+describe('a countdown never holds both timing fields at once', () => {
+  const timer = (state: AppState) => state.countdown.timers[0]!
+  const seeded = (): AppState =>
+    reducer(state(), { type: 'countdown/add', label: 'Tea', durationMs: 90_000, now: NOW })
+
+  it('resumes a paused timer instead of freezing it forever', () => {
+    // `resume()` returns `{ totalMs, endAt }` with no `pausedRemainingMs`, so
+    // spreading it over the old timer used to leave the frozen value behind —
+    // and `remainingMs` reads that first. Pause once and the countdown could
+    // never be restarted.
+    // One state, one id: `makeId` is a real uuid here, so seeding twice would
+    // address a timer that does not exist and every dispatch would no-op.
+    const running = seeded()
+    const id = timer(running).id
+
+    const paused = reducer(running, { type: 'countdown/pause', id, now: NOW + 10_000 })
+    expect(timer(paused).pausedRemainingMs).toBe(80_000)
+
+    const resumed = reducer(paused, { type: 'countdown/resume', id, now: NOW + 40_000 })
+    expect(timer(resumed).pausedRemainingMs).toBeUndefined()
+    expect(timer(resumed).endAt).toBe(NOW + 120_000)
+    expect(remainingMs(timer(resumed), NOW + 50_000)).toBe(70_000)
+  })
+
+  it('holds the invariant across every timing transition', () => {
+    let next = seeded()
+    const id = timer(next).id
+    for (const action of [
+      { type: 'countdown/pause', id, now: NOW + 1_000 },
+      { type: 'countdown/resume', id, now: NOW + 2_000 },
+      { type: 'countdown/pause', id, now: NOW + 3_000 },
+      { type: 'countdown/restart', id, now: NOW + 4_000 },
+      { type: 'countdown/pause', id, now: NOW + 5_000 },
+      { type: 'countdown/start', id, now: NOW + 6_000 },
+    ] as const) {
+      next = reducer(next, action)
+      const both = timer(next).endAt !== undefined && timer(next).pausedRemainingMs !== undefined
+      expect(both, `both fields set after ${action.type}`).toBe(false)
+    }
   })
 })
