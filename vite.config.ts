@@ -55,7 +55,7 @@ export default defineConfig({
         name: 'tick — local-first timers',
         short_name: 'tick',
         description:
-          'Countdowns, stopwatch, intervals, metronome, world clock, duration calculator, alarms and a fullscreen display. Everything stays on your device.',
+          'Countdowns, stopwatch, intervals, metronome, world clock, meeting planner, duration calculator, alarms and a fullscreen display. Everything stays on your device.',
         lang: 'en',
         dir: 'ltr',
         theme_color: '#120b0c',

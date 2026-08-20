@@ -7,11 +7,15 @@
     <title>tick — local-first timers</title>
     <meta
       name="description"
-      content="Countdowns, stopwatch, intervals, metronome, world clock, duration calculator, alarms and a fullscreen display. Everything runs in your browser — no account, no server, no tracking."
+      content="Countdowns, stopwatch, intervals, metronome, world clock, cross-timezone meeting planner, duration calculator, alarms and a fullscreen display. Everything runs in your browser — no account, no server, no tracking."
     />
 
-    <link rel="icon" type="image/svg+xml" href="/tick/favicon.svg" />
-    <link rel="apple-touch-icon" href="/tick/apple-touch-icon-180x180.png" />
+    <!-- Relative, deliberately: Vite prefixes the base onto a leading-slash
+         href in dev but not in the build, so an absolute path is doubled on
+         the dev server. The page always sits at the base, so this resolves
+         correctly in both. -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="apple-touch-icon-180x180.png" />
     <meta name="theme-color" content="#120b0c" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#efe9e2" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
