@@ -1,9 +1,14 @@
 import { cityOf, type Grid, type MeetingParticipant } from '../../engine/meeting.ts'
 
+/**
+ * Three grades, three grounds. `off` is a recess, not air: leaving it
+ * transparent made the night hours read as loose text and the grid stopped
+ * looking like a grid at all.
+ */
 const TONE: Record<string, { background: string; color: string }> = {
   working: { background: 'var(--accent)', color: 'var(--accent-ink)' },
   fringe: { background: 'var(--surface-2)', color: 'var(--ink)' },
-  off: { background: 'transparent', color: 'var(--ink-3)' },
+  off: { background: 'var(--cell)', color: 'var(--ink-3)' },
 }
 
 /**
@@ -48,12 +53,14 @@ export function MeetingGrid({
         </caption>
         <thead className="sticky top-0 z-10" style={{ background: 'var(--bg)' }}>
           <tr>
+            {/* Not the anchor's city: that is already the first participant
+                column, and printing it twice reads as a duplicate row. */}
             <th
               scope="col"
               className="font-display px-2 py-2 text-left text-xs font-semibold tracking-wide uppercase"
               style={{ color: 'var(--ink-3)' }}
             >
-              {cityOf(grid.anchorZoneId)}
+              Time
             </th>
             {participants.map((participant) => (
               <th

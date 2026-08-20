@@ -3,8 +3,12 @@ import { routeToHash } from '../app/router.ts'
 import type { RouteName } from '../app/router.ts'
 import { CHROME, PRIMARY_TOOLS, SECONDARY_TOOLS, toolById } from '../app/tools.ts'
 
+// `min-w-0` is load-bearing: without it a flex child refuses to shrink below
+// its content, five tab labels overflow the viewport, and because the bar is
+// `fixed` that widens the whole scrollable area — which is what pushed every
+// page on a phone sideways.
 const tabClass = (active: boolean): string =>
-  `font-display flex min-h-14 flex-1 flex-col items-center justify-center gap-1 px-1 text-[0.625rem] font-semibold uppercase tracking-wide transition-colors ${
+  `font-display flex min-h-14 w-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[0.625rem] font-semibold uppercase tracking-wide transition-colors ${
     active ? 'text-[var(--ink)]' : 'text-[var(--ink-2)]'
   }`
 
@@ -40,7 +44,7 @@ export function MobileNav({ route }: { route: RouteName }) {
       >
         <ul className="flex items-stretch">
           {PRIMARY_TOOLS.map((tool) => (
-            <li key={tool.id} className="flex flex-1">
+            <li key={tool.id} className="flex min-w-0 flex-1">
               <a
                 href={routeToHash(tool.id)}
                 aria-current={route === tool.id ? 'page' : undefined}
@@ -54,11 +58,11 @@ export function MobileNav({ route }: { route: RouteName }) {
                 >
                   {tool.glyph}
                 </span>
-                {tool.nav}
+                <span className="w-full truncate text-center">{tool.nav}</span>
               </a>
             </li>
           ))}
-          <li className="flex flex-1">
+          <li className="flex min-w-0 flex-1">
             <button
               type="button"
               aria-expanded={open}
@@ -73,7 +77,9 @@ export function MobileNav({ route }: { route: RouteName }) {
               >
                 {behindMore ? (current?.glyph ?? '⋯') : '⋯'}
               </span>
-              {behindMore ? (current?.nav ?? 'More') : 'More'}
+              <span className="w-full truncate text-center">
+                {behindMore ? (current?.nav ?? 'More') : 'More'}
+              </span>
             </button>
           </li>
         </ul>

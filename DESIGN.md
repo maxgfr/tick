@@ -128,8 +128,11 @@ face whether or not the room lights are on. It is the instrument, not a
 preference — and it is what keeps the app recognisable in a light theme
 instead of dissolving into a white utility.
 
-`--cell-edge` is a hairline on the top edge only: the light catching the lip of
-a moulded recess. It is the sole depth cue in the system.
+A cell carries a full hairline ring (`--cell-ring`) with a lighter top edge
+(`--cell-edge`): the lip of a moulded recess. It is the sole depth cue in the
+system, and it is not optional — without the ring the cell is invisible in dark
+mode, where its ground and the page's sit a shade apart, so the instrument's
+key caps disappear in exactly the theme that is the signature.
 
 Every text pair in both themes clears WCAG AA at small text (4.5:1); the
 readout, which is the thing the product actually promises you can read from
@@ -201,6 +204,20 @@ no glass, no blur, no glow filter, no shadows, no circles.
 
 **Digits Don't Dance.** Every running figure is tabular, and in a cell wherever
 the space allows.
+
+## Cascade layers
+
+`tokens.css` puts element resets in `@layer base` and the component classes in
+`@layer components`, deliberately.
+
+Unlayered CSS beats every layer, Tailwind's `@layer utilities` included. Left
+outside a layer, `button { font: inherit; color: inherit }` silently overrode
+the size, weight, family and colour of every button in the app — a shorthand
+resetting five properties at once — and `.cell` overrode `h-6 w-6`, so a
+navigation key cap could not be sized from the markup at all. Neither failure
+is visible in a test; both are obvious the moment you look at the screen.
+
+Any new rule added here belongs in a layer for the same reason.
 
 ## Components
 

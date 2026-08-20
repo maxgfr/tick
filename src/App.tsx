@@ -114,21 +114,25 @@ function ToolPage({ route, desktop }: { route: RouteName; desktop: boolean }) {
     <main
       className={
         desktop
-          ? 'ml-52 min-h-dvh w-full max-w-3xl px-6 pb-16'
-          : 'mx-auto min-h-dvh w-full max-w-3xl px-4 pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]'
+          ? 'min-h-dvh pb-16 pl-52'
+          : 'min-h-dvh pt-[env(safe-area-inset-top)] pb-[calc(5rem+env(safe-area-inset-bottom))]'
       }
     >
-      <header className="pt-6 pb-2">
-        <h1 className="font-display text-2xl font-bold tracking-wide uppercase">
-          {destination?.name}
-        </h1>
-        <p className="text-sm" style={{ color: 'var(--ink-2)' }}>
-          {destination?.tagline}
-        </p>
-      </header>
-      <section aria-label={`${destination?.name ?? 'Tool'} tool`} className="py-8">
-        {view}
-      </section>
+      {/* The column centres in whatever the rail leaves, rather than hugging
+          it — on a wide screen the old layout left the whole right half void. */}
+      <div className={`mx-auto w-full max-w-3xl ${desktop ? 'px-8' : 'px-4'}`}>
+        <header className="pt-6 pb-2">
+          <h1 className="font-display text-2xl font-bold tracking-wide uppercase">
+            {destination?.name}
+          </h1>
+          <p className="text-sm" style={{ color: 'var(--ink-2)' }}>
+            {destination?.tagline}
+          </p>
+        </header>
+        <section aria-label={`${destination?.name ?? 'Tool'} tool`} className="pt-4 pb-8">
+          {view}
+        </section>
+      </div>
     </main>
   )
 }

@@ -87,6 +87,7 @@
   --cell: #1c1214;
   --cell-ink: #ece6d4;
   --cell-edge: #ffffff1f;
+  --cell-ring: #00000024;
 }
 
 :root[data-theme='dark'] {
@@ -110,6 +111,7 @@
   --cell: #0c0708;
   --cell-ink: #e9e7d3;
   --cell-edge: #ffffff14;
+  --cell-ring: #33201f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -130,132 +132,156 @@
     --cell: #0c0708;
     --cell-ink: #e9e7d3;
     --cell-edge: #ffffff14;
+    --cell-ring: #33201f;
   }
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-ui);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Browser surfaces belong to the instrument too: selection, caret, scrollbar. */
+  ::selection {
+    background: var(--selection);
+  }
+  input,
+  textarea {
+    caret-color: var(--accent);
+  }
+  * {
+    scrollbar-color: var(--surface-2) transparent;
+  }
+
+  /*
+    Unlayered, these two lines beat every Tailwind utility — `@layer utilities`
+    loses to unlayered CSS by the cascade's own rules. `font:` is a shorthand,
+    so it was silently resetting size, weight and family on every button in the
+    app, and `color: inherit` was overriding every text colour utility. The
+    More tab rendered at 16px instead of 10px because of exactly this.
+  */
+  button {
+    font: inherit;
+    color: inherit;
+  }
 }
 
-/* Browser surfaces belong to the board too: selection, caret, scrollbar. */
-::selection {
-  background: var(--selection);
-}
-input,
-textarea {
-  caret-color: var(--accent);
-}
-* {
-  scrollbar-color: var(--surface-2) transparent;
-}
-
-button {
-  font: inherit;
-  color: inherit;
-}
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/*
-  Numerals that don't dance. Every readout in the app — clocks, laps, BPM,
-  offsets — uses the condensed face with tabular figures, and most live in
-  cells that fix the column outright.
-*/
-.tnum {
-  font-family: var(--font-display);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum';
-}
-
-/*
-  The readout: figures in the instrument's window.
-
-  Each character sits in its own sunken cell — a dark recess with a hairline
-  catching its top edge, the way a moulded window does. Width is a fraction of
-  the em so a readout scales as one voice, and the fixed box is what keeps the
-  column from shifting as digits change.
-*/
-.readout {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.08em;
-}
-.cell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.82em;
-  height: 1.28em;
-  background: var(--cell);
-  color: var(--cell-ink);
-  border-radius: 2px;
-  border-top: 1px solid var(--cell-edge);
-  position: relative;
-  font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1;
-}
-/*
-  Rank is inversion. Whatever is live prints inverted — the safelight floods
-  the cell and the figure goes dark inside it — so hierarchy never needs a
-  second accent colour anywhere in the app.
-*/
-.cell[data-live='true'] {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-top-color: #ffffff2e;
-}
-
-.readout-sep {
-  font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1;
-  color: var(--ink-2);
-  padding-inline: 0.02em;
-}
-
-/*
-  Touch targets. The visual size of a control is a density decision and stays
-  as designed; the *hit area* is a physical one. On a coarse pointer every
-  control grows to the 44px minimum a fingertip needs — the small button was
-  about 30px tall, which is a miss waiting to happen on a phone and untouched
-  by any amount of desktop polish.
-*/
-@media (pointer: coarse) {
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 }
 
 /*
-  The gauge: time spent, as a row of lit cells.
-
-  Same unit as the readout, shrunk to a bar of indicators — the strip of lamps
-  along an instrument's edge. Unlit cells sit at the recessed ground; lit ones
-  take the safelight. Never a bar, never a ring: the unit is the cell.
+  Component classes live in `@layer components` so a Tailwind utility can still
+  win against them. Unlayered, `.cell` would beat `h-6 w-6` and the navigation
+  key caps could never be sized from the markup.
 */
-.gauge {
-  display: flex;
-  gap: 2px;
-}
-.gauge-cell {
-  flex: 1 1 0;
-  height: 8px;
-  border-radius: 1px;
-  background: var(--surface-2);
-}
-.gauge-cell[data-on='true'] {
-  background: var(--accent);
+@layer components {
+  /*
+    Numerals that don't dance. Every readout in the app — clocks, laps, BPM,
+    offsets — uses the condensed face with tabular figures, and most live in
+    cells that fix the column outright.
+  */
+  .tnum {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /*
+    The readout: figures in the instrument's window.
+
+    Each character sits in its own sunken cell — a dark recess with a hairline
+    catching its top edge, the way a moulded window does. Width is a fraction of
+    the em so a readout scales as one voice, and the fixed box is what keeps the
+    column from shifting as digits change.
+  */
+  .readout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.08em;
+  }
+  .cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.82em;
+    height: 1.28em;
+    background: var(--cell);
+    color: var(--cell-ink);
+    border-radius: 2px;
+    /* A full hairline, top edge lighter: the lip of a moulded recess. Without
+       the ring the cell is invisible in dark mode, where its ground and the
+       page's are a shade apart — the instrument's keys disappear exactly in the
+       theme that is the signature. */
+    border: 1px solid var(--cell-ring);
+    border-top-color: var(--cell-edge);
+    position: relative;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1;
+  }
+  /*
+    Rank is inversion. Whatever is live prints inverted — the safelight floods
+    the cell and the figure goes dark inside it — so hierarchy never needs a
+    second accent colour anywhere in the app.
+  */
+  .cell[data-live='true'] {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-top-color: #ffffff2e;
+  }
+
+  .readout-sep {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink-2);
+    padding-inline: 0.02em;
+  }
+
+  /*
+    Touch targets. The visual size of a control is a density decision and stays
+    as designed; the *hit area* is a physical one. On a coarse pointer every
+    control grows to the 44px minimum a fingertip needs — the small button was
+    about 30px tall, which is a miss waiting to happen on a phone and untouched
+    by any amount of desktop polish.
+  */
+  @media (pointer: coarse) {
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /*
+    The gauge: time spent, as a row of lit cells.
+
+    Same unit as the readout, shrunk to a bar of indicators — the strip of lamps
+    along an instrument's edge. Unlit cells sit at the recessed ground; lit ones
+    take the safelight. Never a bar, never a ring: the unit is the cell.
+  */
+  .gauge {
+    display: flex;
+    gap: 2px;
+  }
+  .gauge-cell {
+    flex: 1 1 0;
+    height: 8px;
+    border-radius: 1px;
+    background: var(--surface-2);
+  }
+  .gauge-cell[data-on='true'] {
+    background: var(--accent);
+  }
 }

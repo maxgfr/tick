@@ -89,7 +89,9 @@ export function SideNav({ route }: { route: RouteName }) {
               key={item.id}
               route={item.id}
               active={route === item.id}
-              glyph={item.key.toUpperCase()}
+              // Tools teach their digit in the key cap; chrome shows its icon,
+              // because a comma rendered at cell size is a speck.
+              glyph={item.glyph}
               label={item.nav}
             />
           ))}
