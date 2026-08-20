@@ -14,8 +14,8 @@ export function DurationChip({
   onStart,
   onRemove,
 }: {
-  /** Omitted for a recent duration, which is only ever its own time. */
-  label?: string
+  /** Absent for a duration nobody has named — the time is the whole chip. */
+  label?: string | undefined
   durationMs: number
   removeLabel: string
   onStart: () => void
@@ -32,7 +32,9 @@ export function DurationChip({
         style={{ color: 'var(--ink)' }}
         onClick={onStart}
       >
-        {label}
+        {/* A real space, not just a margin: without it the accessible name
+            runs the two together as "Pasta11:00". */}
+        {label === undefined ? null : `${label} `}
         <span
           className={label === undefined ? 'tnum' : 'tnum ml-2'}
           style={{ color: label === undefined ? 'var(--ink)' : 'var(--ink-3)' }}

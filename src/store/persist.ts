@@ -84,5 +84,24 @@ export function loadState(raw: string | null, localZone: string): AppState {
       }
     }
   }
+  // The first shape `recents` shipped in was a bare `number[]`. Normalising is
+  // cheap and keeps whatever the user had; dropping the slice would silently
+  // forget six durations to save four lines.
+  merged.countdown = {
+    ...merged.countdown,
+    recents: (Array.isArray(merged.countdown.recents) ? merged.countdown.recents : [])
+      .map((entry: unknown) =>
+        typeof entry === 'number'
+          ? { label: '', durationMs: entry }
+          : isRecord(entry) && typeof entry.durationMs === 'number'
+            ? {
+                label: typeof entry.label === 'string' ? entry.label : '',
+                durationMs: entry.durationMs,
+              }
+            : null,
+      )
+      .filter((entry): entry is { label: string; durationMs: number } => entry !== null),
+  }
+
   return merged
 }

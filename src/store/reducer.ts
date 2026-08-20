@@ -15,7 +15,7 @@ import {
 import { reanchor } from '../engine/metronome.ts'
 import { makeId } from '../lib/id.ts'
 import type { Action } from './actions.ts'
-import type { AppState, CountdownItem } from './types.ts'
+import type { AppState, CountdownItem, RecentDuration } from './types.ts'
 import { DEFAULT_PRESETS } from './types.ts'
 
 export function defaultState(localZone: string): AppState {
@@ -72,8 +72,27 @@ const clamped = (value: number | undefined, min: number, max: number, fallback: 
 
 /** Newest first, no repeats, six deep — enough to be useful, short enough to scan. */
 const RECENTS = 6
-const rememberDuration = (recents: readonly number[], durationMs: number): number[] =>
-  [durationMs, ...recents.filter((ms) => ms !== durationMs)].slice(0, RECENTS)
+
+/**
+ * Remember a duration, and what it was called.
+ *
+ * Keyed by the duration, so eleven minutes is one chip however many times you
+ * run it. A start with no label keeps the name the chip already had — running
+ * an unnamed eleven minutes should not wipe out "Pasta", and re-running it
+ * with a new name is the only thing that renames it.
+ */
+const rememberDuration = (
+  recents: readonly RecentDuration[],
+  label: string,
+  durationMs: number,
+): RecentDuration[] => {
+  const named = label.trim()
+  const previous = recents.find((recent) => recent.durationMs === durationMs)
+  return [
+    { label: named === '' ? (previous?.label ?? '') : named, durationMs },
+    ...recents.filter((recent) => recent.durationMs !== durationMs),
+  ].slice(0, RECENTS)
+}
 
 const mapMeeting = (
   state: AppState,
@@ -113,7 +132,8 @@ export function reducer(state: AppState, action: Action): AppState {
       if (action.durationMs <= 0) return state
       const timer: CountdownItem = {
         id: makeId(),
-        label: action.label,
+        // The fallback lives here, where it is only ever a display name.
+        label: action.label.trim() === '' ? 'Timer' : action.label.trim(),
         ...start({ totalMs: action.durationMs }, action.now),
       }
       return {
@@ -121,7 +141,7 @@ export function reducer(state: AppState, action: Action): AppState {
         countdown: {
           ...state.countdown,
           timers: [...state.countdown.timers, timer],
-          recents: rememberDuration(state.countdown.recents, action.durationMs),
+          recents: rememberDuration(state.countdown.recents, action.label, action.durationMs),
         },
       }
     }
@@ -169,7 +189,9 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         countdown: {
           ...state.countdown,
-          recents: state.countdown.recents.filter((ms) => ms !== action.durationMs),
+          recents: state.countdown.recents.filter(
+            (recent) => recent.durationMs !== action.durationMs,
+          ),
         },
       }
     case 'countdown/preset/remove':

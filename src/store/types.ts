@@ -4,6 +4,12 @@ import type { MeetingParticipant } from '../engine/meeting.ts'
 
 export type Theme = 'system' | 'light' | 'dark'
 
+/** A duration the user has run, with whatever they called it that time. */
+export interface RecentDuration {
+  label: string
+  durationMs: number
+}
+
 export interface Preset {
   id: string
   label: string
@@ -78,7 +84,7 @@ export interface AppState {
     timers: CountdownItem[]
     presets: Preset[]
     /** Durations recently started, newest first — the pad's memory. */
-    recents: number[]
+    recents: RecentDuration[]
   }
   stopwatch: StopwatchState
   interval: IntervalState

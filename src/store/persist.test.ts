@@ -112,3 +112,43 @@ describe('loadState, against a malformed backup', () => {
     }
   })
 })
+
+describe('recent durations, from an older build', () => {
+  it('carries plain numbers over instead of forgetting them', () => {
+    // The first shape `recents` shipped in was a bare number array.
+    const loaded = loadState(
+      JSON.stringify({
+        countdown: { timers: [], presets: [], recents: [60_000, 180_000] },
+      }),
+      'UTC',
+    )
+    expect(loaded.countdown.recents).toEqual([
+      { label: '', durationMs: 60_000 },
+      { label: '', durationMs: 180_000 },
+    ])
+  })
+
+  it('keeps well-formed entries and drops nonsense, without throwing', () => {
+    const loaded = loadState(
+      JSON.stringify({
+        countdown: {
+          timers: [],
+          presets: [],
+          recents: [{ label: 'Pasta', durationMs: 660_000 }, null, 'nope', { label: 'x' }],
+        },
+      }),
+      'UTC',
+    )
+    expect(loaded.countdown.recents).toEqual([{ label: 'Pasta', durationMs: 660_000 }])
+  })
+
+  it('tolerates the key being absent or the wrong type', () => {
+    for (const recents of [undefined, 'nope', 42]) {
+      const loaded = loadState(
+        JSON.stringify({ countdown: { timers: [], presets: [], recents } }),
+        'UTC',
+      )
+      expect(loaded.countdown.recents).toEqual([])
+    }
+  })
+})

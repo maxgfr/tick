@@ -120,9 +120,9 @@ describe('CountdownView', () => {
     expect(running.getByText('12:00')).toBeTruthy()
     expect(running.getByText('Sourdough')).toBeTruthy()
 
-    // The duration is remembered on its own; there is nothing to save.
+    // Remembered under its own name — which is what replaced "Save preset".
     const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
-    expect(recent.getByRole('button', { name: '12:00' })).toBeTruthy()
+    expect(recent.getByRole('button', { name: 'Sourdough 12:00' })).toBeTruthy()
   })
 
   it('shifts digits in from the right, and shows what they mean', () => {
@@ -265,5 +265,62 @@ describe('pruning a recent duration', () => {
       }),
     )
     expect(screen.queryByRole('region', { name: 'Recent durations' })).toBeNull()
+  })
+})
+
+describe('a remembered duration keeps its name', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  const start = (duration: string, label?: string): void => {
+    fireEvent.change(screen.getByLabelText('Duration'), { target: { value: duration } })
+    if (label !== undefined) {
+      fireEvent.change(screen.getByLabelText('Label'), { target: { value: label } })
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+  }
+
+  it('runs again under its own name, with no save step anywhere', () => {
+    seed()
+    mount()
+
+    start('11:00', 'Pasta')
+    const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
+    fireEvent.click(recent.getByRole('button', { name: 'Pasta 11:00' }))
+
+    const running = within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running.getAllByText('Pasta')).toHaveLength(2)
+  })
+
+  it('lets whatever is typed win over the remembered name', () => {
+    seed()
+    mount()
+
+    start('11:00', 'Pasta')
+    fireEvent.change(screen.getByLabelText('Label'), { target: { value: 'Risotto' } })
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Recent durations' })).getByRole('button', {
+        name: 'Pasta 11:00',
+      }),
+    )
+
+    const running = within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running.getByText('Risotto')).toBeTruthy()
+  })
+
+  it('names the remove button after the chip it removes', () => {
+    seed()
+    mount()
+
+    start('11:00', 'Pasta')
+    const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
+    expect(recent.getByRole('button', { name: 'Forget Pasta 11:00' })).toBeTruthy()
   })
 })

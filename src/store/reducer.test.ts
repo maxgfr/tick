@@ -92,7 +92,10 @@ describe('countdown', () => {
       durationMs: 6 * MIN,
       now: NOW,
     })
-    expect(twice.countdown.recents).toEqual([6 * MIN, 3 * MIN])
+    expect(twice.countdown.recents).toEqual([
+      { label: 'Eggs', durationMs: 6 * MIN },
+      { label: 'Tea', durationMs: 3 * MIN },
+    ])
 
     // Starting the same duration again moves it to the front, never duplicates.
     const again = reducer(twice, {
@@ -101,10 +104,39 @@ describe('countdown', () => {
       durationMs: 3 * MIN,
       now: NOW,
     })
-    expect(again.countdown.recents).toEqual([3 * MIN, 6 * MIN])
+    expect(again.countdown.recents).toEqual([
+      { label: 'Tea', durationMs: 3 * MIN },
+      { label: 'Eggs', durationMs: 6 * MIN },
+    ])
 
     const dropped = reducer(again, { type: 'countdown/recent/remove', durationMs: 3 * MIN })
-    expect(dropped.countdown.recents).toEqual([6 * MIN])
+    expect(dropped.countdown.recents).toEqual([{ label: 'Eggs', durationMs: 6 * MIN }])
+  })
+
+  it('keeps the name a duration already had when it is run unnamed', () => {
+    // Running an unnamed eleven minutes must not wipe out "Pasta".
+    const named = reducer(state(), {
+      type: 'countdown/add',
+      label: 'Pasta',
+      durationMs: 11 * MIN,
+      now: NOW,
+    })
+    const unnamed = reducer(named, {
+      type: 'countdown/add',
+      label: '',
+      durationMs: 11 * MIN,
+      now: NOW,
+    })
+    expect(unnamed.countdown.recents).toEqual([{ label: 'Pasta', durationMs: 11 * MIN }])
+
+    // Running it under a new name is the one thing that renames it.
+    const renamed = reducer(unnamed, {
+      type: 'countdown/add',
+      label: 'Risotto',
+      durationMs: 11 * MIN,
+      now: NOW,
+    })
+    expect(renamed.countdown.recents).toEqual([{ label: 'Risotto', durationMs: 11 * MIN }])
   })
 
   it('keeps only the last six durations', () => {
@@ -117,7 +149,9 @@ describe('countdown', () => {
         now: NOW,
       })
     }
-    expect(next.countdown.recents).toEqual([9, 8, 7, 6, 5, 4].map((m) => m * MIN))
+    expect(next.countdown.recents.map((recent) => recent.durationMs)).toEqual(
+      [9, 8, 7, 6, 5, 4].map((m) => m * MIN),
+    )
   })
 
   it('refuses to add a zero-duration timer', () => {

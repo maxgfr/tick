@@ -91,7 +91,10 @@ export function CountdownView() {
     // start up to a quarter second late.
     // oxlint-disable-next-line react/purity
     const now = Date.now()
-    dispatch({ type: 'countdown/add', label: label.trim() || 'Timer', durationMs, now })
+    // The raw label, not the display fallback: "Timer" is what an unnamed card
+    // is called, never something the user typed, and it has no business being
+    // remembered as a name.
+    dispatch({ type: 'countdown/add', label, durationMs, now })
   }
 
   const resetInputs = (): void => {
@@ -188,13 +191,18 @@ export function CountdownView() {
             Recent
           </h2>
           <ul className="flex flex-wrap gap-2">
-            {countdown.recents.map((durationMs) => (
+            {countdown.recents.map((recent) => (
               <DurationChip
-                key={durationMs}
-                durationMs={durationMs}
-                removeLabel={`Forget ${formatClock(durationMs)}`}
-                onStart={() => startTimer(labelText, durationMs)}
-                onRemove={() => dispatch({ type: 'countdown/recent/remove', durationMs })}
+                key={recent.durationMs}
+                label={recent.label === '' ? undefined : recent.label}
+                durationMs={recent.durationMs}
+                removeLabel={`Forget ${recent.label === '' ? '' : `${recent.label} `}${formatClock(recent.durationMs)}`.trim()}
+                // Whatever is typed wins; otherwise the chip runs under its
+                // own name, which is the point of remembering it.
+                onStart={() => startTimer(labelText.trim() || recent.label, recent.durationMs)}
+                onRemove={() =>
+                  dispatch({ type: 'countdown/recent/remove', durationMs: recent.durationMs })
+                }
               />
             ))}
           </ul>
