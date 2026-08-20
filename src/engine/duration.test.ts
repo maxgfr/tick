@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatClock, formatHuman, parseDuration } from './duration.ts'
+import { durationFromDigits, formatClock, formatHuman, parseDuration } from './duration.ts'
 
 const MIN = 60_000
 const HOUR = 3_600_000
@@ -108,5 +108,31 @@ describe('negative durations', () => {
     expect(formatClock(90_000)).toBe('1:30')
     expect(formatClock(3_690_000)).toBe('1:01:30')
     expect(formatHuman(90_000)).toBe('1m 30s')
+  })
+})
+
+describe('durationFromDigits', () => {
+  it('shifts digits in from the right, the way an appliance keypad does', () => {
+    expect(durationFromDigits('')).toBe(0)
+    expect(durationFromDigits('5')).toBe(5_000)
+    expect(durationFromDigits('25')).toBe(25_000)
+    // Three digits are a minute and a half, not a hundred and thirty seconds.
+    expect(durationFromDigits('130')).toBe(90_000)
+    expect(durationFromDigits('2530')).toBe(25 * 60_000 + 30_000)
+    expect(durationFromDigits('13000')).toBe(90 * 60_000)
+    expect(durationFromDigits('123456')).toBe(12 * 3_600_000 + 34 * 60_000 + 56_000)
+  })
+
+  it('carries minutes and seconds above 59 instead of refusing them', () => {
+    // What a microwave does: 90 on the pad is a minute and a half.
+    expect(durationFromDigits('90')).toBe(90_000)
+    expect(durationFromDigits('99')).toBe(99_000)
+    expect(durationFromDigits('9900')).toBe(99 * 60_000)
+  })
+
+  it('ignores anything that is not a digit, and keeps only the last six', () => {
+    expect(durationFromDigits('1:30')).toBe(90_000)
+    expect(durationFromDigits('  12 ')).toBe(12_000)
+    expect(durationFromDigits('9991234567')).toBe(durationFromDigits('234567'))
   })
 })

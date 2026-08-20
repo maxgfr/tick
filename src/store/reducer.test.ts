@@ -279,7 +279,11 @@ describe('alarm ringing bookkeeping', () => {
 describe('whole-state replace and clear', () => {
   it('replaces the state wholesale — the import path', () => {
     const imported = state({
-      countdown: { timers: [], presets: [{ id: 'p1', label: 'Steep', durationMs: 2 * MIN }] },
+      countdown: {
+        timers: [],
+        presets: [{ id: 'p1', label: 'Steep', durationMs: 2 * MIN }],
+        recents: [],
+      },
       world: { zoneIds: ['Asia/Tokyo'] },
     })
     const next = reducer(state(), { type: 'state/replace', state: imported })

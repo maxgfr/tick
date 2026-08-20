@@ -25,6 +25,7 @@ export function defaultState(localZone: string): AppState {
     countdown: {
       timers: [],
       presets: DEFAULT_PRESETS.map((preset, index) => ({ id: `preset-${index}`, ...preset })),
+      recents: [],
     },
     stopwatch: { accumulatedMs: 0, laps: [] },
     interval: {
@@ -69,6 +70,11 @@ const omit = <T extends object, K extends keyof T>(object: T, ...keys: K[]): Omi
 const clamped = (value: number | undefined, min: number, max: number, fallback: number): number =>
   value === undefined || !Number.isFinite(value) ? fallback : Math.min(max, Math.max(min, value))
 
+/** Newest first, no repeats, six deep — enough to be useful, short enough to scan. */
+const RECENTS = 6
+const rememberDuration = (recents: readonly number[], durationMs: number): number[] =>
+  [durationMs, ...recents.filter((ms) => ms !== durationMs)].slice(0, RECENTS)
+
 const mapMeeting = (
   state: AppState,
   fn: (meeting: AppState['meeting']) => AppState['meeting'],
@@ -112,7 +118,11 @@ export function reducer(state: AppState, action: Action): AppState {
       }
       return {
         ...state,
-        countdown: { ...state.countdown, timers: [...state.countdown.timers, timer] },
+        countdown: {
+          ...state.countdown,
+          timers: [...state.countdown.timers, timer],
+          recents: rememberDuration(state.countdown.recents, action.durationMs),
+        },
       }
     }
     case 'countdown/remove':

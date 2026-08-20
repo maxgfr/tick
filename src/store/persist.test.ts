@@ -14,6 +14,7 @@ describe('serialize / loadState round-trip', () => {
       countdown: {
         timers: [{ id: 't1', label: 'Tea', totalMs: 300_000, endAt: 123_456_789 }],
         presets: [],
+        recents: [],
       },
     }
     const loaded = loadState(serialize(state), 'UTC')

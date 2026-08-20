@@ -52,6 +52,31 @@ export function parseDuration(input: string): number | null {
 }
 
 /**
+ * Keypad entry, the way every appliance does it: digits shift in from the
+ * right as seconds, then minutes, then hours. `130` is a minute and a half,
+ * not a hundred and thirty seconds.
+ *
+ * Minutes and seconds above 59 are carried rather than rejected — `90` on the
+ * pad is a minute and a half, which is what a microwave does and what anyone
+ * who has used one expects.
+ */
+export function durationFromDigits(digits: string): number {
+  const clean = digits.replaceAll(/\D/g, '').slice(-6)
+  if (clean === '') return 0
+
+  const take = (from: number, length: number): number => {
+    const end = clean.length - from
+    if (end <= 0) return 0
+    return Number(clean.slice(Math.max(0, end - length), end))
+  }
+
+  const seconds = take(0, 2)
+  const minutes = take(2, 2)
+  const hours = take(4, 2)
+  return (hours * 3600 + minutes * 60 + seconds) * SECOND
+}
+
+/**
  * Countdown readout: "6:30" under an hour, "2:05:00" from an hour up, tenths
  * optional for the stopwatch. Rounds to the nearest displayed unit.
  *

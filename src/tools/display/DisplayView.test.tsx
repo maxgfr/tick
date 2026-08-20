@@ -68,6 +68,7 @@ describe('DisplayView', () => {
       countdown: {
         timers: [timer('Pasta', 11 * MIN), timer('Tea', 30_000)],
         presets: [],
+        recents: [],
       },
     })
     mount()

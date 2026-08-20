@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Button } from '../../components/Button.tsx'
+import { configureAudio, playSignal, unlockAudio } from '../../lib/audio.ts'
 import { downloadJson, readJsonFile } from '../../lib/io.ts'
 import { requestNotificationPermission } from '../../lib/notify.ts'
 import { useDispatch, useStore } from '../../store/context.ts'
@@ -20,10 +21,32 @@ const localZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone
  * can take with you). The whole state exports and imports as one JSON file —
  * the local-first answer to accounts and sync.
  */
+/** A drag fires dozens of events a second; one click per this many is enough. */
+const PREVIEW_MS = 160
+
 export function SettingsView() {
   const state = useStore()
   const { settings } = state
   const dispatch = useDispatch()
+
+  /**
+   * Hear the volume you are setting.
+   *
+   * The store reaches the audio module through an effect, which lands a render
+   * later — so the preview would play at the *previous* level and the slider
+   * would feel a step behind. Setting it here first makes the click the one
+   * you just asked for. Throttled, because a drag fires dozens of events a
+   * second and a machine gun is not feedback.
+   */
+  const lastPreview = useRef(0)
+  const preview = (volume: number): void => {
+    const now = Date.now()
+    if (now - lastPreview.current < PREVIEW_MS) return
+    lastPreview.current = now
+    unlockAudio()
+    configureAudio({ volume })
+    playSignal('beat')
+  }
   const [note, setNote] = useState('')
   const [confirmingClear, setConfirmingClear] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -121,9 +144,11 @@ export function SettingsView() {
             max={1}
             step={0.05}
             value={settings.volume}
-            onChange={(event) =>
-              dispatch({ type: 'settings/set', patch: { volume: Number(event.target.value) } })
-            }
+            onChange={(event) => {
+              const volume = Number(event.target.value)
+              dispatch({ type: 'settings/set', patch: { volume } })
+              preview(volume)
+            }}
             className="w-48"
             style={{ accentColor: 'var(--accent)' }}
           />

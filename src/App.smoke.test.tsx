@@ -55,31 +55,33 @@ describe('every tool, end to end', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
-    expect(screen.getByText('1:30')).toBeTruthy()
+    // Scoped to the card: the recent-durations row shows 1:30 as well now.
+    const running = () => within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running().getByText('1:30')).toBeTruthy()
 
     tick(10_000)
     vi.setSystemTime(NOW + 10_000)
     tick(300)
-    expect(screen.getByText('1:20')).toBeTruthy()
+    expect(running().getByText('1:20')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
     vi.setSystemTime(NOW + 40_000)
     tick(300)
     // Frozen while paused — the whole point of storing a remainder.
-    expect(screen.getByText('1:20')).toBeTruthy()
+    expect(running().getByText('1:20')).toBeTruthy()
 
     // Resuming re-stamps the end from *now* — 80s still to run, from 40s in.
     fireEvent.click(screen.getByRole('button', { name: 'Resume' }))
     vi.setSystemTime(NOW + 50_000)
     tick(300)
-    expect(screen.getByText('1:10')).toBeTruthy()
+    expect(running().getByText('1:10')).toBeTruthy()
   })
 
   it('countdown: a preset starts a timer in one tap', () => {
     render(<App />)
     fireEvent.click(screen.getAllByRole('button', { name: /Tea · green/ })[0]!)
-    // The chip keeps showing its own duration, so the timer's readout makes two.
-    expect(screen.getAllByText('3:00').length).toBeGreaterThan(1)
+    const running = within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running.getByText('3:00')).toBeTruthy()
   })
 
   it('stopwatch: runs, laps, and the lap keeps its own elapsed', async () => {
@@ -224,6 +226,8 @@ describe('every tool, end to end', () => {
 
     render(<App />)
     tick(300)
-    expect(screen.getByText('4:00')).toBeTruthy()
+    expect(
+      within(screen.getByRole('list', { name: 'Running timers' })).getByText('4:00'),
+    ).toBeTruthy()
   })
 })

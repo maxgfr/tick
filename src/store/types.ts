@@ -74,7 +74,12 @@ export interface MeetingState {
 export interface AppState {
   version: 1
   settings: SettingsState
-  countdown: { timers: CountdownItem[]; presets: Preset[] }
+  countdown: {
+    timers: CountdownItem[]
+    presets: Preset[]
+    /** Durations recently started, newest first — the pad's memory. */
+    recents: number[]
+  }
   stopwatch: StopwatchState
   interval: IntervalState
   metronome: MetronomeState

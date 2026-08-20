@@ -69,8 +69,20 @@ export function loadState(raw: string | null, localZone: string): AppState {
     ;(merged as unknown as Record<string, unknown>)[key] = value
   }
 
-  // Settings tolerate missing keys: an older build simply had fewer of them,
-  // and a half-filled settings object must not leave the volume undefined.
-  merged.settings = { ...fallback.settings, ...merged.settings }
+  // Every slice tolerates missing keys: an older build simply had fewer of
+  // them. Without this, adding one field to a slice silently ships
+  // `undefined` to whatever reads it — the whole class of migration bug that
+  // shape-checking above cannot see, because the slice is well-formed for the
+  // version that wrote it.
+  for (const key of Object.keys(fallback) as (keyof AppState)[]) {
+    if (key === 'version') continue
+    const value = merged[key]
+    if (!Array.isArray(value) && typeof value === 'object' && value !== null) {
+      ;(merged as unknown as Record<string, unknown>)[key] = {
+        ...(fallback[key] as object),
+        ...value,
+      }
+    }
+  }
   return merged
 }

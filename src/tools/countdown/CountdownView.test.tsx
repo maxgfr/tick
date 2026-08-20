@@ -87,6 +87,7 @@ describe('CountdownView', () => {
       countdown: {
         timers: [{ id: 'kept', label: 'Laundry', totalMs: 45 * 60_000, endAt: NOW + 40 * 60_000 }],
         presets: defaultState('UTC').countdown.presets,
+        recents: [],
       },
     })
     mount()
@@ -113,5 +114,118 @@ describe('CountdownView', () => {
     expect(
       within(screen.getByRole('list', { name: 'Running timers' })).getByText('12:00'),
     ).toBeTruthy()
+  })
+})
+
+describe('the keypad', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  const press = (name: string): void => {
+    fireEvent.click(
+      within(screen.getByRole('group', { name: 'Duration keypad' })).getByRole('button', { name }),
+    )
+  }
+
+  it('shifts digits in from the right, and shows what they mean', () => {
+    seed()
+    mount()
+
+    press('5')
+    expect(screen.getByLabelText('Duration')).toHaveProperty('value', '5')
+
+    press('2')
+    press('3')
+    press('0')
+    // 5230 reads as 52:30, not five thousand seconds.
+    expect(screen.getByLabelText('Duration')).toHaveProperty('value', '5230')
+    expect(screen.getByText('52:30')).toBeTruthy()
+  })
+
+  it('deletes the last digit and clears the whole entry', () => {
+    seed()
+    mount()
+
+    for (const digit of ['1', '3', '0']) press(digit)
+    expect(screen.getByText('1:30')).toBeTruthy()
+
+    press('Delete last digit')
+    expect(screen.getByLabelText('Duration')).toHaveProperty('value', '13')
+
+    press('Clear')
+    expect(screen.getByLabelText('Duration')).toHaveProperty('value', '')
+    expect(screen.getByText('0:00')).toBeTruthy()
+  })
+
+  it('starts the timer the readout is showing', () => {
+    seed()
+    mount()
+
+    for (const digit of ['2', '0', '0']) press(digit)
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    const running = within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running.getByText('2:00')).toBeTruthy()
+    // The entry resets, ready for the next one.
+    expect(screen.getByLabelText('Duration')).toHaveProperty('value', '')
+  })
+
+  it('still takes a typed duration, units and all', () => {
+    seed()
+    mount()
+
+    fireEvent.change(screen.getByLabelText('Duration'), { target: { value: '2m30s' } })
+    expect(screen.getByText('2:30')).toBeTruthy()
+
+    // A pad tap on top of typed text starts fresh instead of corrupting it.
+    press('7')
+    expect(screen.getByLabelText('Duration')).toHaveProperty('value', '7')
+  })
+})
+
+describe('recent durations', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  it('remembers what you started, newest first and without repeats', () => {
+    seed()
+    mount()
+
+    for (const value of ['1:00', '2:00', '1:00']) {
+      fireEvent.change(screen.getByLabelText('Duration'), { target: { value } })
+      fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    }
+
+    const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
+    const chips = recent.getAllByRole('button').map((node) => node.textContent)
+    expect(chips).toEqual(['1:00', '2:00'])
+  })
+
+  it('starts a timer straight from a recent chip', () => {
+    seed()
+    mount()
+
+    fireEvent.change(screen.getByLabelText('Duration'), { target: { value: '3:00' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
+    fireEvent.click(recent.getByRole('button', { name: '3:00' }))
+
+    const running = within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running.getAllByText('3:00')).toHaveLength(2)
   })
 })

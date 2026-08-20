@@ -13,7 +13,7 @@ your timers.
 
 | Key | Tool            | What it does                                                                                         |
 | --- | --------------- | ---------------------------------------------------------------------------------------------------- |
-| `1` | **Countdown**   | Multiple timers at once, presets (egg, tea, laundry, meeting…), pause/resume, quick-add              |
+| `1` | **Countdown**   | Multiple timers at once, an appliance keypad, recent durations, presets, pause/resume                |
 | `2` | **Stopwatch**   | Laps with deltas, tenth precision                                                                    |
 | `3` | **Interval**    | HIIT / Tabata / EMOM — prepare, work, rest, rounds, cooldown, timeline preview, distinct phase beeps |
 | `4` | **Metronome**   | 20–300 BPM, 1–12 beat measure, accented downbeat, drift-free lookahead scheduling                    |
@@ -32,6 +32,11 @@ tick is a darkroom enlarger timer: the safelight tints every surface, line and
 label, and the luminous figures are the only thing it does not reach. Whatever
 is live prints inverted — that is the whole hierarchy, which is why there is no
 second accent colour. Nothing animates, anywhere.
+
+Setting a timer is a keypad, not a text field: digits shift in from the right,
+so `1` `3` `0` is a minute and a half, and the readout shows what it means
+before anything starts. Typing still works — `1:30`, `2m30s` — for whoever
+would rather. Durations you have used recently sit one tap away.
 
 ## Time that doesn't drift
 

@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useEffect } from 'react'
 import { TickerProvider } from '../../hooks/useNow.tsx'
+import { configureAudio, playSignal } from '../../lib/audio.ts'
 import { downloadJson, readJsonFile } from '../../lib/io.ts'
 import { requestNotificationPermission } from '../../lib/notify.ts'
 import { STORAGE_KEY, serialize } from '../../store/persist.ts'
@@ -11,6 +12,12 @@ import { useStore } from '../../store/context.ts'
 import type { AppState } from '../../store/types.ts'
 import { SettingsView } from './SettingsView.tsx'
 
+vi.mock('../../lib/audio.ts', () => ({
+  playSignal: vi.fn(),
+  unlockAudio: vi.fn(),
+  configureAudio: vi.fn(),
+  audioReady: () => true,
+}))
 vi.mock('../../lib/io.ts', () => ({
   downloadJson: vi.fn(),
   readJsonFile: vi.fn(),
@@ -129,5 +136,32 @@ describe('SettingsView', () => {
     fireEvent.click(screen.getByRole('button', { name: /yes, clear everything/i }))
     expect(seen().countdown.timers).toHaveLength(0)
     expect(seen().countdown.presets).toHaveLength(defaultState('UTC').countdown.presets.length)
+  })
+})
+
+describe('the volume preview', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.clearAllMocks()
+  })
+
+  it('plays at the level you just set, not the one before it', () => {
+    // The store reaches the audio module through an effect, a render later.
+    // Configuring here first is what makes the click match the slider.
+    mount()
+    fireEvent.change(screen.getByLabelText('Volume'), { target: { value: '0.3' } })
+
+    expect(configureAudio).toHaveBeenCalledWith({ volume: 0.3 })
+    expect(playSignal).toHaveBeenCalledWith('beat')
+  })
+
+  it('throttles a drag instead of machine-gunning it', () => {
+    mount()
+    const slider = screen.getByLabelText('Volume')
+    for (const value of ['0.1', '0.2', '0.3', '0.4', '0.5']) {
+      fireEvent.change(slider, { target: { value } })
+    }
+    // Dozens of events a second is not feedback.
+    expect(vi.mocked(playSignal).mock.calls.length).toBeLessThan(3)
   })
 })

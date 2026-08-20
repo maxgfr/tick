@@ -46,8 +46,10 @@ opt-in from an explicit action, wake lock and fullscreen are feature-detected.
 
 ## Capabilities and Constraints
 
-- Countdown: multiple simultaneous timers, presets (egg 6:30/9:30, tea, laundry,
-  meeting…), pause/resume/restart, quick-add.
+- Countdown: multiple simultaneous timers, an appliance-style keypad (digits
+  shift in from the right, with a live readout of what they mean), the last six
+  durations used, presets (egg 6:30/9:30, tea, laundry, meeting…),
+  pause/resume/restart. Typed entry (`1:30`, `2m30s`) still accepted.
 - Stopwatch: laps with deltas, requestAnimationFrame tenths.
 - Interval: prepare/work/rest/rounds/cooldown configs, Tabata/HIIT/EMOM
   defaults, timeline preview, distinct beeps per phase.
