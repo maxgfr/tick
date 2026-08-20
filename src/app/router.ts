@@ -7,9 +7,12 @@ import { useEffect, useState } from 'react'
  * server only ever serves `index.html`, and everything after the `#` never
  * leaves the browser. A router library would add a dependency for flat routes
  * that all follow the same `#/name` shape.
+ *
+ * The countdown is the app's home: it owns the bare `#/` (the landing hash),
+ * and every unknown hash falls back to it. `#/countdown` still parses so old
+ * deep links keep working.
  */
 export type RouteName =
-  | 'home'
   | 'countdown'
   | 'stopwatch'
   | 'interval'
@@ -21,7 +24,6 @@ export type RouteName =
   | 'settings'
 
 export const ROUTES: readonly RouteName[] = [
-  'home',
   'countdown',
   'stopwatch',
   'interval',
@@ -33,11 +35,13 @@ export const ROUTES: readonly RouteName[] = [
   'settings',
 ]
 
-export const routeToHash = (route: RouteName): string => (route === 'home' ? '#/' : `#/${route}`)
+export const LANDING: RouteName = 'countdown'
+
+export const routeToHash = (route: RouteName): string => (route === LANDING ? '#/' : `#/${route}`)
 
 export function parseHash(hash: string): RouteName {
   const head = hash.replace(/^#\/?/, '').split('/')[0] ?? ''
-  return (ROUTES as readonly string[]).includes(head) ? (head as RouteName) : 'home'
+  return (ROUTES as readonly string[]).includes(head) ? (head as RouteName) : LANDING
 }
 
 export function navigate(route: RouteName): void {

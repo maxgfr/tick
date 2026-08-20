@@ -93,7 +93,6 @@ export function IntervalView() {
           }
           elapsedMs={Math.min(elapsed, total)}
           totalMs={total}
-          timeline={timeline}
         />
       )}
 

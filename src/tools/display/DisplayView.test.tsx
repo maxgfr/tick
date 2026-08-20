@@ -47,14 +47,10 @@ const mount = () =>
   )
 
 /**
- * The readout renders its colons in separate spans (they breathe at 1 Hz), so
- * plain getByText cannot match. Assert on the whole readout element instead.
+ * The readout is a FlipReadout: its tiles are aria-hidden and a single
+ * sr-only twin carries the value, so plain getByText matches exactly once.
  */
-const readoutShowing = (text: string) =>
-  screen.getByText(
-    (_, element) =>
-      element !== null && element.classList.contains('tnum') && element.textContent === text,
-  )
+const readoutShowing = (text: string) => screen.getByText(text)
 
 describe('DisplayView', () => {
   beforeEach(() => {

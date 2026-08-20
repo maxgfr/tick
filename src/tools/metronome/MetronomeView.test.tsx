@@ -104,4 +104,29 @@ describe('MetronomeView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
     expect(startMetronome).toHaveBeenLastCalledWith(208, 4, expect.any(Function))
   })
+
+  it('resumes a run found in storage — from now, not from where it left off', () => {
+    // A run started a minute ago (e.g. before a reload): the scheduler must
+    // start fresh at beat 0 with no catch-up burst.
+    seed({ metronome: { bpm: 96, beatsPerBar: 3, runningSince: NOW - 60_000 } })
+    mount()
+
+    expect(startMetronome).toHaveBeenCalledWith(96, 3, expect.any(Function))
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Start' })).toBeNull()
+  })
+
+  it('keeps the run in the store, so leaving the view does not stop it', () => {
+    seed()
+    mount()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    expect(stopMetronome).toHaveBeenCalledTimes(1)
+
+    // Stopping is a store action too — restarting works from the same mount.
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    expect(startMetronome).toHaveBeenCalledTimes(2)
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeTruthy()
+  })
 })

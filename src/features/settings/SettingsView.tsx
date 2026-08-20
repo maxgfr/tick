@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '../../components/Button.tsx'
 import { downloadJson, readJsonFile } from '../../lib/io.ts'
 import { requestNotificationPermission } from '../../lib/notify.ts'
@@ -25,6 +25,8 @@ export function SettingsView() {
   const { settings } = state
   const dispatch = useDispatch()
   const [note, setNote] = useState('')
+  const [confirmingClear, setConfirmingClear] = useState(false)
+  const fileInput = useRef<HTMLInputElement>(null)
 
   const askNotifications = (on: boolean): void => {
     if (!on) {
@@ -76,7 +78,7 @@ export function SettingsView() {
               )?.value
               if (theme !== undefined) dispatch({ type: 'settings/set', patch: { theme } })
             }}
-            className="rounded-md border px-3 py-2"
+            className="rounded-xs border px-3 py-2"
             style={{
               borderColor: 'var(--line)',
               background: 'var(--surface)',
@@ -123,6 +125,7 @@ export function SettingsView() {
               dispatch({ type: 'settings/set', patch: { volume: Number(event.target.value) } })
             }
             className="w-48"
+            style={{ accentColor: 'var(--accent)' }}
           />
         </label>
       </section>
@@ -156,28 +159,36 @@ export function SettingsView() {
         </h2>
         <div className="flex flex-wrap items-center gap-3">
           <Button onClick={() => downloadJson('tick.json', state)}>Export</Button>
-          <label
-            className="cursor-pointer rounded-md border px-4 py-2 text-sm font-medium"
-            style={{ borderColor: 'var(--line)' }}
-          >
-            Import a backup file
-            <input
-              type="file"
-              accept="application/json,.json"
-              onChange={(event) => {
-                importFile(event.target.files?.[0])
-                event.target.value = ''
-              }}
-              className="sr-only"
-            />
-          </label>
-          <Button
-            variant="danger"
-            ariaLabel="Clear all data"
-            onClick={() => dispatch({ type: 'state/clear', localZone: localZone() })}
-          >
-            Clear all data
-          </Button>
+          <Button onClick={() => fileInput.current?.click()}>Import a backup file</Button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            aria-label="Import a backup file"
+            onChange={(event) => {
+              importFile(event.target.files?.[0])
+              event.target.value = ''
+            }}
+            className="sr-only"
+          />
+          {confirmingClear ? (
+            <>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  dispatch({ type: 'state/clear', localZone: localZone() })
+                  setConfirmingClear(false)
+                }}
+              >
+                Yes, clear everything
+              </Button>
+              <Button onClick={() => setConfirmingClear(false)}>Keep my data</Button>
+            </>
+          ) : (
+            <Button variant="danger" onClick={() => setConfirmingClear(true)}>
+              Clear all data
+            </Button>
+          )}
         </div>
       </section>
 

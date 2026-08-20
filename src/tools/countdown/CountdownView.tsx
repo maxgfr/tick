@@ -93,7 +93,7 @@ export function CountdownView() {
           inputMode="text"
           value={durationText}
           onChange={(event) => setDurationText(event.target.value)}
-          className="tnum w-36 rounded-md border px-3 py-2 text-base"
+          className="tnum w-36 rounded-xs border px-3 py-2 text-base"
           style={{ borderColor: 'var(--line)', background: 'var(--surface)', color: 'var(--ink)' }}
         />
         <input
@@ -104,7 +104,7 @@ export function CountdownView() {
           autoComplete="off"
           value={labelText}
           onChange={(event) => setLabelText(event.target.value)}
-          className="min-w-32 flex-1 rounded-md border px-3 py-2 text-base"
+          className="min-w-32 flex-1 rounded-xs border px-3 py-2 text-base"
           style={{ borderColor: 'var(--line)', background: 'var(--surface)', color: 'var(--ink)' }}
         />
         <Button type="submit" variant="primary">
@@ -115,7 +115,11 @@ export function CountdownView() {
         </Button>
       </form>
 
-      <output className="block min-h-5 text-sm" style={{ color: 'var(--accent)' }}>
+      <output
+        aria-live="polite"
+        className="block min-h-5 text-sm"
+        style={{ color: 'var(--accent)' }}
+      >
         {error}
       </output>
 

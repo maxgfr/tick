@@ -10,12 +10,12 @@ import { TickerProvider } from './hooks/useNow.tsx'
 import { toggleFullscreen } from './lib/fullscreen.ts'
 import { useDispatch, useStore } from './store/context.ts'
 import { StoreProvider } from './store/StoreProvider.tsx'
+import { TopBar } from './components/TopBar.tsx'
 import { AlarmWatcher } from './tools/alarm/AlarmWatcher.tsx'
 import { AlarmView } from './tools/alarm/AlarmView.tsx'
 import { CalcView } from './tools/calc/CalcView.tsx'
 import { CountdownView } from './tools/countdown/CountdownView.tsx'
 import { DisplayView } from './tools/display/DisplayView.tsx'
-import { HomeView } from './tools/home/HomeView.tsx'
 import { IntervalView } from './tools/interval/IntervalView.tsx'
 import { MetronomeView } from './tools/metronome/MetronomeView.tsx'
 import { StopwatchView } from './tools/stopwatch/StopwatchView.tsx'
@@ -23,9 +23,9 @@ import { WorldClockView } from './tools/world/WorldClockView.tsx'
 
 /**
  * The shell: store and one shared clock underneath, the routed tool on top.
- * Tools read `now` from the ticker and their slice from the store — neither
- * provider changes shape as tools are added. Global concerns live here and
- * only here: theme, sound settings, keyboard shortcuts, the alarm watcher.
+ * The countdown is the landing screen — the app opens on its main board — and
+ * every other tool hangs off the persistent top bar. Global concerns live here
+ * and only here: theme, sound settings, keyboard shortcuts, the alarm watcher.
  */
 export function App() {
   return (
@@ -73,35 +73,38 @@ function Shell() {
     <>
       {route === 'display' ? (
         <DisplayView />
-      ) : route === 'settings' ? (
-        <ToolPage
-          name="Settings"
-          tagline="Theme, sound, notifications, and your data"
-          content={<SettingsView />}
-        />
-      ) : route !== 'home' ? (
-        <ToolPage
-          route={route}
-          content={
-            route === 'countdown' ? (
-              <CountdownView />
-            ) : route === 'stopwatch' ? (
-              <StopwatchView />
-            ) : route === 'interval' ? (
-              <IntervalView />
-            ) : route === 'metronome' ? (
-              <MetronomeView />
-            ) : route === 'world' ? (
-              <WorldClockView />
-            ) : route === 'calculator' ? (
-              <CalcView />
-            ) : route === 'alarm' ? (
-              <AlarmView />
-            ) : null
-          }
-        />
       ) : (
-        <HomeView />
+        <>
+          <TopBar route={route} />
+          {route === 'settings' ? (
+            <ToolPage
+              name="Settings"
+              tagline="Theme, sound, notifications, and your data"
+              content={<SettingsView />}
+            />
+          ) : (
+            <ToolPage
+              route={route}
+              content={
+                route === 'countdown' ? (
+                  <CountdownView />
+                ) : route === 'stopwatch' ? (
+                  <StopwatchView />
+                ) : route === 'interval' ? (
+                  <IntervalView />
+                ) : route === 'metronome' ? (
+                  <MetronomeView />
+                ) : route === 'world' ? (
+                  <WorldClockView />
+                ) : route === 'calculator' ? (
+                  <CalcView />
+                ) : route === 'alarm' ? (
+                  <AlarmView />
+                ) : null
+              }
+            />
+          )}
+        </>
       )}
       {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
       <AlarmWatcher />
@@ -122,12 +125,11 @@ function ToolPage({
 }) {
   const tool = TOOLS.find((candidate) => candidate.id === route)
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-3xl px-4 pb-16">
+    <main className="mx-auto min-h-[calc(100dvh-3rem)] w-full max-w-3xl px-4 pb-16">
       <header className="pb-2 pt-6">
-        <a href="#/" className="text-sm" style={{ color: 'var(--ink-3)' }}>
-          ← tick
-        </a>
-        <h1 className="text-2xl font-bold">{name ?? tool?.name}</h1>
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wide">
+          {name ?? tool?.name}
+        </h1>
         <p className="text-sm" style={{ color: 'var(--ink-2)' }}>
           {tagline ?? tool?.tagline}
         </p>

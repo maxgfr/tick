@@ -1,75 +1,71 @@
 ---
 name: tick
-description: A warm-black instrument with one amber signal — local-first timer suite.
+description: A departure board for your own time — slate ground, bone tiles, one vermilion signal; local-first timer suite.
 colors:
-  amber-signal: '#ffb224'
-  amber-strong: '#ffc95e'
-  amber-ink: '#1a1409'
-  warm-black: '#161412'
-  warm-surface: '#1e1c19'
-  warm-surface-2: '#292621'
-  warm-ink: '#f0ece3'
-  warm-ink-2: '#a8a294'
-  warm-ink-3: '#767063'
-  warm-line: '#34302a'
-  paper: '#f6f4ef'
-  paper-surface: '#fffefb'
-  paper-surface-2: '#ebe8e0'
-  paper-ink: '#211e18'
-  paper-ink-2: '#5d584d'
-  paper-ink-3: '#8d8779'
-  paper-line: '#ddd9cf'
-  paper-amber: '#f5a623'
-  paper-amber-strong: '#8a5a00'
-  good: '#6fce8b'
-  warn: '#e2b341'
-  selection: '#4d3a12'
+  vermilion: '#ff5a36'
+  vermilion-strong: '#ff7a5c'
+  vermilion-ink: '#1a0d09'
+  slate: '#151b18'
+  slate-surface: '#1c2420'
+  slate-surface-2: '#242e29'
+  bone: '#ede7d9'
+  sage-2: '#a8b0a6'
+  sage-3: '#747d74'
+  slate-line: '#2c3630'
+  tile: '#ece5d3'
+  tile-ink: '#1d231f'
+  seam: '#00000038'
+  selection: '#43211a'
+  paper: '#f0ebde'
+  paper-vermilion: '#e8431f'
+  paper-tile: '#232a26'
 typography:
   readout:
-    fontFamily: "'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
-    fontWeight: 700
-    letterSpacing: 'tight'
-    fontFeature: 'tnum'
-  readout-card:
-    fontFamily: "'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
-    fontSize: '2.25rem'
+    fontFamily: "'IBM Plex Sans Condensed', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif"
     fontWeight: 600
     fontFeature: 'tnum'
+  readout-display:
+    fontFamily: "'IBM Plex Sans Condensed', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif"
+    fontSize: 'clamp(3rem, 16vmin, 7rem)'
+    fontWeight: 600
+    fontFeature: 'tnum'
+  label:
+    fontFamily: "'IBM Plex Sans Condensed', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif"
+    fontSize: '0.875rem'
+    fontWeight: 600
+    letterSpacing: 'wide'
+    textTransform: 'uppercase'
   body:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     fontSize: '16px'
     lineHeight: 1.5
-  label:
-    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: '0.875rem'
-    fontWeight: 500
 rounded:
-  md: '6px'
-  xl: '12px'
+  xs: '2px'
+  cell: '1px'
 spacing:
   sm: '8px'
   md: '16px'
   lg: '24px'
 components:
   button-primary:
-    backgroundColor: '{colors.amber-signal}'
-    textColor: '{colors.amber-ink}'
-    rounded: '{rounded.md}'
+    backgroundColor: '{colors.vermilion}'
+    textColor: '{colors.vermilion-ink}'
+    rounded: '{rounded.xs}'
     padding: '6px 12px'
   button-ghost:
     backgroundColor: 'transparent'
-    textColor: '{colors.warm-ink}'
-    rounded: '{rounded.md}'
+    textColor: '{colors.bone}'
+    rounded: '{rounded.xs}'
     padding: '6px 12px'
   button-danger:
     backgroundColor: 'transparent'
-    textColor: '{colors.warm-ink-3}'
-    rounded: '{rounded.md}'
+    textColor: '{colors.sage-3}'
+    rounded: '{rounded.xs}'
     padding: '6px 12px'
   card-timer:
-    backgroundColor: '{colors.warm-surface}'
-    textColor: '{colors.warm-ink}'
-    rounded: '{rounded.xl}'
+    backgroundColor: '{colors.slate-surface}'
+    textColor: '{colors.bone}'
+    rounded: '{rounded.xs}'
     padding: '16px'
 ---
 
@@ -77,121 +73,130 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Warm-Black Instrument"**
+**Creative North Star: "The Board"**
 
-tick descends from displays that had to be read across a room, in bad light, at
-a glance: darkrooms, split-flap boards, stopwatch dials. The world is that
-instrument turned into an interface — warm black (or warm paper in daylight) as
-the ground, tick marks because instruments mark, numerals in a mono face
-because time is measurement, and exactly one amber signal for whatever is live.
-It refuses the two neighboring defaults: the gradient-ring focus-app dashboard
-and the white minimalist clock clone. There is no glass, no glow, no gradient;
-the dial carries the design and the amber says "running."
+tick descends from the split-flap departure board: rows of tiles that flip to
+their next truth, read from across a station hall by people who cannot stop
+walking. The interface is that board turned inward — time as printed matter.
+Slate-green ground, bone tiles, a condensed grotesque for everything measured,
+and exactly one vermilion signal for whatever is "now". It refuses the two
+neighboring defaults: the gradient-ring focus app and the white minimalist
+clock clone. There is no glass, no glow, no gradient, no circle; the board
+carries the design, and the vermilion says "now".
 
-Density is operational: tool pages are a single centered column of working
-controls, the home is a grid of eight keyed entries, and the fullscreen display
-is one number as large as the viewport allows. The instrument metaphor extends
-to the browser chrome itself — selection, caret, scrollbar and the PWA
-title-bar color all take tokens.
+The app opens straight on the countdowns — there is no home, no landing pitch.
+A slim persistent bar carries the wordmark and the eight tools; every page is
+one centered column of working controls; the fullscreen display is one number
+as large as the viewport allows. Progress is never a bar or a ring: it is a
+row of small tiles filling with vermilion, the board spending itself.
 
 **Key Characteristics:**
 
-- Warm-black ground, one amber signal — amber appears only on what is live,
-  done, or focused, never as decoration.
-- Stopwatch bezels everywhere: 60-tick dials and linear tick rulers are the
-  only progress vocabulary; no bars, no rings without ticks, no fills without
-  marks.
-- Mono numerals with tabular figures — digits hold their columns while the
-  value runs.
+- Slate ground, bone tiles, one vermilion signal — vermilion appears only on
+  what runs, what is done, or what is focused, never as decoration.
+- Tiles are the unit: digits live on tiles, progress is a row of tiles, the
+  metronome's beats are tiles.
+- The condensed grotesque (IBM Plex Sans Condensed) for everything measured
+  or labelled; IBM Plex Sans for everything said.
 - Flat: depth comes from tonal steps (`bg` → `surface` → `surface-2`) and 1px
   lines, never shadows.
-- One authored motion: the breathing colon at 1 Hz on the fullscreen display;
-  nothing else in the app blinks.
+- One authored motion: the mechanical flip of the digit that changes; nothing
+  else in the app moves.
 
 ## Colors
 
-One accent over two warm neutrals — a night set (default identity) and a paper
-set (light theme) — mirrored automatically by `prefers-color-scheme`. Canonical
-values live in `src/components/tokens.css`; dark values below are the signature
-set.
+One signal over one material — a night set (default identity) and a daylight
+set that is the same board with the material inverted — mirrored automatically
+by `prefers-color-scheme`. Canonical values live in
+`src/components/tokens.css`; dark values below are the signature set.
 
 ### Primary
 
-- **Amber Signal** (#ffb224 dark / #f5a623 light): the single live color —
-  running arcs, elapsed ruler ticks, focus outline, done states, the display
-  phase label. Its rarity is the point.
+- **Vermilion** (#ff5a36 dark / #e8431f light): the single "now" color —
+  filled progress tiles, running metronome beats, focus outline, done states,
+  the display phase label. Its rarity is the point.
 
 ### Secondary
 
-- **Amber Strong** (#ffc95e dark / #8a5a00 light): hover/active shift for amber
-  elements where plain amber would lose contrast.
-- **Amber Ink** (#1a1409 dark / #211e18 light): text on amber fills.
+- **Vermilion Strong** (#ff7a5c dark / #c33417 light): hover/active shift for
+  vermilion elements where flat vermilion would lose contrast.
+- **Vermilion Ink** (#1a0d09 dark / #fff6f2 light): text on vermilion fills.
 
 ### Neutral
 
-- **Warm Black** (#161412): page ground, dark theme.
-- **Warm Surface** (#1e1c19): raised cards and panels, dark theme.
-- **Warm Surface 2** (#292621): inactive dial tracks and wells.
-- **Warm Ink** (#f0ece3): primary text, dark theme.
-- **Warm Ink 2** (#a8a294): secondary text, labels, taglines.
-- **Warm Ink 3** (#767063): tertiary text, major ruler ticks, quiet actions.
-- **Warm Line** (#34302a): 1px borders and minor ruler ticks.
-- **Paper set** (#f6f4ef ground, #fffefb surface, #ebe8e0 surface-2, #211e18 /
-  #5d584d / #8d8779 inks, #ddd9cf line): the same roles for the light theme —
-  a paper dial in a daylight kitchen.
+- **Slate** (#151b18): page ground, dark theme — green-blacked, never pure
+  gray, never blue-black.
+- **Slate Surface** (#1c2420): raised cards and panels, dark theme.
+- **Slate Surface 2** (#242e29): wells, empty progress cells, quiet fills.
+- **Bone** (#ede7d9): primary text, dark theme.
+- **Sage 2** (#a8b0a6): secondary text, labels, taglines.
+- **Sage 3** (#747d74): tertiary text, quiet actions (Remove, back-links).
+- **Slate Line** (#2c3630): 1px borders and hairlines.
+- **Tile** (#ece5d3) / **Tile Ink** (#1d231f) / **Seam** (rgba black at 22%):
+  the flap material — a bone plate, its slate glyph, the 1px hinge line
+  across the middle.
+- **Paper set** (#f0ebde ground, #f6f2e7 surface, #e5dfcf surface-2, #1d231f /
+  #5d6660 / #8d948d inks, #d9d2bf line, tile #232a26): the same board in
+  daylight — the material inverts, the roles do not.
 
 ### Named Rules
 
-**The One Signal Rule.** Amber marks exactly one thing per glance: what is
-live, done, or focused. If a second element wants amber, one of them is wrong.
+**The Signal Tile Rule.** Vermilion marks exactly one thing per glance: what
+runs, is done, or is focused. If a second element wants vermilion, one of them
+is wrong.
 
-**The Warm-Only Rule.** Neutrals are warm blacks and warm papers, never pure
-gray and never blue-black. Time instruments glow warm; dashboards go cool.
+**The Inverted Material Rule.** The light theme is the same board with its
+material inverted — paper ground, slate tiles — not a second palette. Roles
+never change sides between themes.
 
 ## Typography
 
-**Display Font:** Spline Sans Mono (self-hosted woff2, weights 500 and 700;
-fallback ui-monospace, SF Mono, Menlo, Consolas)
-**Body Font:** system-ui, -apple-system, Segoe UI, Roboto, sans-serif
+**Display Font:** IBM Plex Sans Condensed (self-hosted woff2, weights 500,
+600, 700; fallback Avenir Next Condensed, Arial Narrow, system-ui)
+**Body Font:** IBM Plex Sans (self-hosted woff2, weights 400 and 500;
+fallback system-ui)
 
-**Character:** one mono face for everything measured, the OS voice for
-everything said. No serif, no second display face — a mono with tabular
-figures is the instrument's prerequisite.
+**Character:** the condensed grotesque of platform signage for everything
+measured or labelled — readouts, headings, buttons, the wordmark — with
+tabular figures as a seat belt; the plain grotesque for sentences. No serif,
+no mono, no second display face.
 
 ### Hierarchy
 
-- **Readout** (700, `clamp(3rem, 16vmin, 7rem)` on the display, `22vmin` for
-  the wall clock; tabular figures): the big numbers — countdown, interval
-  phase, clock.
-- **Card readout** (600, 36px; tabular figures): timer-card readouts and lap
-  columns, via the `.tnum` class.
-- **Title** (700, 24px): tool page headings.
+- **Readout** (600, on tiles; `clamp(3rem, 16vmin, 7rem)` on the display,
+  `clamp(4rem, 22vmin, 10rem)` for the wall clock): the big numbers —
+  countdown, interval phase, clock, laps.
+- **Title** (600, 24px, uppercase, wide tracking): tool page headings.
 - **Body** (400, 16px/1.5): descriptions, forms, settings.
-- **Label** (500, 14px): buttons, taglines, captions; uppercase appears only
-  in display phase labels (READY, WORK, REST, COOL).
+- **Label** (600, 14px, uppercase, wide tracking): buttons, nav links,
+  taglines, phase chips. Uppercase is the norm, carried by CSS
+  `text-transform` so accessible names stay intact.
 
 ### Named Rules
 
-**The Numerals Don't Dance Rule.** Every numeric readout uses the display face
-with tabular figures (`.tnum`). Digits hold their columns while the value runs;
-a proportional figure in a readout is a defect.
+**The Digits Don't Dance Rule.** Every digit sits on its own tile: the tile
+fixes the column, not just `tnum`. A readout too small for tiles (an input, a
+table cell) still uses the condensed face with tabular figures via `.tnum`.
+A running digit column that shifts is a defect, at any size.
 
 ## Layout
 
-Tool pages are a single centered column (`max-w-3xl`, 16px side padding) under
-a header of back-link, name and tagline. The home grid and every list stack
-vertically with 16–24px rhythm. The fullscreen display centers its content in
-the full viewport (`min-h-dvh`) and sizes the readout by `vmin`, so the number,
-not the layout, responds to the screen. Keyboard digits 1–8 jump between tools;
-hash routing keeps deep links (`#/interval`) shareable under the `/tick/` base.
+A slim persistent top bar (48px, sticky) carries the wordmark, the eight
+tools, and Settings; the active tool is underlined 2px in vermilion, derived
+from the parsed route. Tool pages are a single centered column (`max-w-3xl`,
+16px side padding) under a heading and tagline; the fullscreen display has no
+bar at all and sizes its readout by `vmin`, so the number, not the layout,
+responds to the screen. Keyboard digits 1–8 jump between tools; hash routing
+keeps deep links (`#/interval`) shareable under the `/tick/` base, and `#/`
+is the countdown — the app's front door.
 
 ## Elevation & Depth
 
-Flat by design — no shadows anywhere in the app. Depth is tonal: page ground →
-surface (cards) → surface-2 (tracks and wells), each step one warm tone darker
-(or lighter on paper), and separation is carried by 1px lines. The amber focus
-outline (2px, 2px offset) is the only thing allowed to sit "on top" of a
-surface.
+Flat by design — no shadows anywhere in the app. Depth is tonal: page ground
+→ surface (cards) → surface-2 (wells and empty cells), each step one tone
+over, and separation is carried by 1px lines. The vermilion focus outline
+(2px, 2px offset) is the only thing allowed to sit "on top" of a surface;
+the flap's seam is a line, not a shadow.
 
 ### Named Rules
 
@@ -201,12 +206,12 @@ raised.
 
 ## Shapes
 
-Corners are quiet: 12px on cards and containers, 6px on buttons and controls.
-The geometry that identifies the system is not rounded rectangles but
-instruments — circles (the dial: a 60-tick bezel, one in five ticks tall,
-around an amber arc) and linear tick rulers (minor tick every 2.5%, major every
-10%, an amber twin layer clipped to the elapsed fraction). Both are marked,
-not filled: elapsed time is drawn in amber ticks over a ticked track.
+Corners are nearly sharp: 2px (`rounded-xs`) on cards, buttons, inputs,
+tiles; 1px on progress cells. The geometry that identifies the system is the
+tile — a plate taller than wide (0.84em × 1.3em) with a 1px seam across its
+middle — and its miniature, the 8px progress cell. Zero circles: no rings, no
+dials, no rounded-full. The board is rectilinear; anything round reads as a
+different machine.
 
 ## Components
 
@@ -214,63 +219,78 @@ Every component is quiet until it is live.
 
 ### Buttons
 
-- **Shape:** 6px radius, `6px 12px` padding, 14px/500 label.
-- **Primary:** amber fill, amber-ink text — the one loud button per view
-  (Start).
-- **Ghost (default):** transparent, 1px line border, ink text.
-- **Danger:** borderless, ink-3 text (Remove) — quiet enough to sit in a card
-  row, distinguishable by label and position.
-- **Hover/Focus:** color transitions only; focus is the 2px amber outline.
+- **Shape:** 2px radius, `6px 12px` padding (sm) or `10px 20px` (lg),
+  14px/600 uppercase label in the condensed face.
+- **Primary:** vermilion fill, vermilion-ink text — the one loud button per
+  view (Start, Dismiss).
+- **Ghost (default):** transparent, 1px line border, bone text.
+- **Danger:** borderless, sage-3 text (Remove) — quiet enough to sit in a
+  card row, distinguishable by label and position.
+- **Hover/Focus:** color transitions only; focus is the 2px vermilion
+  outline.
+
+### Chips
+
+- **Style:** presets and day toggles are `surface` chips with a 1px line
+  border, 2px radius, 13px/500.
+- **State:** selected takes bone-on-slate inversion (or vermilion when it
+  means "running"); never a fill that competes with the signal.
 
 ### Cards / Containers
 
-- **Corner Style:** 12px radius.
-- **Background:** `surface` over the `bg` ground, 1px `line` border; the border
-  turns amber when the card's timer is done.
+- **Corner Style:** 2px radius.
+- **Background:** `surface` over the `bg` ground, 1px `line` border; the
+  border and readout turn vermilion when the card's timer is done.
 - **Shadow Strategy:** none (The Flat Rule).
 - **Internal Padding:** 16px.
 
 ### Inputs / Fields
 
-- **Style:** `surface` fill, 1px `line` border, 6px radius, body type.
-- **Focus:** amber caret (global) + 2px amber outline.
-- **Numeric fields:** readouts and time inputs use `.tnum`.
+- **Style:** `surface` fill, 1px `line` border, 2px radius, body type.
+- **Focus:** vermilion caret (global) + 2px vermilion outline.
+- **Numeric fields:** durations and times use `.tnum`; errors surface in an
+  `aria-live` region, never only in color.
 
 ### Navigation
 
-Home is the hub: a grid of tool entries, each showing its mono digit key.
-Pages carry a "← tick" text link (14px, ink-3) above the title. No persistent
-chrome — the app is one tool at a time with the keyboard as the real nav.
+The top bar is the whole nav: wordmark to `#/`, then the eight tools and
+Settings as uppercase condensed links (48px row, horizontally scrollable on
+narrow screens). `aria-current="page"` underlines the active link 2px in
+vermilion. The fullscreen display drops the bar — its only way back is the
+"← tick" link. The keyboard is the real nav (digits 1–8, `?` for help).
 
-### Dial (signature)
+### FlipReadout (signature)
 
-An SVG stopwatch bezel: sixty ticks, every fifth full-height and darker,
-inscribing a track (`surface-2`) with one amber arc for progress, rotated from
-twelve o'clock. Used at 72px on cards and 384px on the display; always sits
-next to a text readout carrying the same information (aria-hidden).
+The readout: each character on its own bone tile with the hinge seam; `:` and
+`.` are bare separators in the same voice. The visible row is `aria-hidden`
+and paired with one `sr-only` twin carrying the whole string, so screens
+readers hear "1:00", not "one colon zero zero". When the value changes, only
+the tiles whose character changed remount (keyed remount) and flip.
 
-### Tick ruler (signature)
+### TileRow (signature)
 
-A 12px linear bezel in one element (`.tick-ruler`): minor ticks every 2.5%
-(bottom half), majors every 10%, and an amber twin layer clipped by
-`--progress` via `clip-path: inset(0 calc((1 - var(--progress)) * 100%) 0 0)`.
-The elapsed fraction of a timer card, in the instrument's own material.
+Progress as a row of small tiles: `cells` 8px cells at 1px radius, 2px apart,
+empty cells in `surface-2`, filled cells in vermilion, `filled` rounded to
+the nearest whole tile. Used for countdown cards (24 cells), interval phases,
+and the display. Never a bar, never a ring — the unit is the tile.
 
-### Live clock (signature)
+### Named Rules
 
-Readouts on the fullscreen display split their colons into `.tick-live-sep`
-spans that breathe at 1 Hz (`steps(1, end)`, 1 → 0.35 → 1). The one authored
-motion in the app; `prefers-reduced-motion: reduce` turns it off.
+**The One Motion Rule.** The flap flip (`flap-turn`, 260ms, `steps(6, end)` —
+a half-turn through 90°, quantized like a motor stepping through its cams) is
+the only animation in the app. Everything else changes by state-color
+transition. `prefers-reduced-motion: reduce` turns the flip into an instant
+change; no motion is ever load-bearing.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** use amber for live, done, and focused — and nothing else (The One
-  Signal Rule).
-- **Do** set every numeric readout in `.tnum` (The Numerals Don't Dance Rule).
-- **Do** express progress with dials and tick rulers — marks drawn over a
-  ticked track.
+- **Do** use vermilion for running, done, and focused — and nothing else
+  (The Signal Tile Rule).
+- **Do** put every running digit on a tile, or at minimum in `.tnum` (The
+  Digits Don't Dance Rule).
+- **Do** express progress as a TileRow — tiles filling with vermilion.
 - **Do** pull every color, font, and radius from `src/components/tokens.css`;
   the browser chrome (selection, caret, scrollbar, title bar) takes the same
   tokens.
@@ -283,10 +303,11 @@ motion in the app; `prefers-reduced-motion: reduce` turns it off.
 - **Don't** add shadows, gradients, glass, or glow (The Flat Rule).
 - **Don't** introduce a second accent color, a cool/gray neutral, or a pure
   white.
-- **Don't** add a progress bar, an unmarked ring, or a plain fill where a tick
-  ruler or dial belongs.
-- **Don't** animate anything beyond the breathing colon and state-color
-  transitions.
-- **Don't** use a proportional (non-tabular) figure in a running readout.
+- **Don't** add a progress bar, an arc, a ring, or a dial — or any circle at
+  all — where a TileRow belongs.
+- **Don't** animate anything beyond the flap flip and state-color transitions
+  (The One Motion Rule).
+- **Don't** use a proportional (non-tabular) figure in a running readout, or
+  a mono face: the condensed grotesque is the voice.
 - **Don't** load a font or asset from a network origin — assets are
   self-hosted, and the privacy gate fails the build otherwise.

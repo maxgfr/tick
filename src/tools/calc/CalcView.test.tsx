@@ -64,6 +64,30 @@ describe('CalcView', () => {
     expect(writeClipboard).toHaveBeenCalledWith('2:00:00')
   })
 
+  it('confirms the copy, then reverts on the next keystroke', () => {
+    render(
+      <StoreProvider>
+        <TickerProvider>
+          <CalcView />
+        </TickerProvider>
+      </StoreProvider>,
+    )
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Expression' }), {
+      target: { value: '2h' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeTruthy()
+
+    // Typing again replaces the confirmation — no timer to fight the user.
+    // (Still a valid expression, so the result row stays put.)
+    fireEvent.change(screen.getByRole('textbox', { name: 'Expression' }), {
+      target: { value: '2h5m' },
+    })
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Copied' })).toBeNull()
+  })
+
   it('explains what it could not parse', () => {
     render(
       <StoreProvider>

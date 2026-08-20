@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Button } from '../../components/Button.tsx'
+import { FlipReadout } from '../../components/FlipReadout.tsx'
 import { evaluateDuration } from '../../engine/calc.ts'
 import { formatClock, formatHuman } from '../../engine/duration.ts'
 
@@ -11,6 +12,7 @@ const EXAMPLES = ['25m + 5m', '1:30 + 45m - 20s', '1h - 20m', '1h30m - 15m']
  */
 export function CalcView() {
   const [expression, setExpression] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const { ms, error } = useMemo(() => {
     const trimmed = expression.trim()
@@ -25,6 +27,7 @@ export function CalcView() {
   const copy = (): void => {
     if (ms === null) return
     void navigator.clipboard?.writeText(formatClock(ms, { forceHours: true })).catch(() => {})
+    setCopied(true)
   }
 
   return (
@@ -37,8 +40,11 @@ export function CalcView() {
           autoComplete="off"
           spellCheck={false}
           placeholder="1:30 + 45m - 20s"
-          onChange={(event) => setExpression(event.target.value)}
-          className="tnum rounded-md border px-3 py-2 font-mono text-lg"
+          onChange={(event) => {
+            setExpression(event.target.value)
+            setCopied(false)
+          }}
+          className="tnum rounded-xs border px-3 py-2 text-lg"
           style={{ borderColor: 'var(--line)', background: 'var(--surface)', color: 'var(--ink)' }}
         />
       </label>
@@ -51,25 +57,33 @@ export function CalcView() {
         {error}
       </output>
 
-      {ms !== null && (
-        <section className="flex flex-col items-center gap-2 py-4" aria-label="Result">
-          <p className="tnum text-6xl font-semibold tracking-tight" style={{ color: 'var(--ink)' }}>
-            {formatClock(ms)}
-          </p>
-          <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
-            {formatHuman(ms)} · {ms.toLocaleString('en-US')} ms
-          </p>
-          <Button onClick={copy}>Copy</Button>
-        </section>
-      )}
-
+      {/* Examples sit above the result so picking one never shifts the
+          readout they are about to change. */}
       <div className="flex flex-wrap gap-2" aria-label="Examples">
         {EXAMPLES.map((example) => (
-          <Button key={example} onClick={() => setExpression(example)}>
+          <Button
+            key={example}
+            onClick={() => {
+              setExpression(example)
+              setCopied(false)
+            }}
+          >
             {example}
           </Button>
         ))}
       </div>
+
+      {ms !== null && (
+        <section className="flex flex-col items-center gap-2 py-4" aria-label="Result">
+          <p className="text-6xl" style={{ color: 'var(--ink)' }}>
+            <FlipReadout text={formatClock(ms)} />
+          </p>
+          <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
+            {formatHuman(ms)} · {ms.toLocaleString('en-US')} ms
+          </p>
+          <Button onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button>
+        </section>
+      )}
     </div>
   )
 }

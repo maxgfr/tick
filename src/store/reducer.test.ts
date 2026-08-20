@@ -147,6 +147,29 @@ describe('metronome, world clock, alarms, settings', () => {
     expect(next.metronome).toEqual({ bpm: 144, beatsPerBar: 3 })
   })
 
+  it('keeps a run in the store: start, no double-start, stop clears the key', () => {
+    const started = reducer(state(), { type: 'metronome/start', now: NOW })
+    expect(started.metronome.runningSince).toBe(NOW)
+
+    // A second start while running changes nothing — not even the reference.
+    const again = reducer(started, { type: 'metronome/start', now: NOW + 5_000 })
+    expect(again).toBe(started)
+
+    const stopped = reducer(started, { type: 'metronome/stop' })
+    expect('runningSince' in stopped.metronome).toBe(false)
+    expect(stopped.metronome.bpm).toBe(started.metronome.bpm)
+  })
+
+  it('a tempo edit survives a running metronome, and a stop never adds the key', () => {
+    const started = reducer(state(), { type: 'metronome/start', now: NOW })
+    const retuned = reducer(started, { type: 'metronome/set', bpm: 208 })
+    expect(retuned.metronome).toEqual({ bpm: 208, beatsPerBar: 4, runningSince: NOW })
+
+    const stopped = reducer(retuned, { type: 'metronome/stop' })
+    const edited = reducer(stopped, { type: 'metronome/set', bpm: 96 })
+    expect('runningSince' in edited.metronome).toBe(false)
+  })
+
   it('adds and removes world zones without duplicates', () => {
     const withParis = reducer(state(), { type: 'world/add', zoneId: 'Europe/Paris' })
     const doubled = reducer(withParis, { type: 'world/add', zoneId: 'Europe/Paris' })

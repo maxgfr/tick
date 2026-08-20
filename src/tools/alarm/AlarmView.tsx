@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from '../../components/Button.tsx'
+import { FlipReadout } from '../../components/FlipReadout.tsx'
 import { lastTrigger, nextTrigger } from '../../engine/alarm.ts'
 import { formatClock } from '../../engine/duration.ts'
 import { useNow } from '../../hooks/useNow.tsx'
@@ -12,6 +13,7 @@ const TIME = /^([01]?\d|2[0-3]):([0-5]\d)$/
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const CATCH_UP_MS = 15 * 60_000
 const MISSED_WINDOW_MS = 24 * 60 * 60_000
+const BAD_TIME = "Couldn't read that time — use 24-hour HH:MM, like 07:30."
 
 /**
  * Alarms: a wall-clock time, the days it may ring, and nothing else. The
@@ -24,10 +26,15 @@ export function AlarmView() {
   const now = useNow()
 
   const [timeText, setTimeText] = useState('07:00')
+  const [timeError, setTimeError] = useState('')
   const [permissionNote, setPermissionNote] = useState('')
 
   const add = (): void => {
-    if (!TIME.test(timeText)) return
+    if (!TIME.test(timeText)) {
+      setTimeError(BAD_TIME)
+      return
+    }
+    setTimeError('')
     dispatch({ type: 'alarm/add', time: timeText })
   }
 
@@ -59,8 +66,11 @@ export function AlarmView() {
             inputMode="numeric"
             autoComplete="off"
             placeholder="07:30"
-            onChange={(event) => setTimeText(event.target.value)}
-            className="tnum w-24 rounded-md border px-3 py-2 text-lg"
+            onChange={(event) => {
+              setTimeText(event.target.value)
+              setTimeError('')
+            }}
+            className="tnum w-24 rounded-xs border px-3 py-2 text-lg"
             style={{
               borderColor: 'var(--line)',
               background: 'var(--surface)',
@@ -72,6 +82,14 @@ export function AlarmView() {
           Add alarm
         </Button>
       </form>
+
+      <output
+        aria-live="polite"
+        className="block min-h-5 text-sm"
+        style={{ color: 'var(--accent)' }}
+      >
+        {timeError}
+      </output>
 
       <ul className="flex flex-col gap-3" aria-label="Alarms">
         {alarms.alarms.map((alarm) => (
@@ -120,15 +138,15 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
 
   return (
     <li
-      className="flex flex-wrap items-center gap-4 rounded-xl border p-4"
-      style={{ borderColor: 'var(--line)', background: 'var(--surface)' }}
+      className="flex flex-wrap items-center gap-4 rounded-xs border p-4"
+      style={{
+        borderColor: alarm.enabled ? 'var(--line)' : 'transparent',
+        background: 'var(--surface)',
+      }}
       aria-label={`Alarm ${alarm.time}`}
     >
-      <p
-        className="tnum text-3xl font-semibold"
-        style={{ color: alarm.enabled ? 'var(--ink)' : 'var(--ink-3)' }}
-      >
-        {alarm.time}
+      <p className="text-3xl" style={{ opacity: alarm.enabled ? 1 : 0.45 }}>
+        <FlipReadout text={alarm.time} />
       </p>
 
       <fieldset className="flex gap-1">
@@ -139,7 +157,7 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
             type="button"
             aria-pressed={alarm.days.includes(day)}
             onClick={() => toggleDay(day)}
-            className="rounded-md border px-2 py-1 text-xs font-medium"
+            className="rounded-xs border px-2 py-1 text-xs font-medium"
             style={{
               borderColor: alarm.days.includes(day) ? 'var(--accent)' : 'var(--line)',
               color: alarm.days.includes(day) ? 'var(--accent)' : 'var(--ink-3)',
@@ -153,7 +171,7 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
       <div className="ml-auto flex items-center gap-3">
         {missed && (
           <span
-            className="rounded-full px-2 py-0.5 text-xs font-medium"
+            className="font-display rounded-xs px-2 py-0.5 text-xs font-semibold uppercase tracking-wide"
             style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
           >
             Missed

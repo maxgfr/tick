@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { Dial } from '../../components/Dial.tsx'
+import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { TileRow } from '../../components/TileRow.tsx'
 import { formatClock, formatHuman } from '../../engine/duration.ts'
 import { isDone, progress, remainingMs } from '../../engine/countdown.ts'
 import { useNow } from '../../hooks/useNow.tsx'
@@ -9,10 +10,11 @@ import { fireNotification } from '../../lib/notify.ts'
 import { useDispatch, useStore } from '../../store/context.ts'
 
 /**
- * One countdown. Everything on screen — readout, ring, buttons — is derived
- * from `now` on each tick; the card holds no time of its own. The completion
- * side effects fire on the derived done-transition, so a throttled background
- * tab beeps exactly once when it catches up, never once per skipped tick.
+ * One countdown. Everything on screen — readout, tile row, buttons — is
+ * derived from `now` on each tick; the card holds no time of its own. The
+ * completion side effects fire on the derived done-transition, so a throttled
+ * background tab beeps exactly once when it catches up, never once per
+ * skipped tick.
  */
 export function TimerCard({ id }: { id: string }) {
   const now = useNow()
@@ -42,7 +44,7 @@ export function TimerCard({ id }: { id: string }) {
 
   return (
     <li
-      className="flex flex-col gap-3 rounded-xl border p-4"
+      className="flex flex-col gap-3 rounded-xs border p-4"
       style={{
         borderColor: done ? 'var(--accent)' : 'var(--line)',
         background: 'var(--surface)',
@@ -50,16 +52,15 @@ export function TimerCard({ id }: { id: string }) {
       aria-label={`Timer ${timer.label}`}
     >
       <div className="flex items-center gap-4">
-        <Dial progress={progress(timer, now)} size={72} stroke={5} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium" style={{ color: 'var(--ink-2)' }}>
+          <p
+            className="font-display truncate text-sm font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--ink-2)' }}
+          >
             {timer.label}
           </p>
-          <p
-            className="tnum text-4xl font-semibold tracking-tight"
-            style={{ color: done ? 'var(--accent)' : 'var(--ink)' }}
-          >
-            {formatClock(remaining)}
+          <p className="py-1 text-4xl" style={{ color: done ? 'var(--accent)' : 'var(--ink)' }}>
+            <FlipReadout text={formatClock(remaining)} />
           </p>
           {done && (
             <p className="text-xs" style={{ color: 'var(--ink-3)' }}>
@@ -99,10 +100,7 @@ export function TimerCard({ id }: { id: string }) {
           </Button>
         </div>
       </div>
-      <div
-        className="tick-ruler"
-        style={{ '--progress': String(progress(timer, now)) } as React.CSSProperties}
-      />
+      <TileRow cells={24} filled={progress(timer, now) * 24} className="w-full" />
     </li>
   )
 }

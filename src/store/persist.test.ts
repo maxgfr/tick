@@ -19,6 +19,15 @@ describe('serialize / loadState round-trip', () => {
     const loaded = loadState(serialize(state), 'UTC')
     expect(loaded.countdown.timers[0]).toMatchObject({ endAt: 123_456_789, label: 'Tea' })
   })
+
+  it('round-trips a metronome run — the pulse survives the reload', () => {
+    const state = {
+      ...defaultState('UTC'),
+      metronome: { bpm: 120, beatsPerBar: 4, runningSince: 123_456_789 },
+    }
+    const loaded = loadState(serialize(state), 'UTC')
+    expect(loaded.metronome).toEqual({ bpm: 120, beatsPerBar: 4, runningSince: 123_456_789 })
+  })
 })
 
 describe('loadState resilience', () => {

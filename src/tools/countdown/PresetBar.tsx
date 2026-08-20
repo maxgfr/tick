@@ -20,8 +20,8 @@ export function PresetBar({ presets, onStart, onRemove }: PresetBarProps) {
       {presets.map((preset) => (
         <li
           key={preset.id}
-          className="flex items-center overflow-hidden rounded-full border"
-          style={{ borderColor: 'var(--line)' }}
+          className="flex items-center overflow-hidden rounded-xs border"
+          style={{ borderColor: 'var(--line)', background: 'var(--surface)' }}
         >
           <button
             type="button"

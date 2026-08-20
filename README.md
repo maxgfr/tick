@@ -3,7 +3,8 @@
 A local-first timer suite, entirely in the browser: multiple simultaneous
 countdowns with presets, a stopwatch with laps, HIIT/Tabata/EMOM intervals, a
 metronome, a world clock, a duration calculator, alarms and a big fullscreen
-display. No account, no server, no tracking.
+display. No account, no server, no tracking. It opens straight on your
+countdowns — no home screen between you and your timers.
 
 **→ [maxgfr.github.io/tick](https://maxgfr.github.io/tick/)**
 
@@ -20,8 +21,10 @@ display. No account, no server, no tracking.
 | `7` | **Alarm**       | Time + weekdays, 5-minute snooze, fullscreen ringing overlay, missed alarms flagged                       |
 | `8` | **Display**     | Fullscreen across-the-room view — picks its own source: soonest countdown, running interval, or the clock |
 
-Global keys: `?` shortcuts, `M` mute, `F` fullscreen. Every readout uses tabular
-figures so digits hold their columns while the value runs.
+Global keys: `?` shortcuts, `M` mute, `F` fullscreen. Readouts are a
+departure board: each digit on its own tile, and when a value changes, only
+the changed tiles flip — the one motion in the app. Progress is a row of
+tiles filling with vermilion, never a bar or a ring.
 
 ## Time that doesn't drift
 
@@ -42,8 +45,8 @@ tick is private by architecture, not by policy:
 - **No accounts, no analytics, no cookies, no tracking** of any kind.
 - **Your data stays on your machine** — `localStorage` on your device, moved
   only if you export it yourself.
-- **Fonts are self-hosted** (Spline Sans Mono, OFL); no CDN, no font
-  telemetry, no third-party anything.
+- **Fonts are self-hosted** (IBM Plex Sans Condensed and IBM Plex Sans, OFL);
+  no CDN, no font telemetry, no third-party anything.
 
 ## Offline
 
@@ -60,10 +63,11 @@ pnpm dev
 ```
 
 Vite + React 19 + TypeScript (strict) + Tailwind 4 + vite-plugin-pwa, tested
-with Vitest (161 tests), linted with oxlint, formatted with Prettier. Time
+with Vitest (182 tests), linted with oxlint, formatted with Prettier. Time
 logic lives in `src/engine/` as pure, fully tested functions — no React, no
 DOM.
 
 ## License
 
-[MIT](LICENSE) · Spline Sans Mono under [OFL](src/assets/fonts/NOTICE.md).
+[MIT](LICENSE) · IBM Plex Sans Condensed & IBM Plex Sans under
+[OFL](src/assets/fonts/NOTICE.md).

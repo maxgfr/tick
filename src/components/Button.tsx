@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 type Variant = 'primary' | 'ghost' | 'danger'
+type Size = 'sm' | 'lg'
 
 const STYLES: Record<Variant, string> = {
   primary: 'bg-[var(--accent)] text-[var(--accent-ink)]',
@@ -8,10 +9,16 @@ const STYLES: Record<Variant, string> = {
   danger: 'bg-transparent text-[var(--ink-3)] border border-transparent',
 }
 
+const SIZES: Record<Size, string> = {
+  sm: 'px-3 py-1.5 text-sm',
+  lg: 'px-5 py-2.5 text-base',
+}
+
 interface ButtonProps {
   children: ReactNode
   onClick?: () => void
   variant?: Variant
+  size?: Size
   type?: 'button' | 'submit'
   title?: string
   /** Overrides the accessible name when the visible content is an icon. */
@@ -20,11 +27,15 @@ interface ButtonProps {
   className?: string
 }
 
-/** The one button in the app — variant is a tone, not a component family. */
+/**
+ * The one button in the app — variant is a tone, size is a scale. Labels set
+ * in the condensed face, uppercase, like the board's own controls.
+ */
 export function Button({
   children,
   onClick,
   variant = 'ghost',
+  size = 'sm',
   type = 'button',
   title,
   ariaLabel,
@@ -38,7 +49,7 @@ export function Button({
       title={title}
       aria-label={ariaLabel}
       disabled={disabled}
-      className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40 ${STYLES[variant]} ${className}`}
+      className={`font-display rounded-xs px-3 py-1.5 text-sm font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${SIZES[size]} ${STYLES[variant]} ${className}`}
     >
       {children}
     </button>

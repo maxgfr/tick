@@ -3,87 +3,116 @@
 /*
   tick — design tokens.
 
-  The world: a warm-black instrument with one amber signal. Timers descend
-  from darkrooms, split-flap boards and stopwatch dials — displays that had to
-  be read across a room, in bad light, at a glance. That is the whole system:
-  warm paper or warm night as the ground, one amber signal for whatever is
-  running, numerals in a mono face because time is measurement, and tick
-  marks because instruments mark. No gradients, no glass, no glow — the dial
-  carries the design, the amber says "live".
+  The world: a departure board. Time is printed matter — slate-green ground,
+  bone tiles, one vermilion signal. Numerals live on tiles with a center seam,
+  progress is a row of small tiles filling with vermilion, and the only motion
+  in the app is the mechanical flip of a changing digit. No gradients, no
+  glass, no glow, no circles: the board carries the design, the vermilion says
+  "now".
 */
 
-/* Display numerals: Spline Sans Mono, self-hosted (see assets/fonts/NOTICE.md). */
+/* Numerals and headings: IBM Plex Sans Condensed, self-hosted (see
+   assets/fonts/NOTICE.md). Body: IBM Plex Sans. */
 @font-face {
-  font-family: 'Spline Sans Mono';
+  font-family: 'IBM Plex Sans Condensed';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('../assets/fonts/spline-sans-mono-500.woff2') format('woff2');
+  src: url('../assets/fonts/plex-condensed-500.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Spline Sans Mono';
+  font-family: 'IBM Plex Sans Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/plex-condensed-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans Condensed';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../assets/fonts/spline-sans-mono-700.woff2') format('woff2');
+  src: url('../assets/fonts/plex-condensed-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/plex-sans-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/plex-sans-500.woff2') format('woff2');
+}
+
+/* Registered as theme fonts so `font-display` / `font-ui` utilities exist. */
+@theme {
+  --font-display:
+    'IBM Plex Sans Condensed', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-ui: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 :root {
-  --font-display: 'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-
-  /* Light: a paper dial in a daylight kitchen. */
-  --bg: #f6f4ef;
-  --surface: #fffefb;
-  --surface-2: #ebe8e0;
-  --ink: #211e18;
-  --ink-2: #5d584d;
-  --ink-3: #8d8779;
-  --line: #ddd9cf;
-  --accent: #f5a623;
-  --accent-strong: #8a5a00;
-  --accent-ink: #211e18;
-  --good: #2f7d3f;
-  --warn: #9a6700;
-  --selection: #f5d9a0;
+  /* Light: the board seen in daylight — paper ground, slate tiles. */
+  --bg: #f0ebde;
+  --surface: #f6f2e7;
+  --surface-2: #e5dfcf;
+  --ink: #1d231f;
+  --ink-2: #5d6660;
+  --ink-3: #8d948d;
+  --line: #d9d2bf;
+  --accent: #e8431f;
+  --accent-strong: #c33417;
+  --accent-ink: #fff6f2;
+  --selection: #f3c9bd;
+  --tile: #232a26;
+  --tile-ink: #ece5d3;
+  --seam: #ffffff30;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* Dark: the night kitchen, the gym, the darkroom. Warm, never blue. */
-  --bg: #161412;
-  --surface: #1e1c19;
-  --surface-2: #292621;
-  --ink: #f0ece3;
-  --ink-2: #a8a294;
-  --ink-3: #767063;
-  --line: #34302a;
-  --accent: #ffb224;
-  --accent-strong: #ffc95e;
-  --accent-ink: #1a1409;
-  --good: #6fce8b;
-  --warn: #e2b341;
-  --selection: #4d3a12;
+  /* Dark: the board at night — slate-green ground, bone tiles. The signature
+     set. */
+  --bg: #151b18;
+  --surface: #1c2420;
+  --surface-2: #242e29;
+  --ink: #ede7d9;
+  --ink-2: #a8b0a6;
+  --ink-3: #747d74;
+  --line: #2c3630;
+  --accent: #ff5a36;
+  --accent-strong: #ff7a5c;
+  --accent-ink: #1a0d09;
+  --selection: #43211a;
+  --tile: #ece5d3;
+  --tile-ink: #1d231f;
+  --seam: #00000038;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
 
-    --bg: #161412;
-    --surface: #1e1c19;
-    --surface-2: #292621;
-    --ink: #f0ece3;
-    --ink-2: #a8a294;
-    --ink-3: #767063;
-    --line: #34302a;
-    --accent: #ffb224;
-    --accent-strong: #ffc95e;
-    --accent-ink: #1a1409;
-    --good: #6fce8b;
-    --warn: #e2b341;
-    --selection: #4d3a12;
+    --bg: #151b18;
+    --surface: #1c2420;
+    --surface-2: #242e29;
+    --ink: #ede7d9;
+    --ink-2: #a8b0a6;
+    --ink-3: #747d74;
+    --line: #2c3630;
+    --accent: #ff5a36;
+    --accent-strong: #ff7a5c;
+    --accent-ink: #1a0d09;
+    --selection: #43211a;
+    --tile: #ece5d3;
+    --tile-ink: #1d231f;
+    --seam: #00000038;
   }
 }
 
@@ -99,7 +128,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Browser surfaces belong to the system too: selection, caret, scrollbar. */
+/* Browser surfaces belong to the board too: selection, caret, scrollbar. */
 ::selection {
   background: var(--selection);
 }
@@ -123,8 +152,8 @@ button {
 
 /*
   Numerals that don't dance. Every readout in the app — clocks, laps, BPM,
-  offsets — uses the display face with tabular figures, so digits hold their
-  columns while the value runs.
+  offsets — uses the condensed face with tabular figures, and most live on
+  tiles that fix the column outright.
 */
 .tnum {
   font-family: var(--font-display);
@@ -133,67 +162,89 @@ button {
 }
 
 /*
-  The tick ruler: a stopwatch bezel in one element. Minor ticks every 2.5%
-  (half-height, bottom-aligned), a major tick every 10% (full height). The
-  amber fill is a full-width twin of the tick layers clipped to the elapsed
-  fraction, so its ticks always align with the track's. The instrument's own
-  material, used as its gauge.
+  The flap: one tile of the board. Bone plate, ink digit, a 1px seam across
+  the middle where the two halves meet. Width is a fraction of the em so a
+  readout scales as one voice; the fixed box is what keeps columns steady.
 */
-.tick-ruler {
-  --progress: 0;
+.flip-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.09em;
+}
+.flap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.84em;
+  height: 1.3em;
+  background: var(--tile);
+  color: var(--tile-ink);
+  border-radius: 2px;
   position: relative;
-  height: 12px;
-  /* Minor ticks: one per 2.5%, bottom half of the strip. */
-  background-image: linear-gradient(to right, var(--line) 0 1px, transparent 1px);
-  background-size: calc(100% / 40) 50%;
-  background-position: left bottom;
-  background-repeat: repeat-x;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1;
 }
-.tick-ruler::before {
+.flap::after {
   content: '';
   position: absolute;
-  inset: 0;
-  /* Major ticks: one per 10%, full height. */
-  background-image: linear-gradient(to right, var(--ink-3) 0 1px, transparent 1px);
-  background-size: calc(100% / 10) 100%;
-  background-repeat: repeat-x;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--seam);
 }
-.tick-ruler::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, var(--accent) 0 1px, transparent 1px),
-    linear-gradient(to right, var(--accent) 0 1px, transparent 1px);
-  background-size:
-    calc(100% / 40) 50%,
-    calc(100% / 10) 100%;
-  background-position:
-    left bottom,
-    left top;
-  background-repeat: repeat-x;
-  clip-path: inset(0 calc((1 - var(--progress)) * 100%) 0 0);
+.flip-sep {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1;
+  color: inherit;
 }
 
 /*
-  The authored moment: on the fullscreen display, the colon breathes at 1 Hz
-  while something runs — the app ticks. Reduced-motion users get a steady
-  readout; nothing else in the app blinks.
+  The authored moment: the digit that changes, flips. Remounted tiles replay
+  this animation — a half-turn through 90°, quantized in six frames like a
+  motor stepping through its cams. It is the only motion in the app;
+  reduced-motion users get an instant change instead.
 */
-@keyframes tick-breathe {
-  0%,
-  100% {
-    opacity: 1;
+@keyframes flap-turn {
+  0% {
+    transform: perspective(0.6em) rotateX(0deg);
+    filter: brightness(1);
   }
   50% {
-    opacity: 0.35;
+    transform: perspective(0.6em) rotateX(-90deg);
+    filter: brightness(0.55);
+  }
+  100% {
+    transform: perspective(0.6em) rotateX(0deg);
+    filter: brightness(1);
   }
 }
-.tick-live-sep {
-  animation: tick-breathe 1s steps(1, end) infinite;
+.flap-turn {
+  animation: flap-turn 260ms steps(6, end) both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .tick-live-sep {
+  .flap-turn {
     animation: none;
   }
+}
+
+/*
+  The tile row: progress as a row of small tiles. Empty cells are track,
+  filled cells are vermilion — the board filling up as time is spent. Never a
+  bar, never a ring: the unit is the tile.
+*/
+.tile-row {
+  display: flex;
+  gap: 2px;
+}
+.tile-cell {
+  flex: 1 1 0;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--surface-2);
+}
+.tile-cell[data-on='true'] {
+  background: var(--accent);
 }

@@ -6,16 +6,18 @@ import { useDispatch, useStore } from '../../store/context.ts'
 
 /**
  * The metronome. The pulse is scheduled on the audio clock a lookahead
- * ahead of time — the DOM only animates what the scheduler already played,
- * so the visual and the click never drift apart.
+ * ahead of time — the DOM only marks what the scheduler already played, so
+ * the visual and the click never drift apart. The run lives in the store,
+ * like every other run in the app: leave the view, reload the page — the
+ * beat resumes from now, never from where it left off.
  */
 export function MetronomeView() {
   const { metronome } = useStore()
   const dispatch = useDispatch()
   useNow() // the shared clock keeps this view in step with the rest of the app
 
-  const [running, setRunning] = useState(false)
   const [beat, setBeat] = useState<number | null>(null)
+  const running = metronome.runningSince !== undefined
 
   useEffect(() => {
     const unlock = (): void => unlockAudio()
@@ -24,7 +26,8 @@ export function MetronomeView() {
   }, [])
 
   // One scheduler per run; tempo edits restart it cleanly, and stopping or
-  // unmounting always tears it down.
+  // unmounting always tears it down. A run found in storage (a reload) starts
+  // from now — the scheduler has no notion of catch-up.
   const stopRef = useRef<(() => void) | null>(null)
   useEffect(() => {
     if (!running) return
@@ -32,26 +35,24 @@ export function MetronomeView() {
     return () => {
       stopRef.current?.()
       stopRef.current = null
+      setBeat(null)
     }
   }, [running, metronome.bpm, metronome.beatsPerBar])
-
-  const stop = (): void => {
-    setRunning(false)
-    setBeat(null)
-  }
 
   const activeBeat = beat === null ? null : beat % metronome.beatsPerBar
 
   return (
     <div className="flex flex-col items-center gap-8 py-4">
-      <div className="flex items-end gap-3" aria-hidden="false">
+      <div className="flex items-end gap-2" aria-hidden="false">
         {Array.from({ length: metronome.beatsPerBar }, (_, index) => (
+          // The bar is a fixed row of slots: the index is the slot.
+          // oxlint-disable-next-line react/no-array-index-key
           <span
             key={index}
             aria-label={`Beat ${index + 1}`}
             data-active={String(index === activeBeat)}
             data-accent={String(index === 0)}
-            className="h-8 w-8 rounded-full border-2 transition-transform"
+            className="h-12 w-8 rounded-xs border"
             style={{
               borderColor: index === 0 ? 'var(--accent)' : 'var(--line)',
               background:
@@ -60,7 +61,6 @@ export function MetronomeView() {
                     ? 'var(--accent)'
                     : 'var(--ink)'
                   : 'transparent',
-              transform: index === activeBeat ? 'scale(1.25)' : 'scale(1)',
             }}
           />
         ))}
@@ -71,11 +71,14 @@ export function MetronomeView() {
       </p>
 
       {running ? (
-        <Button variant="primary" onClick={stop}>
+        <Button variant="primary" onClick={() => dispatch({ type: 'metronome/stop' })}>
           Stop
         </Button>
       ) : (
-        <Button variant="primary" onClick={() => setRunning(true)}>
+        <Button
+          variant="primary"
+          onClick={() => dispatch({ type: 'metronome/start', now: Date.now() })}
+        >
           Start
         </Button>
       )}
@@ -89,6 +92,7 @@ export function MetronomeView() {
             min={20}
             max={300}
             value={metronome.bpm}
+            style={{ accentColor: 'var(--accent)' }}
             onChange={(event) =>
               dispatch({ type: 'metronome/set', bpm: Number.parseInt(event.target.value, 10) })
             }

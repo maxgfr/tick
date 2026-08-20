@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { Button } from '../../components/Button.tsx'
+import { FlipReadout } from '../../components/FlipReadout.tsx'
 import { lastTrigger } from '../../engine/alarm.ts'
 import { useNow } from '../../hooks/useNow.tsx'
 import { playSignal, unlockAudio } from '../../lib/audio.ts'
@@ -75,29 +77,25 @@ export function AlarmWatcher() {
       className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6"
       style={{ background: 'var(--surface)', color: 'var(--ink)' }}
     >
-      <p className="text-2xl" style={{ color: 'var(--ink-3)' }}>
-        ⏰ tick · alarm
+      <p
+        className="font-display text-2xl font-semibold uppercase tracking-wide"
+        style={{ color: 'var(--ink-3)' }}
+      >
+        tick · alarm
       </p>
-      <p className="tnum text-8xl font-bold tracking-tight" style={{ color: 'var(--accent)' }}>
-        {ringing.time}
+      <p className="text-8xl" style={{ color: 'var(--accent)' }}>
+        <FlipReadout text={ringing.time} />
       </p>
       <div className="flex gap-3">
-        <button
-          type="button"
+        <Button
+          size="lg"
           onClick={() => setSnooze({ id: ringing.id, wakeAt: Date.now() + SNOOZE_MS })}
-          className="rounded-md border px-5 py-2.5 text-base font-medium"
-          style={{ borderColor: 'var(--line)' }}
         >
           Snooze 5 min
-        </button>
-        <button
-          type="button"
-          onClick={dismiss}
-          className="rounded-md px-5 py-2.5 text-base font-medium"
-          style={{ background: 'var(--accent)', color: 'var(--accent-ink)' }}
-        >
+        </Button>
+        <Button size="lg" variant="primary" onClick={dismiss}>
           Dismiss
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -45,6 +45,8 @@ export interface IntervalState {
 export interface MetronomeState {
   bpm: number
   beatsPerBar: number
+  /** Absent while stopped. A reload resumes from now — never catches up. */
+  runningSince?: number
 }
 
 export interface SettingsState {

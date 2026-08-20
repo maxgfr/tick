@@ -55,6 +55,23 @@ describe('AlarmView', () => {
     expect(screen.getByText('07:30')).toBeTruthy()
   })
 
+  it('refuses a malformed time out loud instead of ignoring the tap', () => {
+    seed()
+    mount()
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Time' }), { target: { value: '25:99' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add alarm' }))
+
+    expect(screen.getByText(/couldn't read that time/i)).toBeTruthy()
+    expect(screen.queryByRole('listitem')).toBeNull()
+
+    // A corrected time clears the complaint and adds the alarm.
+    fireEvent.change(screen.getByRole('textbox', { name: 'Time' }), { target: { value: '07:30' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add alarm' }))
+    expect(screen.queryByText(/couldn't read that time/i)).toBeNull()
+    expect(screen.getByText('07:30')).toBeTruthy()
+  })
+
   it('toggles and removes alarms', () => {
     seed({
       alarms: { alarms: [{ id: 'a1', time: '07:30', days: [], enabled: true, lastRangAt: 0 }] },

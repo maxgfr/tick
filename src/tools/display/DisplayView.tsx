@@ -1,5 +1,6 @@
-import { Fragment } from 'react'
-import { Dial } from '../../components/Dial.tsx'
+import { Button } from '../../components/Button.tsx'
+import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { TileRow } from '../../components/TileRow.tsx'
 import { progress as countdownProgress, remainingMs } from '../../engine/countdown.ts'
 import { formatClock } from '../../engine/duration.ts'
 import { buildTimeline, phaseAt } from '../../engine/intervals.ts'
@@ -21,7 +22,7 @@ const PHASE_LABEL: Record<Phase['kind'], string> = {
  * The across-the-room view. It picks its own source — whatever is most
  * urgent right now — so walking over to the big screen never means choosing
  * a screen: the soonest countdown wins, then a running workout, then the
- * clock.
+ * clock. The board is the display: giant tiles, a row filling underneath.
  */
 export function DisplayView() {
   const { countdown, interval } = useStore()
@@ -37,7 +38,8 @@ export function DisplayView() {
     interval.pausedElapsedMs ?? (interval.startedAt !== undefined ? now - interval.startedAt : 0)
   const active = interval.startedAt !== undefined || interval.pausedElapsedMs !== undefined
   const timeline = buildTimeline(interval.config)
-  const phase = active && elapsed < timeline.at(-1)!.endMs ? phaseAt(timeline, elapsed) : null
+  const totalMs = timeline.at(-1)!.endMs
+  const phase = active && elapsed < totalMs ? phaseAt(timeline, elapsed) : null
 
   return (
     <section
@@ -46,48 +48,47 @@ export function DisplayView() {
     >
       {timer !== undefined ? (
         <>
-          <p className="text-2xl" style={{ color: 'var(--ink-2)' }}>
+          <p
+            className="font-display text-2xl font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--ink-2)' }}
+          >
             {timer.label}
           </p>
-          <div className="relative flex items-center justify-center">
-            <Dial progress={countdownProgress(timer, now)} size={384} stroke={10} />
-            <p
-              className="tnum absolute font-bold tracking-tight"
-              style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}
-            >
-              <LiveClock text={formatClock(remainingMs(timer, now))} />
-            </p>
-          </div>
+          <p
+            className="text-center"
+            style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}
+          >
+            <FlipReadout text={formatClock(remainingMs(timer, now))} />
+          </p>
+          <TileRow
+            cells={24}
+            filled={countdownProgress(timer, now) * 24}
+            className="w-full max-w-xl"
+          />
         </>
       ) : phase !== null ? (
         <>
-          <p className="text-2xl font-semibold tracking-wide" style={{ color: 'var(--accent)' }}>
+          <p
+            className="font-display text-2xl font-semibold uppercase tracking-wide"
+            style={{ color: 'var(--accent)' }}
+          >
             {PHASE_LABEL[phase.kind]}
             {phase.round > 0 && ` · Round ${phase.round} of ${interval.config.rounds}`}
           </p>
-          <p
-            className="tnum font-bold tracking-tight"
-            style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}
-          >
-            <LiveClock text={formatClock(phase.endMs - elapsed)} />
+          <p style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}>
+            <FlipReadout text={formatClock(phase.endMs - elapsed)} />
           </p>
+          <TileRow cells={24} filled={(elapsed / totalMs) * 24} className="w-full max-w-xl" />
         </>
       ) : (
         <WallClock now={now} />
       )}
 
       <div className="flex gap-3 pt-4">
-        <button
-          type="button"
-          onClick={() => toggleFullscreen()}
-          className="rounded-md border px-4 py-2 text-sm font-medium"
-          style={{ borderColor: 'var(--line)' }}
-        >
-          Fullscreen (F)
-        </button>
+        <Button onClick={() => toggleFullscreen()}>Fullscreen (F)</Button>
         <a
           href="#/"
-          className="rounded-md px-4 py-2 text-sm font-medium"
+          className="font-display flex items-center px-3 py-1.5 text-sm font-semibold uppercase tracking-wide"
           style={{ color: 'var(--ink-3)' }}
         >
           ← tick
@@ -100,34 +101,10 @@ export function DisplayView() {
 function WallClock({ now }: { now: number }) {
   const parts = zonedParts(Intl.DateTimeFormat().resolvedOptions().timeZone, new Date(now))
   return (
-    <p
-      className="tnum font-bold tracking-tight"
-      style={{ fontSize: 'clamp(4rem, 22vmin, 10rem)', color: 'var(--ink)' }}
-    >
-      <LiveClock
+    <p style={{ fontSize: 'clamp(4rem, 22vmin, 10rem)', color: 'var(--ink)' }}>
+      <FlipReadout
         text={`${String(parts.hour).padStart(2, '0')}:${String(parts.minute).padStart(2, '0')}`}
       />
     </p>
-  )
-}
-
-/**
- * The authored moment of this view: the colons breathe at 1 Hz. It is the
- * one blink in the app — the readout proves it is alive without moving a
- * digit, and reduced-motion users simply get a steady clock.
- */
-function LiveClock({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(':').map((part, index) => (
-        // The list is positional by construction (clock groups never reorder),
-        // and parts can repeat (22:22) — position is the only stable identity.
-        // oxlint-disable-next-line react/no-array-index-key
-        <Fragment key={`${part}-${index}`}>
-          {index > 0 && <span className="tick-live-sep">:</span>}
-          {part}
-        </Fragment>
-      ))}
-    </>
   )
 }

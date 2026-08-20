@@ -108,9 +108,25 @@ describe('SettingsView', () => {
     })
   })
 
-  it('clears everything back to defaults', () => {
+  it('clears everything back to defaults, but only after an explicit confirm', () => {
+    const withTimer = defaultState('UTC')
+    withTimer.countdown.timers = [
+      { id: 't1', label: 'Tea', totalMs: 60_000, endAt: Date.now() + 60_000 },
+    ]
+    localStorage.setItem(STORAGE_KEY, serialize(withTimer))
     mount()
+
+    // The first tap only asks — the data is still there.
     fireEvent.click(screen.getByRole('button', { name: /clear/i }))
+    expect(seen().countdown.timers).toHaveLength(1)
+
+    // Backing out keeps everything.
+    fireEvent.click(screen.getByRole('button', { name: /keep my data/i }))
+    fireEvent.click(screen.getByRole('button', { name: /clear/i }))
+    expect(seen().countdown.timers).toHaveLength(1)
+
+    // Confirming wipes to defaults.
+    fireEvent.click(screen.getByRole('button', { name: /yes, clear everything/i }))
     expect(seen().countdown.timers).toHaveLength(0)
     expect(seen().countdown.presets).toHaveLength(defaultState('UTC').countdown.presets.length)
   })

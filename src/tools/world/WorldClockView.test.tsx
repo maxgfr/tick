@@ -59,6 +59,14 @@ describe('WorldClockView', () => {
     vi.clearAllMocks()
   })
 
+  it('welcomes an empty board with something to do, not a blank column', () => {
+    seed({ world: { zoneIds: [] } })
+    mount()
+
+    expect(screen.getByText(/no clocks yet/i)).toBeTruthy()
+    expect(screen.queryByRole('listitem')).toBeNull()
+  })
+
   it('lists the restored zones with their local time and day or night', () => {
     seed({ world: { zoneIds: ['UTC', 'Europe/Paris', 'Asia/Tokyo'] } })
     mount()

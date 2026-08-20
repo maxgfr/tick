@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Button } from '../../components/Button.tsx'
+import { FlipReadout } from '../../components/FlipReadout.tsx'
 import { CURATED_ZONES, offsetMs, zonedParts } from '../../engine/timezones.ts'
 import { useNow } from '../../hooks/useNow.tsx'
 import { useDispatch, useStore } from '../../store/context.ts'
@@ -57,7 +58,7 @@ export function WorldClockView() {
         <select
           value={pickerValue}
           onChange={(event) => add(event.target.value)}
-          className="max-w-xs rounded-md border px-3 py-2"
+          className="max-w-xs rounded-xs border px-3 py-2"
           style={{ borderColor: 'var(--line)', background: 'var(--surface)', color: 'var(--ink)' }}
         >
           <option value="">Choose a city…</option>
@@ -84,7 +85,7 @@ export function WorldClockView() {
           return (
             <li
               key={zoneId}
-              className="flex items-center gap-4 rounded-xl border p-4"
+              className="flex items-center gap-4 rounded-xs border p-4"
               style={{ borderColor: 'var(--line)', background: 'var(--surface)' }}
             >
               <span title={isDay ? 'Daytime' : 'Night'} className="text-xl" aria-hidden="true">
@@ -98,8 +99,8 @@ export function WorldClockView() {
                   {zoneId} · {offsetLabel(delta)}
                 </p>
               </div>
-              <p className="tnum text-3xl font-semibold" style={{ color: 'var(--ink)' }}>
-                {time}
+              <p className="text-3xl" style={{ color: 'var(--ink)' }}>
+                <FlipReadout text={time} />
               </p>
               <div className="flex shrink-0 gap-1">
                 <Button
@@ -131,6 +132,12 @@ export function WorldClockView() {
           )
         })}
       </ul>
+
+      {world.zoneIds.length === 0 && (
+        <p className="py-8 text-center text-sm" style={{ color: 'var(--ink-3)' }}>
+          No clocks yet — add a city above and it stays, across reloads.
+        </p>
+      )}
     </div>
   )
 }

@@ -172,13 +172,20 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, interval: { config: state.interval.config } }
 
     case 'metronome/set':
+      // Spread, not rebuild: a tempo edit must not stop a running pulse.
       return {
         ...state,
         metronome: {
+          ...state.metronome,
           bpm: action.bpm ?? state.metronome.bpm,
           beatsPerBar: action.beatsPerBar ?? state.metronome.beatsPerBar,
         },
       }
+    case 'metronome/start':
+      if (state.metronome.runningSince !== undefined) return state
+      return { ...state, metronome: { ...state.metronome, runningSince: action.now } }
+    case 'metronome/stop':
+      return { ...state, metronome: omit(state.metronome, 'runningSince') }
 
     case 'world/add':
       return state.world.zoneIds.includes(action.zoneId)

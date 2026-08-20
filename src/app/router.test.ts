@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { parseHash, routeToHash } from './router.ts'
+import { ROUTES, parseHash, routeToHash } from './router.ts'
 
 describe('parseHash', () => {
-  it('lands on home for empty and bare hashes', () => {
-    expect(parseHash('')).toBe('home')
-    expect(parseHash('#')).toBe('home')
-    expect(parseHash('#/')).toBe('home')
+  it('lands on countdown for empty and bare hashes', () => {
+    expect(parseHash('')).toBe('countdown')
+    expect(parseHash('#')).toBe('countdown')
+    expect(parseHash('#/')).toBe('countdown')
   })
 
   it('reads each tool route', () => {
@@ -20,32 +20,21 @@ describe('parseHash', () => {
     expect(parseHash('#/settings')).toBe('settings')
   })
 
-  it('falls back to home for unknown routes and noise', () => {
-    expect(parseHash('#/nonsense')).toBe('home')
+  it('falls back to countdown for unknown routes and noise', () => {
+    expect(parseHash('#/nonsense')).toBe('countdown')
     expect(parseHash('#/countdown/extra/segments')).toBe('countdown')
-    expect(parseHash('#garbage')).toBe('home')
+    expect(parseHash('#garbage')).toBe('countdown')
   })
 })
 
 describe('routeToHash', () => {
   it('round-trips every route', () => {
-    for (const route of [
-      'home',
-      'countdown',
-      'stopwatch',
-      'interval',
-      'metronome',
-      'world',
-      'calculator',
-      'alarm',
-      'display',
-      'settings',
-    ] as const) {
+    for (const route of ROUTES) {
       expect(parseHash(routeToHash(route))).toBe(route)
     }
   })
 
-  it('uses the bare hash for home', () => {
-    expect(routeToHash('home')).toBe('#/')
+  it("uses the bare hash for the countdown, the app's landing screen", () => {
+    expect(routeToHash('countdown')).toBe('#/')
   })
 })
