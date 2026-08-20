@@ -66,6 +66,63 @@ export function offsetMs(timeZone: string, date: Date): number {
   return Math.round((asUTC - date.getTime()) / 60_000) * 60_000
 }
 
+/**
+ * The inverse of `zonedParts`: the instant at which a zone's wall clock reads
+ * these parts.
+ *
+ * Two passes, because the offset you need is the offset *at the answer*, not
+ * at the guess. Guess by treating the wall clock as UTC, subtract the offset
+ * there, then re-read the offset at that instant and correct once if the
+ * first guess landed on the other side of a transition.
+ *
+ * Around a DST change the wall clock is not a bijection, so the edges are
+ * defined rather than left to chance: in a spring-forward gap (a local time
+ * that never happens) this returns the first instant at or after it, and in a
+ * fall-back overlap (a local time that happens twice) it returns the earlier.
+ */
+export function zonedTimeToInstant(
+  timeZone: string,
+  parts: { year: number; month: number; day: number; hour?: number; minute?: number },
+): number {
+  const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour ?? 0, parts.minute ?? 0)
+
+  // Probe half a day either side, so both offsets in play around a transition
+  // are on the table. Correcting a single guess cannot find the *first* of two
+  // identical wall clocks: both passes converge on the offset after the change.
+  const HALF_DAY = 12 * 3_600_000
+  const candidates = [
+    asUTC - offsetMs(timeZone, new Date(asUTC - HALF_DAY)),
+    asUTC - offsetMs(timeZone, new Date(asUTC + HALF_DAY)),
+  ]
+
+  const reads = (instant: number): boolean => {
+    const back = zonedParts(timeZone, new Date(instant))
+    return (
+      back.year === parts.year &&
+      back.month === parts.month &&
+      back.day === parts.day &&
+      back.hour === (parts.hour ?? 0) &&
+      back.minute === (parts.minute ?? 0)
+    )
+  }
+
+  const valid = candidates.filter(reads)
+  // An overlap has two answers — take the earlier, the first time the clock
+  // reads this. A gap has none: the wall clock never happens, so return the
+  // instant just past the jump rather than a time that does not exist.
+  return valid.length > 0 ? Math.min(...valid) : Math.max(...candidates)
+}
+
+/** True when the zone id is one the platform's timezone tables recognise. */
+export function isKnownZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone })
+    return true
+  } catch {
+    return false
+  }
+}
+
 export interface ZoneOption {
   id: string
   city: string

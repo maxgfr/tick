@@ -298,3 +298,116 @@ describe('whole-state replace and clear', () => {
     expect(cleared).toEqual(defaultState('Europe/Paris'))
   })
 })
+
+describe('meeting', () => {
+  it('seeds one participant in the local zone', () => {
+    const seeded = defaultState('Europe/Paris')
+    expect(seeded.meeting.participants).toHaveLength(1)
+    expect(seeded.meeting.participants[0]?.zoneId).toBe('Europe/Paris')
+    expect(seeded.meeting.durationMin).toBe(30)
+  })
+
+  it('two default states are comparable — the seeded id is a literal', () => {
+    // `persist` fills a missing slice from the defaults and the tests compare
+    // the two; a random uuid here would make that comparison flap.
+    expect(defaultState('UTC').meeting).toEqual(defaultState('UTC').meeting)
+  })
+
+  it('adds and removes participants, and keeps the anchor', () => {
+    const added = reducer(state(), { type: 'meeting/participant/add', zoneId: 'Asia/Tokyo' })
+    expect(added.meeting.participants).toHaveLength(2)
+
+    // Duplicates are fine: two people in one city with different hours.
+    const twice = reducer(added, { type: 'meeting/participant/add', zoneId: 'Asia/Tokyo' })
+    expect(twice.meeting.participants).toHaveLength(3)
+
+    const back = reducer(added, {
+      type: 'meeting/participant/remove',
+      id: added.meeting.participants[1]!.id,
+    })
+    expect(back.meeting.participants).toHaveLength(1)
+
+    // The first participant anchors the grid, so the roster never empties.
+    const emptied = reducer(back, {
+      type: 'meeting/participant/remove',
+      id: back.meeting.participants[0]!.id,
+    })
+    expect(emptied).toBe(back)
+  })
+
+  it('caps the roster', () => {
+    let next = state()
+    for (let index = 0; index < 12; index += 1) {
+      next = reducer(next, { type: 'meeting/participant/add', zoneId: 'UTC' })
+    }
+    expect(next.meeting.participants).toHaveLength(8)
+  })
+
+  it('refuses working hours that run backwards', () => {
+    const id = state().meeting.participants[0]!.id
+    const ok = reducer(state(), {
+      type: 'meeting/participant/hours',
+      id,
+      startMin: 8 * 60,
+      endMin: 16 * 60,
+    })
+    expect(ok.meeting.participants[0]?.startMin).toBe(480)
+
+    const inverted = reducer(ok, {
+      type: 'meeting/participant/hours',
+      id,
+      startMin: 18 * 60,
+      endMin: 9 * 60,
+    })
+    expect(inverted).toBe(ok)
+  })
+
+  it('clamps the duration and reorders participants', () => {
+    expect(
+      reducer(state(), { type: 'meeting/duration', durationMin: 9_000 }).meeting.durationMin,
+    ).toBe(480)
+    expect(reducer(state(), { type: 'meeting/duration', durationMin: 1 }).meeting.durationMin).toBe(
+      5,
+    )
+
+    const two = reducer(state(), { type: 'meeting/participant/add', zoneId: 'Asia/Tokyo' })
+    const moved = reducer(two, {
+      type: 'meeting/participant/move',
+      id: two.meeting.participants[1]!.id,
+      delta: -1,
+    })
+    expect(moved.meeting.participants[0]?.zoneId).toBe('Asia/Tokyo')
+
+    // Off either end is a no-op, not a wrap.
+    expect(
+      reducer(two, {
+        type: 'meeting/participant/move',
+        id: two.meeting.participants[0]!.id,
+        delta: -1,
+      }),
+    ).toBe(two)
+  })
+
+  it('clears the day key rather than storing undefined', () => {
+    const pinned = reducer(state(), { type: 'meeting/day', day: '2026-05-06' })
+    expect(pinned.meeting.day).toBe('2026-05-06')
+
+    const cleared = reducer(pinned, { type: 'meeting/day' })
+    expect('day' in cleared.meeting).toBe(false)
+  })
+
+  it('replaces the roster from a shared link with fresh ids', () => {
+    const shared = reducer(state(), {
+      type: 'meeting/replace',
+      durationMin: 45,
+      participants: [
+        { id: 'shared-0', label: 'Ana', zoneId: 'Europe/Lisbon', startMin: 540, endMin: 1020 },
+        { id: 'shared-1', label: 'Kenji', zoneId: 'Asia/Tokyo', startMin: 600, endMin: 1080 },
+      ],
+    })
+    expect(shared.meeting.participants).toHaveLength(2)
+    expect(shared.meeting.durationMin).toBe(45)
+    expect(shared.meeting.participants[0]?.label).toBe('Ana')
+    expect(shared.meeting.participants[0]?.id).not.toBe('shared-0')
+  })
+})

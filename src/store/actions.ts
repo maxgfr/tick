@@ -1,4 +1,5 @@
 import type { IntervalConfig } from '../engine/intervals.ts'
+import type { MeetingParticipant } from '../engine/meeting.ts'
 import type { AppState, SettingsState, Theme } from './types.ts'
 
 /**
@@ -30,6 +31,15 @@ export type Action =
   | { type: 'world/add'; zoneId: string }
   | { type: 'world/remove'; zoneId: string }
   | { type: 'world/move'; zoneId: string; delta: number }
+  | { type: 'meeting/participant/add'; zoneId: string }
+  | { type: 'meeting/participant/remove'; id: string }
+  | { type: 'meeting/participant/label'; id: string; label: string }
+  | { type: 'meeting/participant/zone'; id: string; zoneId: string }
+  | { type: 'meeting/participant/hours'; id: string; startMin: number; endMin: number }
+  | { type: 'meeting/participant/move'; id: string; delta: number }
+  | { type: 'meeting/duration'; durationMin: number }
+  | { type: 'meeting/day'; day?: string }
+  | { type: 'meeting/replace'; participants: MeetingParticipant[]; durationMin: number }
   | { type: 'alarm/add'; time: string }
   | { type: 'alarm/remove'; id: string }
   | { type: 'alarm/toggle'; id: string }

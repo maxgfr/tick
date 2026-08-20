@@ -37,6 +37,7 @@ const SLICE_GUARDS: Record<Exclude<keyof AppState, 'version'>, (value: unknown) 
   interval: (v) => isRecord(v) && isRecord(v.config),
   metronome: (v) => isRecord(v) && typeof v.bpm === 'number' && typeof v.beatsPerBar === 'number',
   world: (v) => isRecord(v) && Array.isArray(v.zoneIds),
+  meeting: (v) => isRecord(v) && Array.isArray(v.participants) && typeof v.durationMin === 'number',
   alarms: (v) => isRecord(v) && Array.isArray(v.alarms),
 }
 

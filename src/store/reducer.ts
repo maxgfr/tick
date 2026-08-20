@@ -6,6 +6,12 @@
  * background tabs. The reducer is pure: `now` arrives inside the action.
  */
 import { pause, resume, start } from '../engine/countdown.ts'
+import {
+  DEFAULT_END_MIN,
+  DEFAULT_START_MIN,
+  MAX_PARTICIPANTS,
+  type MeetingParticipant,
+} from '../engine/meeting.ts'
 import { reanchor } from '../engine/metronome.ts'
 import { makeId } from '../lib/id.ts'
 import type { Action } from './actions.ts'
@@ -32,6 +38,20 @@ export function defaultState(localZone: string): AppState {
     },
     metronome: { bpm: 100, beatsPerBar: 4 },
     world: { zoneIds: dedupe([localZone, 'UTC']) },
+    meeting: {
+      // A literal id, not `makeId()`: two calls to `defaultState` must be
+      // comparable, which is exactly what the persistence tests do.
+      participants: [
+        {
+          id: 'me',
+          label: '',
+          zoneId: localZone,
+          startMin: DEFAULT_START_MIN,
+          endMin: DEFAULT_END_MIN,
+        },
+      ],
+      durationMin: 30,
+    },
     alarms: { alarms: [] },
   }
 }
@@ -48,6 +68,26 @@ const omit = <T extends object, K extends keyof T>(object: T, ...keys: K[]): Omi
 /** A finite number pulled into range; anything else keeps the old value. */
 const clamped = (value: number | undefined, min: number, max: number, fallback: number): number =>
   value === undefined || !Number.isFinite(value) ? fallback : Math.min(max, Math.max(min, value))
+
+const mapMeeting = (
+  state: AppState,
+  fn: (meeting: AppState['meeting']) => AppState['meeting'],
+) => ({
+  ...state,
+  meeting: fn(state.meeting),
+})
+
+const mapParticipant = (
+  state: AppState,
+  id: string,
+  fn: (participant: MeetingParticipant) => MeetingParticipant,
+): AppState =>
+  mapMeeting(state, (meeting) => ({
+    ...meeting,
+    participants: meeting.participants.map((participant) =>
+      participant.id === id ? fn(participant) : participant,
+    ),
+  }))
 
 const mapTimer = (
   state: AppState,
@@ -203,6 +243,85 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, metronome: { ...state.metronome, runningSince: action.now } }
     case 'metronome/stop':
       return { ...state, metronome: omit(state.metronome, 'runningSince') }
+
+    case 'meeting/participant/add': {
+      // Duplicate zones are allowed, unlike the world clock: two people in one
+      // city with different hours is an ordinary case, not a mistake.
+      if (state.meeting.participants.length >= MAX_PARTICIPANTS) return state
+      return mapMeeting(state, (meeting) => ({
+        ...meeting,
+        participants: [
+          ...meeting.participants,
+          {
+            id: makeId(),
+            label: '',
+            zoneId: action.zoneId,
+            startMin: DEFAULT_START_MIN,
+            endMin: DEFAULT_END_MIN,
+          },
+        ],
+      }))
+    }
+    case 'meeting/participant/remove':
+      // The first participant anchors the grid, so the roster never empties.
+      if (state.meeting.participants.length <= 1) return state
+      return mapMeeting(state, (meeting) => ({
+        ...meeting,
+        participants: meeting.participants.filter((participant) => participant.id !== action.id),
+      }))
+    case 'meeting/participant/label':
+      return mapParticipant(state, action.id, (participant) => ({
+        ...participant,
+        label: action.label.slice(0, 60),
+      }))
+    case 'meeting/participant/zone':
+      return mapParticipant(state, action.id, (participant) => ({
+        ...participant,
+        zoneId: action.zoneId,
+      }))
+    case 'meeting/participant/hours': {
+      const startMin = clamped(action.startMin, 0, 1440, DEFAULT_START_MIN)
+      const endMin = clamped(action.endMin, 0, 1440, DEFAULT_END_MIN)
+      // No overnight windows: a working day that wraps midnight is a different
+      // feature, and a silently inverted one would read as availability.
+      if (startMin >= endMin) return state
+      return mapParticipant(state, action.id, (participant) => ({
+        ...participant,
+        startMin,
+        endMin,
+      }))
+    }
+    case 'meeting/participant/move': {
+      const from = state.meeting.participants.findIndex(
+        (participant) => participant.id === action.id,
+      )
+      const to = from + action.delta
+      if (from < 0 || to < 0 || to >= state.meeting.participants.length) return state
+      const participants = [...state.meeting.participants]
+      const [moved] = participants.splice(from, 1)
+      participants.splice(to, 0, moved!)
+      return mapMeeting(state, (meeting) => ({ ...meeting, participants }))
+    }
+    case 'meeting/duration':
+      return mapMeeting(state, (meeting) => ({
+        ...meeting,
+        durationMin: clamped(action.durationMin, 5, 480, meeting.durationMin),
+      }))
+    case 'meeting/day':
+      return mapMeeting(state, (meeting) =>
+        action.day === undefined ? omit(meeting, 'day') : { ...meeting, day: action.day },
+      )
+    case 'meeting/replace':
+      // Everything here has already been vetted by `decodeMeeting`; fresh ids
+      // keep a shared roster from colliding with the local one.
+      return mapMeeting(state, (meeting) => ({
+        ...omit(meeting, 'day'),
+        participants: action.participants.map((participant) => ({
+          ...participant,
+          id: makeId(),
+        })),
+        durationMin: action.durationMin,
+      }))
 
     case 'world/add':
       return state.world.zoneIds.includes(action.zoneId)

@@ -1,5 +1,6 @@
 import type { CountdownTimer } from '../engine/countdown.ts'
 import type { IntervalConfig } from '../engine/intervals.ts'
+import type { MeetingParticipant } from '../engine/meeting.ts'
 
 export type Theme = 'system' | 'light' | 'dark'
 
@@ -62,6 +63,14 @@ export interface SettingsState {
   notifications: boolean
 }
 
+export interface MeetingState {
+  participants: MeetingParticipant[]
+  /** Meeting length; a slot must fit it end to end to count as workable. */
+  durationMin: number
+  /** "YYYY-MM-DD" in the first participant's zone. Absent means today. */
+  day?: string
+}
+
 export interface AppState {
   version: 1
   settings: SettingsState
@@ -70,6 +79,7 @@ export interface AppState {
   interval: IntervalState
   metronome: MetronomeState
   world: { zoneIds: string[] }
+  meeting: MeetingState
   alarms: { alarms: AlarmItem[] }
 }
 
