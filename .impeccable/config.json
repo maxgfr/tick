@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "3rem",
+        "createdAt": "2026-08-20T13:09:53.388Z",
+        "reason": "Readout clamp lower bound documented in DESIGN.md typography (clamp(3rem,16vmin,7rem)) — DisplayView.tsx"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "4rem",
+        "createdAt": "2026-08-20T13:09:53.421Z",
+        "reason": "Wall-clock clamp lower bound documented in DESIGN.md typography (clamp(4rem,22vmin,10rem)) — DisplayView.tsx"
+      }
+    ]
+  }
+}

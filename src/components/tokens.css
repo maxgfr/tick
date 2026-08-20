@@ -1,58 +1,89 @@
 @import 'tailwindcss';
 
 /*
-  Design tokens — scaffold state.
-  The visual identity pass owns this file; these values only guarantee the app
-  is legible and consistent until then.
+  tick — design tokens.
+
+  The world: a warm-black instrument with one amber signal. Timers descend
+  from darkrooms, split-flap boards and stopwatch dials — displays that had to
+  be read across a room, in bad light, at a glance. That is the whole system:
+  warm paper or warm night as the ground, one amber signal for whatever is
+  running, numerals in a mono face because time is measurement, and tick
+  marks because instruments mark. No gradients, no glass, no glow — the dial
+  carries the design, the amber says "live".
 */
 
-:root {
-  color-scheme: light dark;
+/* Display numerals: Spline Sans Mono, self-hosted (see assets/fonts/NOTICE.md). */
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/spline-sans-mono-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spline Sans Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/spline-sans-mono-700.woff2') format('woff2');
+}
 
-  --bg: #f2f2f0;
-  --surface: #ffffff;
-  --surface-2: #e9e9e6;
-  --ink: #1a1a1c;
-  --ink-2: #55555c;
-  --ink-3: #8a8a92;
-  --line: #d8d8d4;
-  --accent: #c2410c;
-  --accent-ink: #ffffff;
-  --good: #15803d;
-  --warn: #b45309;
+:root {
+  --font-display: 'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Light: a paper dial in a daylight kitchen. */
+  --bg: #f6f4ef;
+  --surface: #fffefb;
+  --surface-2: #ebe8e0;
+  --ink: #211e18;
+  --ink-2: #5d584d;
+  --ink-3: #8d8779;
+  --line: #ddd9cf;
+  --accent: #f5a623;
+  --accent-strong: #8a5a00;
+  --accent-ink: #211e18;
+  --good: #2f7d3f;
+  --warn: #9a6700;
+  --selection: #f5d9a0;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --bg: #0b0b0c;
-  --surface: #141416;
-  --surface-2: #1e1e21;
-  --ink: #f0f0ee;
-  --ink-2: #a8a8b0;
-  --ink-3: #6e6e76;
-  --line: #2a2a2e;
-  --accent: #ea580c;
-  --accent-ink: #0b0b0c;
-  --good: #4ade80;
-  --warn: #fbbf24;
+  /* Dark: the night kitchen, the gym, the darkroom. Warm, never blue. */
+  --bg: #161412;
+  --surface: #1e1c19;
+  --surface-2: #292621;
+  --ink: #f0ece3;
+  --ink-2: #a8a294;
+  --ink-3: #767063;
+  --line: #34302a;
+  --accent: #ffb224;
+  --accent-strong: #ffc95e;
+  --accent-ink: #1a1409;
+  --good: #6fce8b;
+  --warn: #e2b341;
+  --selection: #4d3a12;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     color-scheme: dark;
 
-    --bg: #0b0b0c;
-    --surface: #141416;
-    --surface-2: #1e1e21;
-    --ink: #f0f0ee;
-    --ink-2: #a8a8b0;
-    --ink-3: #6e6e76;
-    --line: #2a2a2e;
-    --accent: #ea580c;
-    --accent-ink: #0b0b0c;
-    --good: #4ade80;
-    --warn: #fbbf24;
+    --bg: #161412;
+    --surface: #1e1c19;
+    --surface-2: #292621;
+    --ink: #f0ece3;
+    --ink-2: #a8a294;
+    --ink-3: #767063;
+    --line: #34302a;
+    --accent: #ffb224;
+    --accent-strong: #ffc95e;
+    --accent-ink: #1a1409;
+    --good: #6fce8b;
+    --warn: #e2b341;
+    --selection: #4d3a12;
   }
 }
 
@@ -62,21 +93,22 @@ body {
   padding: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: var(--font-ui);
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Digits that don't dance: every timer readout uses tabular figures. */
-.tnum {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum';
+/* Browser surfaces belong to the system too: selection, caret, scrollbar. */
+::selection {
+  background: var(--selection);
+}
+input,
+textarea {
+  caret-color: var(--accent);
+}
+* {
+  scrollbar-color: var(--surface-2) transparent;
 }
 
 button {
@@ -87,4 +119,81 @@ button {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/*
+  Numerals that don't dance. Every readout in the app — clocks, laps, BPM,
+  offsets — uses the display face with tabular figures, so digits hold their
+  columns while the value runs.
+*/
+.tnum {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/*
+  The tick ruler: a stopwatch bezel in one element. Minor ticks every 2.5%
+  (half-height, bottom-aligned), a major tick every 10% (full height). The
+  amber fill is a full-width twin of the tick layers clipped to the elapsed
+  fraction, so its ticks always align with the track's. The instrument's own
+  material, used as its gauge.
+*/
+.tick-ruler {
+  --progress: 0;
+  position: relative;
+  height: 12px;
+  /* Minor ticks: one per 2.5%, bottom half of the strip. */
+  background-image: linear-gradient(to right, var(--line) 0 1px, transparent 1px);
+  background-size: calc(100% / 40) 50%;
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+.tick-ruler::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Major ticks: one per 10%, full height. */
+  background-image: linear-gradient(to right, var(--ink-3) 0 1px, transparent 1px);
+  background-size: calc(100% / 10) 100%;
+  background-repeat: repeat-x;
+}
+.tick-ruler::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--accent) 0 1px, transparent 1px),
+    linear-gradient(to right, var(--accent) 0 1px, transparent 1px);
+  background-size:
+    calc(100% / 40) 50%,
+    calc(100% / 10) 100%;
+  background-position:
+    left bottom,
+    left top;
+  background-repeat: repeat-x;
+  clip-path: inset(0 calc((1 - var(--progress)) * 100%) 0 0);
+}
+
+/*
+  The authored moment: on the fullscreen display, the colon breathes at 1 Hz
+  while something runs — the app ticks. Reduced-motion users get a steady
+  readout; nothing else in the app blinks.
+*/
+@keyframes tick-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.tick-live-sep {
+  animation: tick-breathe 1s steps(1, end) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tick-live-sep {
+    animation: none;
+  }
 }

@@ -46,6 +46,16 @@ const mount = () =>
     </StoreProvider>,
   )
 
+/**
+ * The readout renders its colons in separate spans (they breathe at 1 Hz), so
+ * plain getByText cannot match. Assert on the whole readout element instead.
+ */
+const readoutShowing = (text: string) =>
+  screen.getByText(
+    (_, element) =>
+      element !== null && element.classList.contains('tnum') && element.textContent === text,
+  )
+
 describe('DisplayView', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -67,7 +77,7 @@ describe('DisplayView', () => {
     mount()
 
     expect(screen.getByText('Tea')).toBeTruthy()
-    expect(screen.getByText(formatClock(remainingMs(timer('Tea', 30_000), START)))).toBeTruthy()
+    expect(readoutShowing(formatClock(remainingMs(timer('Tea', 30_000), START)))).toBeTruthy()
     expect(screen.queryByText('Pasta')).toBeNull()
   })
 
@@ -83,7 +93,7 @@ describe('DisplayView', () => {
     const timeline = buildTimeline(defaultState('UTC').interval.config)
     const phase = phaseAt(timeline, 5_000)!
     expect(screen.getByText('READY')).toBeTruthy()
-    expect(screen.getByText(formatClock(phase.endMs - 5_000))).toBeTruthy()
+    expect(readoutShowing(formatClock(phase.endMs - 5_000))).toBeTruthy()
   })
 
   it('falls back to the local wall clock when nothing runs', () => {
@@ -92,7 +102,7 @@ describe('DisplayView', () => {
 
     const parts = zonedParts(Intl.DateTimeFormat().resolvedOptions().timeZone, new Date(START))
     expect(
-      screen.getByText(
+      readoutShowing(
         `${String(parts.hour).padStart(2, '0')}:${String(parts.minute).padStart(2, '0')}`,
       ),
     ).toBeTruthy()

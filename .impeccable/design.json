@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-20T00:00:00.000Z",
+  "title": "Design System: tick",
+  "extensions": {
+    "colorMeta": {
+      "amber-signal": {
+        "role": "primary",
+        "displayName": "Amber Signal",
+        "canonical": "#ffb224",
+        "tonalRamp": [
+          "#3d2a05",
+          "#6b4a0a",
+          "#966810",
+          "#c08517",
+          "#e8a01c",
+          "#ffb224",
+          "#ffc95e",
+          "#ffe0a1"
+        ]
+      },
+      "warm-black": {
+        "role": "neutral",
+        "displayName": "Warm Black",
+        "canonical": "#161412",
+        "tonalRamp": [
+          "#0a0908",
+          "#161412",
+          "#1e1c19",
+          "#292621",
+          "#3a352e",
+          "#4d463c",
+          "#6b6355",
+          "#8d8578"
+        ]
+      },
+      "warm-surface": {
+        "role": "neutral",
+        "displayName": "Warm Surface",
+        "canonical": "#1e1c19",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#161412",
+          "#1e1c19",
+          "#262320",
+          "#292621",
+          "#34302a",
+          "#453f37",
+          "#5d564a"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper Ground",
+        "canonical": "#f6f4ef",
+        "tonalRamp": [
+          "#c9c4b6",
+          "#d8d4c8",
+          "#e4e0d6",
+          "#ebe8e0",
+          "#f1efe8",
+          "#f6f4ef",
+          "#fffefb",
+          "#ffffff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "The big numbers — countdown, interval phase, clock. Spline Sans Mono, tabular figures."
+      },
+      "readout-card": {
+        "displayName": "Card Readout",
+        "purpose": "Timer-card and lap numerals, 36px, tabular figures."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions, forms, settings — the OS voice for everything said."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, taglines, captions; uppercase only in display phase labels."
+      }
+    },
+    "motion": [
+      {
+        "name": "tick-breathe",
+        "value": "tick-breathe 1s steps(1, end) infinite",
+        "purpose": "The one authored motion: display colons breathe at 1 Hz between opacity 1 and 0.35. Disabled under prefers-reduced-motion."
+      },
+      {
+        "name": "state-color",
+        "value": "transition: color 0.15s, background-color 0.15s, border-color 0.15s",
+        "purpose": "Quiet color-only transitions on interactive elements."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "single-column",
+        "value": "always",
+        "note": "Tool pages are one centered max-w-3xl column at every width; the display sizes by vmin."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one loud button per view — Start.",
+      "html": "<button class=\"ds-btn-primary\">Start</button>",
+      "css": ".ds-btn-primary { background: var(--accent); color: var(--accent-ink); border: none; border-radius: 6px; padding: 6px 12px; font-size: 14px; font-weight: 500; font-family: system-ui, sans-serif; transition: background-color 0.15s; } .ds-btn-primary:hover { background: var(--accent-strong); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Default button tone — transparent, 1px warm line.",
+      "html": "<button class=\"ds-btn-ghost\">Pause</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 14px; font-weight: 500; font-family: system-ui, sans-serif; transition: background-color 0.15s, border-color 0.15s; } .ds-btn-ghost:hover { background: var(--surface-2); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Timer Card",
+      "kind": "card",
+      "refersTo": "card-timer",
+      "description": "One countdown: readout + controls over a surface card, tick ruler along the bottom. Border turns amber when done.",
+      "html": "<div class=\"ds-card-timer\"><p class=\"ds-card-label\">Tea</p><p class=\"ds-card-readout\">3:00</p><div class=\"ds-tick-ruler\" style=\"--progress: 0.4\"></div></div>",
+      "css": ".ds-card-timer { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; max-width: 420px; } .ds-card-label { margin: 0; font-size: 14px; font-weight: 500; color: var(--ink-2); font-family: system-ui, sans-serif; } .ds-card-readout { margin: 0; font-size: 36px; font-weight: 600; letter-spacing: -0.01em; font-family: 'Spline Sans Mono', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; } .ds-tick-ruler { --progress: 0.4; position: relative; height: 12px; background-image: linear-gradient(to right, var(--line) 0 1px, transparent 1px); background-size: calc(100% / 40) 50%; background-position: left bottom; background-repeat: repeat-x; } .ds-tick-ruler::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, var(--ink-3) 0 1px, transparent 1px); background-size: calc(100% / 10) 100%; background-repeat: repeat-x; } .ds-tick-ruler::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, var(--accent) 0 1px, transparent 1px), linear-gradient(to right, var(--accent) 0 1px, transparent 1px); background-size: calc(100% / 40) 50%, calc(100% / 10) 100%; background-position: left bottom, left top; background-repeat: repeat-x; clip-path: inset(0 calc((1 - var(--progress)) * 100%) 0 0); }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Text and time inputs — surface fill, warm line, amber caret.",
+      "html": "<input class=\"ds-input\" value=\"25:00\" aria-label=\"Duration\" />",
+      "css": ".ds-input { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 16px; font-family: 'Spline Sans Mono', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; caret-color: var(--accent); } .ds-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }"
+    },
+    {
+      "name": "Dial",
+      "kind": "custom",
+      "refersTo": "dial",
+      "description": "Signature: a stopwatch bezel — sixty ticks, one in five tall — inscribing an amber progress arc. Always paired with a text readout.",
+      "html": "<svg class=\"ds-dial\" width=\"96\" height=\"96\" viewBox=\"0 0 96 96\" aria-hidden=\"true\"><circle cx=\"48\" cy=\"48\" r=\"32\" fill=\"none\" stroke=\"var(--surface-2)\" stroke-width=\"6\"/><circle cx=\"48\" cy=\"48\" r=\"32\" fill=\"none\" stroke=\"var(--accent)\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-dasharray=\"201\" stroke-dashoffset=\"80\" transform=\"rotate(-90 48 48)\"/><line x1=\"48\" y1=\"3\" x2=\"48\" y2=\"12\" stroke=\"var(--ink-3)\" stroke-width=\"2\"/><line x1=\"48\" y1=\"84\" x2=\"48\" y2=\"93\" stroke=\"var(--ink-3)\" stroke-width=\"2\"/><line x1=\"3\" y1=\"48\" x2=\"12\" y2=\"48\" stroke=\"var(--ink-3)\" stroke-width=\"2\"/><line x1=\"84\" y1=\"48\" x2=\"93\" y2=\"48\" stroke=\"var(--ink-3)\" stroke-width=\"2\"/></svg>",
+      "css": ".ds-dial { display: block; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Warm-Black Instrument",
+    "overview": "tick descends from displays that had to be read across a room, in bad light, at a glance: darkrooms, split-flap boards, stopwatch dials. The world is that instrument turned into an interface — warm black (or warm paper in daylight) as the ground, tick marks because instruments mark, numerals in a mono face because time is measurement, and exactly one amber signal for whatever is live. It refuses the two neighboring defaults: the gradient-ring focus-app dashboard and the white minimalist clock clone. There is no glass, no glow, no gradient; the dial carries the design and the amber says \"running.\"",
+    "keyCharacteristics": [
+      "Warm-black ground, one amber signal — amber appears only on what is live, done, or focused, never as decoration.",
+      "Stopwatch bezels everywhere: 60-tick dials and linear tick rulers are the only progress vocabulary; no bars, no rings without ticks, no fills without marks.",
+      "Mono numerals with tabular figures — digits hold their columns while the value runs.",
+      "Flat: depth comes from tonal steps (bg → surface → surface-2) and 1px lines, never shadows.",
+      "One authored motion: the breathing colon at 1 Hz on the fullscreen display; nothing else in the app blinks."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Amber marks exactly one thing per glance: what is live, done, or focused. If a second element wants amber, one of them is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Warm-Only Rule",
+        "body": "Neutrals are warm blacks and warm papers, never pure gray and never blue-black. Time instruments glow warm; dashboards go cool.",
+        "section": "colors"
+      },
+      {
+        "name": "The Numerals Don't Dance Rule",
+        "body": "Every numeric readout uses the display face with tabular figures (.tnum). Digits hold their columns while the value runs; a proportional figure in a readout is a defect.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Rule",
+        "body": "No box-shadow, ever. If a surface needs to feel raised, give it surface over bg and a line border — or it does not need to feel raised.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use amber for live, done, and focused — and nothing else (The One Signal Rule).",
+      "Do set every numeric readout in .tnum (The Numerals Don't Dance Rule).",
+      "Do express progress with dials and tick rulers — marks drawn over a ticked track.",
+      "Do pull every color, font, and radius from src/components/tokens.css; the browser chrome (selection, caret, scrollbar, title bar) takes the same tokens.",
+      "Do size display readouts by vmin/clamp, so the number owns the viewport.",
+      "Do honor prefers-reduced-motion and prefers-color-scheme."
+    ],
+    "donts": [
+      "Don't add shadows, gradients, glass, or glow (The Flat Rule).",
+      "Don't introduce a second accent color, a cool/gray neutral, or a pure white.",
+      "Don't add a progress bar, an unmarked ring, or a plain fill where a tick ruler or dial belongs.",
+      "Don't animate anything beyond the breathing colon and state-color transitions.",
+      "Don't use a proportional (non-tabular) figure in a running readout.",
+      "Don't load a font or asset from a network origin — assets are self-hosted, and the privacy gate fails the build otherwise."
+    ]
+  }
+}

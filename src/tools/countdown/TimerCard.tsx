@@ -42,59 +42,67 @@ export function TimerCard({ id }: { id: string }) {
 
   return (
     <li
-      className="flex items-center gap-4 rounded-xl border p-4"
+      className="flex flex-col gap-3 rounded-xl border p-4"
       style={{
         borderColor: done ? 'var(--accent)' : 'var(--line)',
         background: 'var(--surface)',
       }}
       aria-label={`Timer ${timer.label}`}
     >
-      <Dial progress={progress(timer, now)} size={72} stroke={5} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium" style={{ color: 'var(--ink-2)' }}>
-          {timer.label}
-        </p>
-        <p
-          className="tnum text-4xl font-semibold tracking-tight"
-          style={{ color: done ? 'var(--accent)' : 'var(--ink)' }}
-        >
-          {formatClock(remaining)}
-        </p>
-        {done && (
-          <p className="text-xs" style={{ color: 'var(--ink-3)' }}>
-            Done — {formatHuman(timer.totalMs)} elapsed
+      <div className="flex items-center gap-4">
+        <Dial progress={progress(timer, now)} size={72} stroke={5} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium" style={{ color: 'var(--ink-2)' }}>
+            {timer.label}
           </p>
-        )}
-      </div>
-      <div className="flex shrink-0 flex-col gap-1.5">
-        {running ? (
-          <Button
-            onClick={() => dispatch({ type: 'countdown/pause', id: timer.id, now: Date.now() })}
+          <p
+            className="tnum text-4xl font-semibold tracking-tight"
+            style={{ color: done ? 'var(--accent)' : 'var(--ink)' }}
           >
-            Pause
-          </Button>
-        ) : (
-          !done && (
+            {formatClock(remaining)}
+          </p>
+          {done && (
+            <p className="text-xs" style={{ color: 'var(--ink-3)' }}>
+              Done — {formatHuman(timer.totalMs)} elapsed
+            </p>
+          )}
+        </div>
+        <div className="flex shrink-0 flex-col gap-1.5">
+          {running ? (
             <Button
-              onClick={() => dispatch({ type: 'countdown/resume', id: timer.id, now: Date.now() })}
+              onClick={() => dispatch({ type: 'countdown/pause', id: timer.id, now: Date.now() })}
             >
-              Resume
+              Pause
             </Button>
-          )
-        )}
-        <Button
-          onClick={() => dispatch({ type: 'countdown/restart', id: timer.id, now: Date.now() })}
-        >
-          Restart
-        </Button>
-        <Button
-          variant="danger"
-          title="Remove timer"
-          onClick={() => dispatch({ type: 'countdown/remove', id: timer.id })}
-        >
-          Remove
-        </Button>
+          ) : (
+            !done && (
+              <Button
+                onClick={() =>
+                  dispatch({ type: 'countdown/resume', id: timer.id, now: Date.now() })
+                }
+              >
+                Resume
+              </Button>
+            )
+          )}
+          <Button
+            onClick={() => dispatch({ type: 'countdown/restart', id: timer.id, now: Date.now() })}
+          >
+            Restart
+          </Button>
+          <Button
+            variant="danger"
+            title="Remove timer"
+            onClick={() => dispatch({ type: 'countdown/remove', id: timer.id })}
+          >
+            Remove
+          </Button>
+        </div>
       </div>
+      <div
+        className="tick-ruler"
+        style={{ '--progress': String(progress(timer, now)) } as React.CSSProperties}
+      />
     </li>
   )
 }

@@ -17,7 +17,7 @@ export function useThemeEffect(theme: Theme): void {
       const resolved = theme === 'system' ? (media.matches ? 'dark' : 'light') : theme
       document.documentElement.dataset.theme = resolved
 
-      const colour = resolved === 'dark' ? '#0b0b0c' : '#f2f2f0'
+      const colour = resolved === 'dark' ? '#161412' : '#f6f4ef'
       for (const tag of document.querySelectorAll('meta[name="theme-color"]')) {
         tag.setAttribute('content', colour)
       }

@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { Dial } from '../../components/Dial.tsx'
 import { progress as countdownProgress, remainingMs } from '../../engine/countdown.ts'
 import { formatClock } from '../../engine/duration.ts'
@@ -54,7 +55,7 @@ export function DisplayView() {
               className="tnum absolute font-bold tracking-tight"
               style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}
             >
-              {formatClock(remainingMs(timer, now))}
+              <LiveClock text={formatClock(remainingMs(timer, now))} />
             </p>
           </div>
         </>
@@ -68,7 +69,7 @@ export function DisplayView() {
             className="tnum font-bold tracking-tight"
             style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}
           >
-            {formatClock(phase.endMs - elapsed)}
+            <LiveClock text={formatClock(phase.endMs - elapsed)} />
           </p>
         </>
       ) : (
@@ -103,7 +104,30 @@ function WallClock({ now }: { now: number }) {
       className="tnum font-bold tracking-tight"
       style={{ fontSize: 'clamp(4rem, 22vmin, 10rem)', color: 'var(--ink)' }}
     >
-      {String(parts.hour).padStart(2, '0')}:{String(parts.minute).padStart(2, '0')}
+      <LiveClock
+        text={`${String(parts.hour).padStart(2, '0')}:${String(parts.minute).padStart(2, '0')}`}
+      />
     </p>
+  )
+}
+
+/**
+ * The authored moment of this view: the colons breathe at 1 Hz. It is the
+ * one blink in the app — the readout proves it is alive without moving a
+ * digit, and reduced-motion users simply get a steady clock.
+ */
+function LiveClock({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(':').map((part, index) => (
+        // The list is positional by construction (clock groups never reorder),
+        // and parts can repeat (22:22) — position is the only stable identity.
+        // oxlint-disable-next-line react/no-array-index-key
+        <Fragment key={`${part}-${index}`}>
+          {index > 0 && <span className="tick-live-sep">:</span>}
+          {part}
+        </Fragment>
+      ))}
+    </>
   )
 }
