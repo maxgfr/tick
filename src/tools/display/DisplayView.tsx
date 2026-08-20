@@ -3,7 +3,7 @@ import { FlipReadout } from '../../components/FlipReadout.tsx'
 import { TileRow } from '../../components/TileRow.tsx'
 import { progress as countdownProgress, remainingMs } from '../../engine/countdown.ts'
 import { formatClock } from '../../engine/duration.ts'
-import { buildTimeline, phaseAt } from '../../engine/intervals.ts'
+import { buildTimeline, phaseAt, totalMs } from '../../engine/intervals.ts'
 import type { Phase } from '../../engine/intervals.ts'
 import { zonedParts } from '../../engine/timezones.ts'
 import { useNow } from '../../hooks/useNow.tsx'
@@ -38,8 +38,11 @@ export function DisplayView() {
     interval.pausedElapsedMs ?? (interval.startedAt !== undefined ? now - interval.startedAt : 0)
   const active = interval.startedAt !== undefined || interval.pausedElapsedMs !== undefined
   const timeline = buildTimeline(interval.config)
-  const totalMs = timeline.at(-1)!.endMs
-  const phase = active && elapsed < totalMs ? phaseAt(timeline, elapsed) : null
+  // `buildTimeline` drops every zero-length phase, so an all-zero config
+  // yields an empty timeline. `.at(-1)!` on it threw on every render of this
+  // view — a white screen for the whole app, with no error boundary under it.
+  const total = totalMs(timeline)
+  const phase = active && total > 0 && elapsed < total ? phaseAt(timeline, elapsed) : null
 
   return (
     <section
@@ -78,7 +81,11 @@ export function DisplayView() {
           <p style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}>
             <FlipReadout text={formatClock(phase.endMs - elapsed)} />
           </p>
-          <TileRow cells={24} filled={(elapsed / totalMs) * 24} className="w-full max-w-xl" />
+          <TileRow
+            cells={24}
+            filled={total > 0 ? (elapsed / total) * 24 : 0}
+            className="w-full max-w-xl"
+          />
         </>
       ) : (
         <WallClock now={now} />

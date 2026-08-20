@@ -41,7 +41,11 @@ export function PhaseBanner({ banner, remainingMs, round, elapsedMs, totalMs }: 
         </p>
       )}
 
-      <TileRow cells={24} filled={(elapsedMs / totalMs) * 24} className="mt-2 w-full" />
+      <TileRow
+        cells={24}
+        filled={totalMs > 0 ? (elapsedMs / totalMs) * 24 : 0}
+        className="mt-2 w-full"
+      />
       <p className="tnum text-xs" style={{ color: 'var(--ink-3)' }}>
         {formatClock(elapsedMs)} / {formatClock(totalMs)}
       </p>

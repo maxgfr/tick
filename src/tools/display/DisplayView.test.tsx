@@ -112,3 +112,28 @@ describe('DisplayView', () => {
     expect(toggleFullscreen).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('DisplayView, defensively', () => {
+  it('survives an interval config with every phase at zero', () => {
+    // `buildTimeline` drops zero-length phases, so this config yields an empty
+    // timeline. Reaching past `totalMs` for `.at(-1)!.endMs` threw on every
+    // render — and with no error boundary, that is the whole app gone white.
+    seed({
+      interval: {
+        config: { prepareMs: 0, workMs: 0, restMs: 0, rounds: 1, cooldownMs: 0 },
+        startedAt: START,
+      },
+    })
+
+    expect(() => mount()).not.toThrow()
+    // With nothing to run it falls through to the wall clock, as designed.
+    expect(screen.getByLabelText('Display')).toBeTruthy()
+  })
+
+  it('survives it while idle too — the crash did not need a running interval', () => {
+    seed({
+      interval: { config: { prepareMs: 0, workMs: 0, restMs: 0, rounds: 3, cooldownMs: 0 } },
+    })
+    expect(() => mount()).not.toThrow()
+  })
+})

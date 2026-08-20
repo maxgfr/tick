@@ -36,6 +36,7 @@ export type Action =
   | { type: 'alarm/setTime'; id: string; time: string }
   | { type: 'alarm/setDays'; id: string; days: number[] }
   | { type: 'alarm/fired'; id: string; at: number }
+  | { type: 'alarm/snooze'; id: string; until: number }
   | {
       type: 'settings/set'
       patch: Partial<Pick<SettingsState, 'sound' | 'volume' | 'notifications'>> | { theme: Theme }

@@ -254,11 +254,22 @@ export function reducer(state: AppState, action: Action): AppState {
         alarms: {
           alarms: state.alarms.alarms.map((alarm) =>
             alarm.id === action.id && action.at > (alarm.lastRangAt ?? 0)
-              ? { ...alarm, lastRangAt: action.at }
+              ? // Dismissing ends any snooze with it.
+                { ...omit(alarm, 'snoozedUntil'), lastRangAt: action.at }
               : alarm,
           ),
         },
       }
+    case 'alarm/snooze':
+      return {
+        ...state,
+        alarms: {
+          alarms: state.alarms.alarms.map((alarm) =>
+            alarm.id === action.id ? { ...alarm, snoozedUntil: action.until } : alarm,
+          ),
+        },
+      }
+
     case 'alarm/setTime':
       return {
         ...state,

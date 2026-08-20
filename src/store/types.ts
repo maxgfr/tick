@@ -22,8 +22,13 @@ export interface AlarmItem {
   /** 0 (Sunday) to 6 (Saturday). Empty means every day. */
   days: number[]
   enabled: boolean
-  /** Timestamp of the occurrence this alarm last rang for (dismiss/snooze). */
+  /** Timestamp of the occurrence this alarm last rang for (dismissed). */
   lastRangAt?: number
+  /**
+   * When a snooze ends. Persisted, not component state: a reload used to
+   * cancel the snooze and set the alarm off again on the spot.
+   */
+  snoozedUntil?: number
 }
 
 export interface StopwatchState {

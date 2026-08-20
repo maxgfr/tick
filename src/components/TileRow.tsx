@@ -10,7 +10,9 @@ interface TileRowProps {
  * digits, progress just fills.
  */
 export function TileRow({ cells, filled, className = '' }: TileRowProps) {
-  const count = Math.max(0, Math.min(cells, Math.round(filled)))
+  // A NaN reaches here whenever a caller divides by a zero-length total, and
+  // NaN survives round/min/max untouched — straight into `data-filled`.
+  const count = Number.isFinite(filled) ? Math.max(0, Math.min(cells, Math.round(filled))) : 0
   return (
     <span className={`tile-row ${className}`.trim()} aria-hidden="true" data-filled={count}>
       {Array.from({ length: cells }, (_, index) => (

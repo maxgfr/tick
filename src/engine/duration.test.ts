@@ -80,3 +80,33 @@ describe('formatHuman', () => {
     expect(formatHuman(0)).toBe('0s')
   })
 })
+
+describe('negative durations', () => {
+  it('formats the clock as a signed magnitude, not digit by digit', () => {
+    // The calculator is documented to go negative; these used to read
+    // "-1:00", "-2:-30" and "-2:-30" — the last one losing its hour entirely.
+    expect(formatClock(-60_000)).toBe('-1:00')
+    expect(formatClock(-90_000)).toBe('-1:30')
+    expect(formatClock(-3_690_000)).toBe('-1:01:30')
+    expect(formatClock(-1_500)).toBe('-0:02')
+  })
+
+  it('forces hours on the negative side too — the string the Copy button writes', () => {
+    expect(formatClock(-90_000, { forceHours: true })).toBe('-0:01:30')
+    expect(formatClock(-3_690_000, { forceHours: true })).toBe('-1:01:30')
+  })
+
+  it('phrases a negative duration instead of clamping it to zero', () => {
+    // Clamping here while the clock line showed "-1:30" gave one expression
+    // two different answers on two adjacent lines.
+    expect(formatHuman(-90_000)).toBe('-1m 30s')
+    expect(formatHuman(-3_690_000)).toBe('-1h 1m')
+    expect(formatHuman(0)).toBe('0s')
+  })
+
+  it('leaves positive durations exactly as they were', () => {
+    expect(formatClock(90_000)).toBe('1:30')
+    expect(formatClock(3_690_000)).toBe('1:01:30')
+    expect(formatHuman(90_000)).toBe('1m 30s')
+  })
+})

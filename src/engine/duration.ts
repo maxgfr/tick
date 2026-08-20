@@ -54,9 +54,15 @@ export function parseDuration(input: string): number | null {
 /**
  * Countdown readout: "6:30" under an hour, "2:05:00" from an hour up, tenths
  * optional for the stopwatch. Rounds to the nearest displayed unit.
+ *
+ * A negative duration is formatted as its magnitude behind a minus sign. The
+ * calculator is documented to go negative, and `Math.floor` with `%` both run
+ * the wrong way there: `1:30 - 3m` used to read "-2:-30".
  */
 export function formatClock(ms: number, opts?: { tenths?: boolean; forceHours?: boolean }): string {
-  const rounded = opts?.tenths ? ms : Math.ceil(ms / SECOND) * SECOND
+  const sign = ms < 0 ? '-' : ''
+  const magnitude = Math.abs(ms)
+  const rounded = opts?.tenths ? magnitude : Math.ceil(magnitude / SECOND) * SECOND
   const totalSeconds = Math.floor(rounded / SECOND)
   const tenths = Math.floor((rounded % SECOND) / 100)
 
@@ -68,25 +74,31 @@ export function formatClock(ms: number, opts?: { tenths?: boolean; forceHours?: 
   const ss = String(seconds).padStart(2, '0')
   const tenth = opts?.tenths ? `.${String(tenths)}` : ''
 
-  if (hours > 0 || opts?.forceHours) return `${hours}:${mm}:${ss}${tenth}`
-  return `${minutes}:${ss}${tenth}`
+  if (hours > 0 || opts?.forceHours) return `${sign}${hours}:${mm}:${ss}${tenth}`
+  return `${sign}${minutes}:${ss}${tenth}`
 }
 
 /**
  * Human phrasing for labels and results: the two most significant units,
  * "1h 30m" rather than "1:30:00" — for reading, not timing against.
+ *
+ * Negative durations read as a signed magnitude. Clamping them to "0s" while
+ * the clock readout above showed something else gave one expression two
+ * different answers on two adjacent lines.
  */
 export function formatHuman(ms: number): string {
-  if (ms <= 0) return '0s'
+  if (ms === 0) return '0s'
+  const sign = ms < 0 ? '-' : ''
+  const magnitude = Math.abs(ms)
 
-  const hours = Math.floor(ms / HOUR)
-  const minutes = Math.floor((ms % HOUR) / MINUTE)
-  const seconds = Math.floor((ms % MINUTE) / SECOND)
+  const hours = Math.floor(magnitude / HOUR)
+  const minutes = Math.floor((magnitude % HOUR) / MINUTE)
+  const seconds = Math.floor((magnitude % MINUTE) / SECOND)
 
   const parts: string[] = []
   if (hours > 0) parts.push(`${hours}h`)
   if (minutes > 0) parts.push(`${minutes}m`)
   if (seconds > 0 && hours === 0) parts.push(`${seconds}s`)
 
-  return parts.length > 0 ? parts.slice(0, 2).join(' ') : '0s'
+  return parts.length > 0 ? `${sign}${parts.slice(0, 2).join(' ')}` : '0s'
 }

@@ -122,3 +122,38 @@ describe('TimerCard', () => {
     expect(screen.getByRole('button', { name: 'Pause' })).toBeTruthy()
   })
 })
+
+describe('TimerCard, restarted', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  it('beeps again the second time it finishes', () => {
+    // The fired guard used to be keyed by `timer.id`, which never changes on
+    // restart — so every run after the first was silent.
+    seed([{ id: 't1', label: 'Eggs', totalMs: MIN, endAt: NOW + MIN }])
+    mount('t1')
+
+    // First completion.
+    act(() => {
+      vi.setSystemTime(NOW + MIN + 1_000)
+      vi.advanceTimersByTime(300)
+    })
+    expect(playSignal).toHaveBeenCalledTimes(1)
+
+    // Restart, then let it run out again.
+    fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
+    act(() => {
+      vi.setSystemTime(NOW + MIN + 1_000 + MIN + 1_000)
+      vi.advanceTimersByTime(300)
+    })
+
+    expect(playSignal).toHaveBeenCalledTimes(2)
+  })
+})

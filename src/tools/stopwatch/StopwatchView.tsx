@@ -92,8 +92,11 @@ export function StopwatchView() {
             const lapNumber = lapCount - index
             const delta = deltas[lapCount - index - 1] ?? 0
             return (
+              // Keyed by lap number, not by the elapsed value: two taps inside
+              // the same millisecond produce identical elapsed times, and React
+              // then has duplicate keys on rows that are genuinely distinct.
               <li
-                key={lap}
+                key={lapNumber}
                 className="tnum flex items-baseline justify-between border-b py-2"
                 style={{ borderColor: 'var(--line)' }}
               >

@@ -25,10 +25,17 @@ export function TimerCard({ id }: { id: string }) {
   const done = timer !== undefined && isDone(timer, now)
 
   // Hooks stay unconditional; the guard lives inside the effect.
+  //
+  // The ref is keyed by the *run*, not the timer: `endAt` is re-stamped on
+  // restart while `id` never changes, so keying by id silenced every run
+  // after the first — no beep, no notification, and `countdown/fired` never
+  // dispatched, so `firedAt` stayed undefined forever.
   const firedFor = useRef<string | null>(null)
   useEffect(() => {
-    if (!timer || !done || timer.firedAt !== undefined || firedFor.current === timer.id) return
-    firedFor.current = timer.id
+    if (!timer || !done || timer.firedAt !== undefined) return
+    const run = `${timer.id}:${String(timer.endAt)}`
+    if (firedFor.current === run) return
+    firedFor.current = run
     dispatch({ type: 'countdown/fired', id: timer.id, now: Date.now() })
     if (settings.sound) playSignal('countdown-done')
     if (settings.notifications) {

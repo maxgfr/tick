@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Button } from '../../components/Button.tsx'
 import { FlipReadout } from '../../components/FlipReadout.tsx'
 import { lastTrigger } from '../../engine/alarm.ts'
@@ -15,14 +15,16 @@ const SNOOZE_MS = 5 * 60_000
  * scheduled — every render asks the engine what already passed, so an
  * occurrence missed during a reload or a throttled tab still rings (within a
  * quarter hour) and never rings twice. Whether an alarm is ringing is
- * derived, not stored; the only local state is an optional snooze.
+ * derived, never stored.
+ *
+ * The snooze is a persisted timestamp on the alarm, like every other run in
+ * this app. Holding it in component state meant a reload cancelled it and the
+ * alarm went off again immediately.
  */
 export function AlarmWatcher() {
   const { alarms, settings } = useStore()
   const dispatch = useDispatch()
   const now = useNow()
-
-  const [snooze, setSnooze] = useState<{ id: string; wakeAt: number } | null>(null)
 
   useEffect(() => {
     const unlock = (): void => unlockAudio()
@@ -34,8 +36,15 @@ export function AlarmWatcher() {
     if (!alarm.enabled) return false
     const last = lastTrigger(alarm, new Date(now))
     if (last === null || last <= (alarm.lastRangAt ?? 0)) return false
-    if (now - last > CATCH_UP_MS) return false
-    if (snooze !== null && snooze.id === alarm.id && now < snooze.wakeAt) return false
+
+    const snoozedUntil = alarm.snoozedUntil ?? 0
+    if (now < snoozedUntil) return false
+
+    // The catch-up window runs from whatever is due — the occurrence, or the
+    // end of a snooze. Measuring it from the original occurrence meant the
+    // third snooze walked the alarm past its own fifteen-minute window, and
+    // it never rang again, with nothing on screen to say so.
+    if (now - Math.max(last, snoozedUntil) > CATCH_UP_MS) return false
     return true
   })
 
@@ -89,7 +98,9 @@ export function AlarmWatcher() {
       <div className="flex gap-3">
         <Button
           size="lg"
-          onClick={() => setSnooze({ id: ringing.id, wakeAt: Date.now() + SNOOZE_MS })}
+          onClick={() =>
+            dispatch({ type: 'alarm/snooze', id: ringing.id, until: Date.now() + SNOOZE_MS })
+          }
         >
           Snooze 5 min
         </Button>

@@ -100,6 +100,9 @@ export function IntervalView() {
         {!active && (
           <Button
             variant="primary"
+            // Every phase set to zero builds an empty timeline: starting it
+            // would finish instantly and play the end signal on the spot.
+            disabled={total <= 0}
             onClick={() => dispatch({ type: 'interval/start', now: Date.now() })}
           >
             Start
@@ -143,6 +146,7 @@ export function IntervalView() {
 
       <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
         {interval.config.rounds} rounds · {formatClock(total)} total
+        {total <= 0 && ' — give at least one phase a duration'}
       </p>
     </div>
   )

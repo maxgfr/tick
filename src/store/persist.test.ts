@@ -65,3 +65,49 @@ describe('STORAGE_KEY', () => {
     expect(STORAGE_KEY).toMatch(/^tick:/)
   })
 })
+
+describe('loadState, against a malformed backup', () => {
+  it('rejects a slice that lost its shape instead of adopting it', () => {
+    // The import dialog hands any JSON file to this function. `{}` used to
+    // pass the `typeof === 'object'` check, and `timers.some(...)` then threw
+    // on every render — with the bad state already persisted.
+    const loaded = loadState(JSON.stringify({ countdown: {} }), 'UTC')
+    expect(Array.isArray(loaded.countdown.timers)).toBe(true)
+    expect(Array.isArray(loaded.countdown.presets)).toBe(true)
+  })
+
+  it('rejects an array where an object belongs', () => {
+    const loaded = loadState(JSON.stringify({ world: [], alarms: [] }), 'UTC')
+    expect(Array.isArray(loaded.world.zoneIds)).toBe(true)
+    expect(Array.isArray(loaded.alarms.alarms)).toBe(true)
+  })
+
+  it('rejects each malformed slice on its own, keeping the good ones', () => {
+    const loaded = loadState(
+      JSON.stringify({
+        stopwatch: {},
+        metronome: { bpm: 144, beatsPerBar: 3 },
+        world: { zoneIds: ['Europe/Paris'] },
+      }),
+      'UTC',
+    )
+    expect(loaded.stopwatch.accumulatedMs).toBe(0)
+    expect(loaded.stopwatch.laps).toEqual([])
+    // The well-formed neighbours are untouched.
+    expect(loaded.metronome.bpm).toBe(144)
+    expect(loaded.world.zoneIds).toEqual(['Europe/Paris'])
+  })
+
+  it('fills settings keys an older build never wrote', () => {
+    const loaded = loadState(JSON.stringify({ settings: { theme: 'dark' } }), 'UTC')
+    expect(loaded.settings.theme).toBe('dark')
+    expect(loaded.settings.volume).toBe(0.7)
+    expect(loaded.settings.sound).toBe(true)
+  })
+
+  it('still never throws, whatever it is handed', () => {
+    for (const raw of ['null', '[]', '"a string"', '42', '{"interval":{"config":null}}']) {
+      expect(() => loadState(raw, 'UTC')).not.toThrow()
+    }
+  })
+})

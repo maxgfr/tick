@@ -33,3 +33,18 @@ describe('TileRow', () => {
     expect(on.length).toBe(2)
   })
 })
+
+describe('TileRow, defensively', () => {
+  it('fills nothing rather than printing NaN when the total is zero', () => {
+    // An all-zero interval config makes every caller divide by zero.
+    const { container } = render(<TileRow cells={6} filled={Number.NaN} />)
+    const row = container.querySelector('.tile-row')
+    expect(row?.getAttribute('data-filled')).toBe('0')
+    expect(container.querySelectorAll('[data-on="true"]')).toHaveLength(0)
+  })
+
+  it('ignores an infinite fill the same way', () => {
+    const { container } = render(<TileRow cells={6} filled={Number.POSITIVE_INFINITY} />)
+    expect(container.querySelector('.tile-row')?.getAttribute('data-filled')).toBe('0')
+  })
+})
