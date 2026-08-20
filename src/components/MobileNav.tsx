@@ -5,7 +5,7 @@ import { CHROME, PRIMARY_TOOLS, SECONDARY_TOOLS, toolById } from '../app/tools.t
 
 const tabClass = (active: boolean): string =>
   `font-display flex min-h-14 flex-1 flex-col items-center justify-center gap-1 px-1 text-[0.625rem] font-semibold uppercase tracking-wide transition-colors ${
-    active ? 'text-[var(--accent)]' : 'text-[var(--ink-2)]'
+    active ? 'text-[var(--ink)]' : 'text-[var(--ink-2)]'
   }`
 
 /**
@@ -46,7 +46,12 @@ export function MobileNav({ route }: { route: RouteName }) {
                 aria-current={route === tool.id ? 'page' : undefined}
                 className={tabClass(route === tool.id)}
               >
-                <span aria-hidden="true" className="flap h-7 w-7 text-sm">
+                {/* Rank is inversion: the live key is flooded. */}
+                <span
+                  aria-hidden="true"
+                  className="cell h-7 w-7 text-sm"
+                  data-live={String(route === tool.id)}
+                >
                   {tool.glyph}
                 </span>
                 {tool.nav}
@@ -61,7 +66,11 @@ export function MobileNav({ route }: { route: RouteName }) {
               onClick={() => setOpenFor(open ? null : route)}
               className={tabClass(behindMore)}
             >
-              <span aria-hidden="true" className="flap h-7 w-7 text-sm">
+              <span
+                aria-hidden="true"
+                className="cell h-7 w-7 text-sm"
+                data-live={String(behindMore)}
+              >
                 {behindMore ? (current?.glyph ?? '⋯') : '⋯'}
               </span>
               {behindMore ? (current?.nav ?? 'More') : 'More'}
@@ -109,7 +118,11 @@ function MoreSheet({ route, onClose }: { route: RouteName; onClose: () => void }
                 }`}
                 style={{ borderColor: route === item.id ? 'var(--accent)' : 'var(--line)' }}
               >
-                <span aria-hidden="true" className="flap h-7 w-7 shrink-0 text-sm">
+                <span
+                  aria-hidden="true"
+                  className="cell h-7 w-7 shrink-0 text-sm"
+                  data-live={String(route === item.id)}
+                >
                   {item.glyph}
                 </span>
                 <span className="min-w-0 truncate">{item.nav}</span>

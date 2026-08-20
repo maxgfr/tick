@@ -3,14 +3,26 @@
 /*
   tick — design tokens.
 
-  The world: a departure board. Time is printed matter — slate-green ground,
-  bone tiles, one vermilion signal. Numerals live on tiles with a center seam,
-  progress is a row of small tiles filling with vermilion. No gradients, no
-  glass, no glow, no circles: the board carries the design, the vermilion says
-  "now".
+  The world: a darkroom enlarger timer under a safelight. The one instrument
+  built to be read in the dark, by someone whose hands are busy and whose eyes
+  have no light to spare.
 
-  Nothing moves. Values change instantly — the digit flip is gone, and no
-  animation replaces it.
+  The move the whole system turns on: the safelight touches everything except
+  the figure. The ground is not a neutral near-black with a red accent laid on
+  top — it is a room lit red, so every surface, line and label is warmed by it.
+  The luminous figures are the only thing the lamp does not reach, and that is
+  what makes them read as glowing rather than as pale text.
+
+  The readout window stays dark in both themes. A darkroom timer has a dark
+  bakelite face whether or not the room lights are on: it is the instrument,
+  not a preference. Light theme is the same darkroom with the lights up —
+  bleached enamel, red gone to ink.
+
+  Luminance comes from tone, never from effects. No gradients, no glass, no
+  blur, no glow filter, no circles.
+
+  Nothing moves. Values change instantly, and no animation replaces the flip
+  that used to live here.
 */
 
 /* Numerals and headings: IBM Plex Sans Condensed, self-hosted (see
@@ -59,62 +71,65 @@
 }
 
 :root {
-  /* Light: the board seen in daylight — paper ground, slate tiles. */
-  --bg: #f0ebde;
-  --surface: #f6f2e7;
-  --surface-2: #e5dfcf;
-  --ink: #1d231f;
-  --ink-2: #5d6660;
-  --ink-3: #8d948d;
-  --line: #d9d2bf;
-  --accent: #e8431f;
-  --accent-strong: #c33417;
-  --accent-ink: #fff6f2;
-  --selection: #f3c9bd;
-  --tile: #232a26;
-  --tile-ink: #ece5d3;
-  --seam: #ffffff30;
+  /* Light: the darkroom with the lights up. Bleached enamel, red as ink. */
+  --bg: #efe9e2;
+  --surface: #f6f2ec;
+  --surface-2: #e2dad1;
+  --ink: #191313;
+  --ink-2: #5c4f4c;
+  --ink-3: #726561;
+  --line: #d6cbc2;
+  --accent: #bd2d1a;
+  --accent-strong: #98220f;
+  --accent-ink: #fff6f3;
+  --selection: #f0cabe;
+  /* The instrument's face, dark in either room. */
+  --cell: #1c1214;
+  --cell-ink: #ece6d4;
+  --cell-edge: #ffffff1f;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* Dark: the board at night — slate-green ground, bone tiles. The signature
-     set. */
-  --bg: #151b18;
-  --surface: #1c2420;
-  --surface-2: #242e29;
-  --ink: #ede7d9;
-  --ink-2: #a8b0a6;
-  --ink-3: #747d74;
-  --line: #2c3630;
-  --accent: #ff5a36;
-  --accent-strong: #ff7a5c;
-  --accent-ink: #1a0d09;
-  --selection: #43211a;
-  --tile: #ece5d3;
-  --tile-ink: #1d231f;
-  --seam: #00000038;
+  /* Dark: the safelight is on. Every surface is warmed by the lamp — the
+     ground is red-biased near-black, not neutral grey. The signature set. */
+  --bg: #120b0c;
+  --surface: #1a1011;
+  --surface-2: #241618;
+  /* The figure: faintly green-cream, like real luminous paint, and the one
+     thing in the room the safelight does not tint. */
+  --ink: #e9e7d3;
+  --ink-2: #a8968f;
+  --ink-3: #8f7a74;
+  --line: #2e1c1e;
+  --accent: #e0402a;
+  --accent-strong: #ff5c42;
+  --accent-ink: #1a0708;
+  --selection: #4a1a18;
+  --cell: #0c0708;
+  --cell-ink: #e9e7d3;
+  --cell-edge: #ffffff14;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
+  :root:not([data-theme='light']) {
     color-scheme: dark;
 
-    --bg: #151b18;
-    --surface: #1c2420;
-    --surface-2: #242e29;
-    --ink: #ede7d9;
-    --ink-2: #a8b0a6;
-    --ink-3: #747d74;
-    --line: #2c3630;
-    --accent: #ff5a36;
-    --accent-strong: #ff7a5c;
-    --accent-ink: #1a0d09;
-    --selection: #43211a;
-    --tile: #ece5d3;
-    --tile-ink: #1d231f;
-    --seam: #00000038;
+    --bg: #120b0c;
+    --surface: #1a1011;
+    --surface-2: #241618;
+    --ink: #e9e7d3;
+    --ink-2: #a8968f;
+    --ink-3: #8f7a74;
+    --line: #2e1c1e;
+    --accent: #e0402a;
+    --accent-strong: #ff5c42;
+    --accent-ink: #1a0708;
+    --selection: #4a1a18;
+    --cell: #0c0708;
+    --cell-ink: #e9e7d3;
+    --cell-edge: #ffffff14;
   }
 }
 
@@ -154,8 +169,8 @@ button {
 
 /*
   Numerals that don't dance. Every readout in the app — clocks, laps, BPM,
-  offsets — uses the condensed face with tabular figures, and most live on
-  tiles that fix the column outright.
+  offsets — uses the condensed face with tabular figures, and most live in
+  cells that fix the column outright.
 */
 .tnum {
   font-family: var(--font-display);
@@ -164,45 +179,50 @@ button {
 }
 
 /*
-  The flap: one tile of the board. Bone plate, ink digit, a 1px seam across
-  the middle where the two halves meet. Width is a fraction of the em so a
-  readout scales as one voice; the fixed box is what keeps columns steady.
+  The readout: figures in the instrument's window.
 
-  The seam is the only thing left of the split-flap; the tile no longer turns.
+  Each character sits in its own sunken cell — a dark recess with a hairline
+  catching its top edge, the way a moulded window does. Width is a fraction of
+  the em so a readout scales as one voice, and the fixed box is what keeps the
+  column from shifting as digits change.
 */
-.flip-row {
+.readout {
   display: inline-flex;
   align-items: center;
-  gap: 0.09em;
+  gap: 0.08em;
 }
-.flap {
+.cell {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 0.84em;
-  height: 1.3em;
-  background: var(--tile);
-  color: var(--tile-ink);
+  width: 0.82em;
+  height: 1.28em;
+  background: var(--cell);
+  color: var(--cell-ink);
   border-radius: 2px;
+  border-top: 1px solid var(--cell-edge);
   position: relative;
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1;
 }
-.flap::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--seam);
+/*
+  Rank is inversion. Whatever is live prints inverted — the safelight floods
+  the cell and the figure goes dark inside it — so hierarchy never needs a
+  second accent colour anywhere in the app.
+*/
+.cell[data-live='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-top-color: #ffffff2e;
 }
-.flip-sep {
+
+.readout-sep {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1;
-  color: inherit;
+  color: var(--ink-2);
+  padding-inline: 0.02em;
 }
 
 /*
@@ -220,20 +240,22 @@ button {
 }
 
 /*
-  The tile row: progress as a row of small tiles. Empty cells are track,
-  filled cells are vermilion — the board filling up as time is spent. Never a
-  bar, never a ring: the unit is the tile.
+  The gauge: time spent, as a row of lit cells.
+
+  Same unit as the readout, shrunk to a bar of indicators — the strip of lamps
+  along an instrument's edge. Unlit cells sit at the recessed ground; lit ones
+  take the safelight. Never a bar, never a ring: the unit is the cell.
 */
-.tile-row {
+.gauge {
   display: flex;
   gap: 2px;
 }
-.tile-cell {
+.gauge-cell {
   flex: 1 1 0;
   height: 8px;
   border-radius: 1px;
   background: var(--surface-2);
 }
-.tile-cell[data-on='true'] {
+.gauge-cell[data-on='true'] {
   background: var(--accent);
 }

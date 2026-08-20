@@ -1,24 +1,33 @@
 ---
 name: tick
-description: A departure board for your own time — slate ground, bone tiles, one vermilion signal; local-first timer suite.
+description: A darkroom enlarger timer under a safelight — the lamp touches everything except the figure; local-first timer suite.
 colors:
-  vermilion: '#ff5a36'
-  vermilion-strong: '#ff7a5c'
-  vermilion-ink: '#1a0d09'
-  slate: '#151b18'
-  slate-surface: '#1c2420'
-  slate-surface-2: '#242e29'
-  bone: '#ede7d9'
-  sage-2: '#a8b0a6'
-  sage-3: '#747d74'
-  slate-line: '#2c3630'
-  tile: '#ece5d3'
-  tile-ink: '#1d231f'
-  seam: '#00000038'
-  selection: '#43211a'
-  paper: '#f0ebde'
-  paper-vermilion: '#e8431f'
-  paper-tile: '#232a26'
+  safelight: '#e0402a'
+  safelight-strong: '#ff5c42'
+  safelight-ink: '#1a0708'
+  dark-bg: '#120b0c'
+  dark-surface: '#1a1011'
+  dark-surface-2: '#241618'
+  dark-line: '#2e1c1e'
+  luminous: '#e9e7d3'
+  lit-2: '#a8968f'
+  lit-3: '#8f7a74'
+  cell-dark: '#0c0708'
+  cell-light: '#1c1214'
+  cell-ink: '#ece6d4'
+  cell-edge-dark: '#ffffff14'
+  cell-edge-light: '#ffffff1f'
+  selection-dark: '#4a1a18'
+  enamel-bg: '#efe9e2'
+  enamel-surface: '#f6f2ec'
+  enamel-surface-2: '#e2dad1'
+  enamel-ink: '#191313'
+  enamel-ink-2: '#5c4f4c'
+  enamel-ink-3: '#726561'
+  enamel-line: '#d6cbc2'
+  enamel-red: '#bd2d1a'
+  enamel-red-strong: '#98220f'
+  selection-light: '#f0cabe'
 typography:
   readout:
     fontFamily: "'IBM Plex Sans Condensed', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif"
@@ -39,6 +48,12 @@ typography:
     fontFamily: "'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
     fontSize: '16px'
     lineHeight: 1.5
+  caption:
+    fontFamily: "'IBM Plex Sans Condensed', 'Avenir Next Condensed', 'Arial Narrow', system-ui, sans-serif"
+    fontSize: '0.625rem'
+    fontWeight: 600
+    letterSpacing: 'wide'
+    textTransform: 'uppercase'
 rounded:
   xs: '2px'
   cell: '1px'
@@ -48,23 +63,23 @@ spacing:
   lg: '24px'
 components:
   button-primary:
-    backgroundColor: '{colors.vermilion}'
-    textColor: '{colors.vermilion-ink}'
+    backgroundColor: '{colors.safelight}'
+    textColor: '{colors.safelight-ink}'
     rounded: '{rounded.xs}'
     padding: '6px 12px'
   button-ghost:
     backgroundColor: 'transparent'
-    textColor: '{colors.bone}'
+    textColor: '{colors.luminous}'
     rounded: '{rounded.xs}'
     padding: '6px 12px'
   button-danger:
     backgroundColor: 'transparent'
-    textColor: '{colors.sage-3}'
+    textColor: '{colors.lit-3}'
     rounded: '{rounded.xs}'
     padding: '6px 12px'
   card-timer:
-    backgroundColor: '{colors.slate-surface}'
-    textColor: '{colors.bone}'
+    backgroundColor: '{colors.dark-surface}'
+    textColor: '{colors.luminous}'
     rounded: '{rounded.xs}'
     padding: '16px'
 ---
@@ -73,250 +88,173 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Board"**
+**Creative North Star: "The Safelight"**
 
-tick descends from the split-flap departure board: rows of tiles that flip to
-their next truth, read from across a station hall by people who cannot stop
-walking. The interface is that board turned inward — time as printed matter.
-Slate-green ground, bone tiles, a condensed grotesque for everything measured,
-and exactly one vermilion signal for whatever is "now". It refuses the two
-neighboring defaults: the gradient-ring focus app and the white minimalist
-clock clone. There is no glass, no glow, no gradient, no circle; the board
-carries the design, and the vermilion says "now".
+tick is a darkroom enlarger timer. It descends from the one family of
+instruments designed to be read in the dark by someone whose hands are busy
+and whose eyes have no light to spare — which is, exactly, the product's own
+scene: the cook with three pans going, the athlete mid-round, the musician at
+a tempo, the phone propped against something across the room.
 
-The app opens straight on the countdowns — there is no home, no landing pitch.
-A slim persistent bar carries the wordmark and the eight tools; every page is
-one centered column of working controls; the fullscreen display is one number
-as large as the viewport allows. Progress is never a bar or a ring: it is a
-row of small tiles filling with vermilion, the board spending itself.
+**The move the whole system turns on: the safelight touches everything except
+the figure.** The ground is not a neutral near-black with a red accent laid on
+top. It is a room lit red — every surface, hairline and label is warmed by the
+lamp — and the luminous figures are the only thing it does not reach. That
+inversion is what makes them read as _glowing_ rather than as pale text, and
+it is the difference between this world and a competent dark theme.
 
-**Key Characteristics:**
-
-- Slate ground, bone tiles, one vermilion signal — vermilion appears only on
-  what runs, what is done, or what is focused, never as decoration.
-- Tiles are the unit: digits live on tiles, progress is a row of tiles, the
-  metronome's beats are tiles.
-- The condensed grotesque (IBM Plex Sans Condensed) for everything measured
-  or labelled; IBM Plex Sans for everything said.
-- Flat: depth comes from tonal steps (`bg` → `surface` → `surface-2`) and 1px
-  lines, never shadows.
-- No motion: values change instantly. Nothing in the app animates, and the
-  interface never moves to explain itself.
+It refuses three neighbours by construction: the gradient-ring focus app, the
+white minimalist clock clone, and the split-flap departure board this project
+used to be.
 
 ## Colors
 
-One signal over one material — a night set (default identity) and a daylight
-set that is the same board with the material inverted — mirrored automatically
-by `prefers-color-scheme`. Canonical values live in
-`src/components/tokens.css`; dark values below are the signature set.
+Two rooms, one instrument.
 
-### Primary
+**Dark — the safelight is on.** The signature set. `--bg: #120b0c` is a
+red-biased near-black, never neutral grey; surfaces warm as they come forward
+(`#1a1011` → `#241618`) rather than lightening. Prose is lit by the lamp
+(`--ink-2: #a8968f`, `--ink-3: #8f7a74`) and therefore red-touched. The figure
+`--ink: #e9e7d3` is faintly green-cream, like real luminous paint, and is the
+one value in the palette with no red in it.
 
-- **Vermilion** (#ff5a36 dark / #e8431f light): the single "now" color —
-  filled progress tiles, running metronome beats, focus outline, done states,
-  the display phase label. Its rarity is the point.
+**Light — the same room with the lights up.** Bleached enamel
+(`--bg: #efe9e2`), ink `#191313`, and the safelight gone to printed red
+(`--accent: #bd2d1a`).
 
-### Secondary
+**The readout window stays dark in both themes** (`--cell: #0c0708` dark,
+`#1c1214` light, figure `--cell-ink`). A darkroom timer has a dark bakelite
+face whether or not the room lights are on. It is the instrument, not a
+preference — and it is what keeps the app recognisable in a light theme
+instead of dissolving into a white utility.
 
-- **Vermilion Strong** (#ff7a5c dark / #c33417 light): hover/active shift for
-  vermilion elements where flat vermilion would lose contrast.
-- **Vermilion Ink** (#1a0d09 dark / #fff6f2 light): text on vermilion fills.
+`--cell-edge` is a hairline on the top edge only: the light catching the lip of
+a moulded recess. It is the sole depth cue in the system.
 
-### Neutral
-
-- **Slate** (#151b18): page ground, dark theme — green-blacked, never pure
-  gray, never blue-black.
-- **Slate Surface** (#1c2420): raised cards and panels, dark theme.
-- **Slate Surface 2** (#242e29): wells, empty progress cells, quiet fills.
-- **Bone** (#ede7d9): primary text, dark theme.
-- **Sage 2** (#a8b0a6): secondary text, labels, taglines.
-- **Sage 3** (#747d74): tertiary text, quiet actions (Remove, back-links).
-- **Slate Line** (#2c3630): 1px borders and hairlines.
-- **Tile** (#ece5d3) / **Tile Ink** (#1d231f) / **Seam** (rgba black at 22%):
-  the flap material — a bone plate, its slate glyph, the 1px hinge line
-  across the middle.
-- **Paper set** (#f0ebde ground, #f6f2e7 surface, #e5dfcf surface-2, #1d231f /
-  #5d6660 / #8d948d inks, #d9d2bf line, tile #232a26): the same board in
-  daylight — the material inverts, the roles do not.
-
-### Named Rules
-
-**The Signal Tile Rule.** Vermilion marks exactly one thing per glance: what
-runs, is done, or is focused. If a second element wants vermilion, one of them
-is wrong.
-
-**The Inverted Material Rule.** The light theme is the same board with its
-material inverted — paper ground, slate tiles — not a second palette. Roles
-never change sides between themes.
+Every text pair in both themes clears WCAG AA at small text (4.5:1); the
+readout, which is the thing the product actually promises you can read from
+across a room, sits near 15:1 in both.
 
 ## Typography
 
-**Display Font:** IBM Plex Sans Condensed (self-hosted woff2, weights 500,
-600, 700; fallback Avenir Next Condensed, Arial Narrow, system-ui)
-**Body Font:** IBM Plex Sans (self-hosted woff2, weights 400 and 500;
-fallback system-ui)
+IBM Plex Sans Condensed for everything measured or labelled; IBM Plex Sans for
+everything said.
 
-**Character:** the condensed grotesque of platform signage for everything
-measured or labelled — readouts, headings, buttons, the wordmark — with
-tabular figures as a seat belt; the plain grotesque for sentences. No serif,
-no mono, no second display face.
+The condensed face is not a default here, it is the instrument's own voice:
+enlarger timers, lab counters and scoreboards all set their figures tall and
+narrow so a large number fits a small window. It is also already vendored — a
+network font is impossible under this project's CSP, so changing face means
+shipping new binaries, and no other face answers the brief better enough to
+justify that.
 
-### Hierarchy
+Every running value uses tabular figures (`.tnum`), and most sit in cells that
+fix the column outright, so a changing digit never shifts the line.
 
-- **Readout** (600, on tiles; `clamp(3rem, 16vmin, 7rem)` on the display,
-  `clamp(4rem, 22vmin, 10rem)` for the wall clock): the big numbers —
-  countdown, interval phase, clock, laps.
-- **Title** (600, 24px, uppercase, wide tracking): tool page headings.
-- **Body** (400, 16px/1.5): descriptions, forms, settings.
-- **Label** (600, 14px, uppercase, wide tracking): buttons, nav links,
-  taglines, phase chips. Uppercase is the norm, carried by CSS
-  `text-transform` so accessible names stay intact.
-
-### Named Rules
-
-**The Digits Don't Dance Rule.** Every digit sits on its own tile: the tile
-fixes the column, not just `tnum`. A readout too small for tiles (an input, a
-table cell) still uses the condensed face with tabular figures via `.tnum`.
-A running digit column that shifts is a defect, at any size.
+The ramp has one step below `label`: **caption**, at 0.625rem. It exists for
+exactly two jobs, both of which are a label riding along another element
+rather than standing on its own — the phone tab title under its key, and the
+day-offset marker beside a time in the meeting grid. Nothing else may use it,
+and nothing that has to be read across a room ever does.
 
 ## Layout
 
-A slim persistent top bar (48px, sticky) carries the wordmark, the eight
-tools, and Settings; the active tool is underlined 2px in vermilion, derived
-from the parsed route. Tool pages are a single centered column (`max-w-3xl`,
-16px side padding) under a heading and tagline; the fullscreen display has no
-bar at all and sizes its readout by `vmin`, so the number, not the layout,
-responds to the screen. Keyboard digits 1–8 jump between tools; hash routing
-keeps deep links (`#/interval`) shareable under the `/tick/` base, and `#/`
-is the countdown — the app's front door.
+One content column, `max-w-3xl`.
 
-## Elevation & Depth
+- **Desktop (≥64rem):** a fixed 13rem rail on the left, every destination
+  visible at once, grouped under Timers and Clocks, each row carrying its key.
+- **Phone:** no top bar at all — the page's own `h1` already names the tool. A
+  fixed bar at the bottom where the thumb is: four primary tools plus More,
+  56px targets, padded by `env(safe-area-inset-bottom)`.
 
-Flat by design — no shadows anywhere in the app. Depth is tonal: page ground
-→ surface (cards) → surface-2 (wells and empty cells), each step one tone
-over, and separation is carried by 1px lines. The vermilion focus outline
-(2px, 2px offset) is the only thing allowed to sit "on top" of a surface;
-the flap's seam is a line, not a shadow.
+Exactly one navigation is mounted at a time (see `useMediaQuery`): they are
+different components, not one restyled, and mounting both would announce every
+destination twice.
 
-### Named Rules
+The fullscreen display drops all navigation — one figure as large as the
+viewport allows.
 
-**The Flat Rule.** No `box-shadow`, ever. If a surface needs to feel raised,
-give it `surface` over `bg` and a `line` border — or it does not need to feel
-raised.
+## Named Rules
 
-## Shapes
+**The Safelight Rule.** The lamp tints every surface, line and label. The only
+thing it does not touch is the figure. Never introduce a neutral grey: if a
+value is not luminous cream, it is warmed.
 
-Corners are nearly sharp: 2px (`rounded-xs`) on cards, buttons, inputs,
-tiles; 1px on progress cells. The geometry that identifies the system is the
-tile — a plate taller than wide (0.84em × 1.3em) with a 1px seam across its
-middle — and its miniature, the 8px progress cell. Zero circles: no rings, no
-dials, no rounded-full. The board is rectilinear; anything round reads as a
-different machine.
+**Rank Is Inversion.** Whatever is live prints inverted — the safelight floods
+the cell and the figure goes dark inside it (`.cell[data-live='true']`). This
+is the app's entire hierarchy device, which is why there is no second accent
+colour anywhere: the running timer, the current interval phase, the ringing
+alarm and the active nav key all say "now" the same way.
+
+**One Label Schema.** Every panel labels the same way, in the same order, at
+the same size: name, value, unit. No exceptions.
+
+**One Label Scale.** No label outranks another. Hierarchy comes from the
+readout, which is the only element in the interface allowed to shout.
+
+**The No Motion Rule.** Nothing animates. There is no keyframe in the
+stylesheet and no element changes position, size or rotation over time. The
+one exception is a 150ms colour fade on hover and focus — nothing travels and
+no layout redraws, and without it the controls read as unresponsive.
+
+**The Flat Rule.** Luminance comes from tone, never from effects. No gradients,
+no glass, no blur, no glow filter, no shadows, no circles.
+
+**Digits Don't Dance.** Every running figure is tabular, and in a cell wherever
+the space allows.
 
 ## Components
 
-Every component is quiet until it is live.
+### Readout (signature)
 
-### Buttons
+Each character in its own sunken cell — dark recess, luminous figure, a
+hairline catching the top edge. `:` and `.` are bare separators in the same
+voice. The visible row is `aria-hidden` and paired with one `sr-only` twin
+carrying the whole string, so a screen reader hears "1:00", not "one colon
+zero zero". Cells are keyed by position, so a changing value rewrites the
+figure in place. `live` inverts the whole row.
 
-- **Shape:** 2px radius, `6px 12px` padding (sm) or `10px 20px` (lg),
-  14px/600 uppercase label in the condensed face.
-- **Primary:** vermilion fill, vermilion-ink text — the one loud button per
-  view (Start, Dismiss).
-- **Ghost (default):** transparent, 1px line border, bone text.
-- **Danger:** borderless, sage-3 text (Remove) — quiet enough to sit in a
-  card row, distinguishable by label and position.
-- **Hover/Focus:** color transitions only; focus is the 2px vermilion
-  outline.
+### Gauge (signature)
 
-### Chips
+Time spent as a row of lit cells — the strip of lamps along an instrument's
+edge. Same unit as the readout, shrunk. Unlit cells sit at `--surface-2`, lit
+cells take the safelight. Decorative and `aria-hidden`: the readout beside it
+already carries the value. Never a bar, never a ring.
 
-- **Style:** presets and day toggles are `surface` chips with a 1px line
-  border, 2px radius, 13px/500.
-- **State:** selected takes bone-on-slate inversion (or vermilion when it
-  means "running"); never a fill that competes with the signal.
+### Button
 
-### Cards / Containers
-
-- **Corner Style:** 2px radius.
-- **Background:** `surface` over the `bg` ground, 1px `line` border; the
-  border and readout turn vermilion when the card's timer is done.
-- **Shadow Strategy:** none (The Flat Rule).
-- **Internal Padding:** 16px.
-
-### Inputs / Fields
-
-- **Style:** `surface` fill, 1px `line` border, 2px radius, body type.
-- **Focus:** vermilion caret (global) + 2px vermilion outline.
-- **Numeric fields:** durations and times use `.tnum`; errors surface in an
-  `aria-live` region, never only in color.
-
-### Navigation
-
-The top bar is the whole nav: wordmark to `#/`, then the eight tools and
-Settings as uppercase condensed links (48px row, horizontally scrollable on
-narrow screens). `aria-current="page"` underlines the active link 2px in
-vermilion. The fullscreen display drops the bar — its only way back is the
-"← tick" link. The keyboard is the real nav (digits 1–8, `?` for help).
-
-### FlipReadout (signature)
-
-The readout: each character on its own bone tile with the hinge seam; `:` and
-`.` are bare separators in the same voice. The visible row is `aria-hidden`
-and paired with one `sr-only` twin carrying the whole string, so screens
-readers hear "1:00", not "one colon zero zero". Tiles are keyed by position,
-so a changing value rewrites the character in place — no remount, no motion.
-
-### TileRow (signature)
-
-Progress as a row of small tiles: `cells` 8px cells at 1px radius, 2px apart,
-empty cells in `surface-2`, filled cells in vermilion, `filled` rounded to
-the nearest whole tile. Used for countdown cards (24 cells), interval phases,
-and the display. Never a bar, never a ring — the unit is the tile.
-
-### Named Rules
-
-**The No Motion Rule.** Nothing in the app animates. There is no keyframe
-anywhere in the stylesheet, and no element ever changes position, size or
-rotation over time. State changes are instant.
-
-The one exception is a 150ms colour fade on hover and focus, which is not
-motion in the sense that matters: nothing travels, nothing redraws its layout,
-and without it interactive controls read as unresponsive.
-
-This replaced a mechanical digit flip. Each tile was keyed by its character so
-a changed digit would remount and replay the animation — which meant that on
-every route change React remounted the whole readout and the entire board
-turned over at once. That was never the intent, and the flip is gone rather
-than patched.
+One component, three tones (primary / ghost / danger), two scales. Always
+emits `touch-target`, which grows the hit area to 44px on a coarse pointer
+without changing how the control looks on a mouse.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** use vermilion for running, done, and focused — and nothing else
-  (The Signal Tile Rule).
-- **Do** put every running digit on a tile, or at minimum in `.tnum` (The
-  Digits Don't Dance Rule).
-- **Do** express progress as a TileRow — tiles filling with vermilion.
-- **Do** pull every color, font, and radius from `src/components/tokens.css`;
+- **Do** warm every neutral. A grey that is not red-touched does not belong to
+  this room.
+- **Do** mark "now" by inversion, and only by inversion.
+- **Do** put every running figure in a cell, or at minimum in `.tnum`.
+- **Do** pull every color, font and radius from `src/components/tokens.css`;
   the browser chrome (selection, caret, scrollbar, title bar) takes the same
   tokens.
-- **Do** size display readouts by `vmin`/`clamp`, so the number owns the
+- **Do** size display readouts by `vmin`/`clamp`, so the figure owns the
   viewport.
 - **Do** honor `prefers-color-scheme`. (`prefers-reduced-motion` needs no
   handling: there is no motion to reduce.)
+- **Do** give any new control `touch-target`.
 
 ### Don't:
 
-- **Don't** add shadows, gradients, glass, or glow (The Flat Rule).
-- **Don't** introduce a second accent color, a cool/gray neutral, or a pure
-  white.
-- **Don't** add a progress bar, an arc, a ring, or a dial — or any circle at
-  all — where a TileRow belongs.
-- **Don't** animate. No keyframes, no transitions beyond hover/focus colour
-  (The No Motion Rule).
-- **Don't** use a proportional (non-tabular) figure in a running readout, or
-  a mono face: the condensed grotesque is the voice.
+- **Don't** add shadows, gradients, glass or glow (The Flat Rule). The only
+  depth in the system is one top-edge hairline on a cell.
+- **Don't** introduce a second accent colour, or a cool/neutral grey, or a
+  pure white.
+- **Don't** light the readout window in the light theme. The instrument's face
+  is dark in both rooms.
+- **Don't** add a progress bar, an arc, a ring or a dial — or any circle at
+  all — where a Gauge belongs.
+- **Don't** animate. No keyframes, no transitions beyond hover/focus colour.
+- **Don't** use a proportional figure in a running readout, or a mono face:
+  the condensed grotesque is the voice.
 - **Don't** load a font or asset from a network origin — assets are
   self-hosted, and the privacy gate fails the build otherwise.

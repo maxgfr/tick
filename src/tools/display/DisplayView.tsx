@@ -1,6 +1,6 @@
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
-import { TileRow } from '../../components/TileRow.tsx'
+import { Readout } from '../../components/Readout.tsx'
+import { Gauge } from '../../components/Gauge.tsx'
 import { progress as countdownProgress, remainingMs } from '../../engine/countdown.ts'
 import { formatClock } from '../../engine/duration.ts'
 import { buildTimeline, phaseAt, totalMs } from '../../engine/intervals.ts'
@@ -61,9 +61,9 @@ export function DisplayView() {
             className="text-center"
             style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}
           >
-            <FlipReadout text={formatClock(remainingMs(timer, now))} />
+            <Readout text={formatClock(remainingMs(timer, now))} />
           </p>
-          <TileRow
+          <Gauge
             cells={24}
             filled={countdownProgress(timer, now) * 24}
             className="w-full max-w-xl"
@@ -79,9 +79,9 @@ export function DisplayView() {
             {phase.round > 0 && ` · Round ${phase.round} of ${interval.config.rounds}`}
           </p>
           <p style={{ fontSize: 'clamp(3rem, 16vmin, 7rem)', color: 'var(--ink)' }}>
-            <FlipReadout text={formatClock(phase.endMs - elapsed)} />
+            <Readout text={formatClock(phase.endMs - elapsed)} />
           </p>
-          <TileRow
+          <Gauge
             cells={24}
             filled={total > 0 ? (elapsed / total) * 24 : 0}
             className="w-full max-w-xl"
@@ -109,7 +109,7 @@ function WallClock({ now }: { now: number }) {
   const parts = zonedParts(Intl.DateTimeFormat().resolvedOptions().timeZone, new Date(now))
   return (
     <p style={{ fontSize: 'clamp(4rem, 22vmin, 10rem)', color: 'var(--ink)' }}>
-      <FlipReadout
+      <Readout
         text={`${String(parts.hour).padStart(2, '0')}:${String(parts.minute).padStart(2, '0')}`}
       />
     </p>

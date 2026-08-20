@@ -1,5 +1,5 @@
-import { FlipReadout } from '../../components/FlipReadout.tsx'
-import { TileRow } from '../../components/TileRow.tsx'
+import { Readout } from '../../components/Readout.tsx'
+import { Gauge } from '../../components/Gauge.tsx'
 import { formatClock } from '../../engine/duration.ts'
 
 interface PhaseBannerProps {
@@ -30,7 +30,7 @@ export function PhaseBanner({ banner, remainingMs, round, elapsedMs, totalMs }: 
         </span>
       </p>
       <p className="py-1 text-6xl sm:text-7xl" style={{ color: 'var(--ink)' }}>
-        <FlipReadout text={formatClock(remainingMs)} />
+        <Readout text={formatClock(remainingMs)} live />
       </p>
       {round && (
         <p
@@ -41,7 +41,7 @@ export function PhaseBanner({ banner, remainingMs, round, elapsedMs, totalMs }: 
         </p>
       )}
 
-      <TileRow
+      <Gauge
         cells={24}
         filled={totalMs > 0 ? (elapsedMs / totalMs) * 24 : 0}
         className="mt-2 w-full"

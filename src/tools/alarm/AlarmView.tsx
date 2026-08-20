@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { Readout } from '../../components/Readout.tsx'
 import { lastTrigger, nextTrigger } from '../../engine/alarm.ts'
 import { formatClock } from '../../engine/duration.ts'
 import { useNow } from '../../hooks/useNow.tsx'
@@ -146,7 +146,7 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
       aria-label={`Alarm ${alarm.time}`}
     >
       <p className="text-3xl" style={{ opacity: alarm.enabled ? 1 : 0.45 }}>
-        <FlipReadout text={alarm.time} />
+        <Readout text={alarm.time} />
       </p>
 
       <fieldset className="flex gap-1">

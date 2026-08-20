@@ -5,7 +5,7 @@ import { CHROME, SECTIONS } from '../app/tools.ts'
 const rowClass = (active: boolean): string =>
   `font-display flex min-h-11 items-center gap-3 border-l-2 px-3 text-sm font-semibold uppercase tracking-wide transition-colors ${
     active
-      ? 'border-[var(--accent)] text-[var(--accent)]'
+      ? 'border-[var(--accent)] text-[var(--ink)]'
       : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
   }`
 
@@ -26,7 +26,8 @@ const Row = ({
       aria-current={active ? 'page' : undefined}
       className={rowClass(active)}
     >
-      <span aria-hidden="true" className="flap h-6 w-6 shrink-0 text-xs">
+      {/* Rank is inversion: the live key is flooded, its glyph goes dark. */}
+      <span aria-hidden="true" className="cell h-6 w-6 shrink-0 text-xs" data-live={String(active)}>
         {glyph}
       </span>
       <span className="min-w-0 flex-1 truncate">{label}</span>

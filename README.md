@@ -2,29 +2,36 @@
 
 A local-first timer suite, entirely in the browser: multiple simultaneous
 countdowns with presets, a stopwatch with laps, HIIT/Tabata/EMOM intervals, a
-metronome, a world clock, a duration calculator, alarms and a big fullscreen
-display. No account, no server, no tracking. It opens straight on your
-countdowns — no home screen between you and your timers.
+metronome, a world clock, a meeting planner across timezones, a duration
+calculator, alarms and a big fullscreen display. No account, no server, no
+tracking. It opens straight on your countdowns — no home screen between you and
+your timers.
 
 **→ [maxgfr.github.io/tick](https://maxgfr.github.io/tick/)**
 
 ## The tools
 
-| Key | Tool            | What it does                                                                                              |
-| --- | --------------- | --------------------------------------------------------------------------------------------------------- |
-| `1` | **Countdown**   | Multiple timers at once, presets (egg, tea, laundry, meeting…), pause/resume, quick-add                   |
-| `2` | **Stopwatch**   | Laps with deltas, tenth precision                                                                         |
-| `3` | **Interval**    | HIIT / Tabata / EMOM — prepare, work, rest, rounds, cooldown, timeline preview, distinct phase beeps      |
-| `4` | **Metronome**   | 20–300 BPM, 1–12 beat measure, accented downbeat, drift-free lookahead scheduling                         |
-| `5` | **World clock** | IANA timezones via `Intl` (zero libraries), day/night indicator, offset from local                        |
-| `6` | **Calculator**  | Duration arithmetic: `1:30 + 45m - 20s`                                                                   |
-| `7` | **Alarm**       | Time + weekdays, 5-minute snooze, fullscreen ringing overlay, missed alarms flagged                       |
-| `8` | **Display**     | Fullscreen across-the-room view — picks its own source: soonest countdown, running interval, or the clock |
+| Key | Tool            | What it does                                                                                         |
+| --- | --------------- | ---------------------------------------------------------------------------------------------------- |
+| `1` | **Countdown**   | Multiple timers at once, presets (egg, tea, laundry, meeting…), pause/resume, quick-add              |
+| `2` | **Stopwatch**   | Laps with deltas, tenth precision                                                                    |
+| `3` | **Interval**    | HIIT / Tabata / EMOM — prepare, work, rest, rounds, cooldown, timeline preview, distinct phase beeps |
+| `4` | **Metronome**   | 20–300 BPM, 1–12 beat measure, accented downbeat, drift-free lookahead scheduling                    |
+| `5` | **World clock** | IANA timezones via `Intl` (zero libraries), day/night indicator, offset from local                   |
+| `6` | **Meeting**     | A time everyone can make: working hours per city, a graded 24h grid, and a line you can paste        |
+| `7` | **Alarm**       | Time + weekdays, 5-minute snooze, fullscreen ringing overlay, missed alarms flagged                  |
+| `8` | **Calculator**  | Duration arithmetic: `1:30 + 45m - 20s`                                                              |
 
-Global keys: `?` shortcuts, `M` mute, `F` fullscreen. Readouts are a
-departure board: each digit on its own tile. Nothing animates — values change
-instantly, and no route change stirs the board. Progress is a row of tiles
-filling with vermilion, never a bar or a ring.
+`D` opens the fullscreen **Display** — an across-the-room view that picks its
+own source: soonest countdown, running interval, or the clock. `,` opens
+Settings.
+
+Global keys: `?` shortcuts, `M` mute, `F` fullscreen.
+
+tick is a darkroom enlarger timer: the safelight tints every surface, line and
+label, and the luminous figures are the only thing it does not reach. Whatever
+is live prints inverted — that is the whole hierarchy, which is why there is no
+second accent colour. Nothing animates, anywhere.
 
 ## Time that doesn't drift
 
@@ -47,12 +54,15 @@ tick is private by architecture, not by policy:
   only if you export it yourself.
 - **Fonts are self-hosted** (IBM Plex Sans Condensed and IBM Plex Sans, OFL);
   no CDN, no font telemetry, no third-party anything.
+- **Meeting share links** are hash fragments, which browsers never put on the
+  wire. The link is a string only tick can read; nothing is uploaded to make
+  one.
 
 ## Offline
 
 Installable as a PWA: after the first load, tick works with the network off.
 Notifications are opt-in from an explicit action; wake lock keeps the display
-alive; reduced-motion preferences are honored.
+alive. There is no motion to opt out of.
 
 ## Development
 
@@ -63,7 +73,7 @@ pnpm dev
 ```
 
 Vite + React 19 + TypeScript (strict) + Tailwind 4 + vite-plugin-pwa, tested
-with Vitest (182 tests), linted with oxlint, formatted with Prettier. Time
+with Vitest (295 tests), linted with oxlint, formatted with Prettier. Time
 logic lives in `src/engine/` as pure, fully tested functions — no React, no
 DOM.
 

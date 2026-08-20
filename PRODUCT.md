@@ -20,8 +20,9 @@ localize by hand if that ever matters.
 
 tick is a suite of eight timer tools that runs entirely in the browser:
 simultaneous countdowns with presets, a stopwatch with laps, HIIT/Tabata/EMOM
-intervals, a metronome, a world clock, a duration calculator, alarms, and a
-fullscreen across-the-room display. Success means the second count is right —
+intervals, a metronome, a world clock, a cross-timezone meeting planner, alarms
+and a duration calculator — plus a fullscreen across-the-room display, which is
+a mode rather than a tool. Success means the second count is right —
 timers survive reloads and background-tab throttling without drifting, and time
 is kept by deriving remaining time from system-clock timestamps rather than
 accumulating ticks.
@@ -57,10 +58,19 @@ opt-in from an explicit action, wake lock and fullscreen are feature-detected.
 - Duration calculator: expressions like `1:30 + 45m - 20s`.
 - Alarm: time + weekdays, 5-minute snooze, fullscreen overlay, missed alarms
   flagged.
+- Meeting: participants as city + label + working hours, a graded 24-hour grid
+  (working / a stretch / outside hours), best windows, one instant converted
+  into every local clock with day offsets, and a copyable summary or share
+  link. Availability is derived from the absolute instant through `Intl`, so
+  daylight saving is correct without a table.
 - Display: fullscreen ambient view that picks its own source (soonest
-  countdown → running interval → wall clock), wake lock, breathing colon.
-- Global: single 250 ms ticker, live tab title, keyboard shortcuts (1–8, ?, M,
-  F), theme (system/light/dark), sound + volume, export/import/clear data.
+  countdown → running interval → wall clock), wake lock. Reached by `D`; not a
+  tool in the navigation, because it only ever presents what is already
+  running.
+- Global: single 250 ms ticker, live tab title, keyboard shortcuts (1–8 tools,
+  `D` display, `,` settings, `?` help, `M` mute, `F` fullscreen), theme
+  (system/light/dark), sound + volume, export/import/clear data, and an error
+  boundary that can discard corrupted state from inside the app.
 
 Constraints: local-first only — no backend, no accounts, no analytics, no
 external requests (enforced by CSP and CI). System-clock math means timers
@@ -71,12 +81,15 @@ timers with it (documented behavior, not drift).
 
 - Name: **tick** (lowercase), tagline shape "No account, no server, no
   tracking."
-- Logo: a clock dial whose hands form a check mark — "time, kept."
-- MIT licensed; self-hosted fonts only (Spline Sans Mono, OFL).
+- Logo: the instrument's window, two cells wide, mid-count — the left flooded
+  by the safelight with its figure gone dark, the right a recess holding one
+  luminous figure. Rank is inversion, legible at 16px.
+- MIT licensed; self-hosted fonts only (IBM Plex Sans Condensed and IBM Plex
+  Sans, OFL).
 
 ## Evidence on Hand
 
-The shipped app itself at the URL above; this repository's tests (161) and CI.
+The shipped app itself at the URL above; this repository's tests (295) and CI.
 No screenshots, testimonials, usage data, or metrics exist — future work must
 not fabricate any.
 

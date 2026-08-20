@@ -6,8 +6,8 @@ import type { Theme } from '../store/types.ts'
  *
  * `system` is resolved here rather than left to a CSS media query because the
  * app also has to keep `<meta name="theme-color">` in step — on an installed
- * PWA that colour is the window chrome, and a mismatch between the board and
- * the title bar is the seam that gives away a web app.
+ * PWA that colour is the window chrome, and a title bar that does not match
+ * the darkroom is the seam that gives away a web app.
  */
 export function useThemeEffect(theme: Theme): void {
   useEffect(() => {
@@ -17,7 +17,7 @@ export function useThemeEffect(theme: Theme): void {
       const resolved = theme === 'system' ? (media.matches ? 'dark' : 'light') : theme
       document.documentElement.dataset.theme = resolved
 
-      const colour = resolved === 'dark' ? '#151b18' : '#f0ebde'
+      const colour = resolved === 'dark' ? '#120b0c' : '#efe9e2'
       for (const tag of document.querySelectorAll('meta[name="theme-color"]')) {
         tag.setAttribute('content', colour)
       }

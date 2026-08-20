@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { Readout } from '../../components/Readout.tsx'
 import { lastTrigger } from '../../engine/alarm.ts'
 import { useNow } from '../../hooks/useNow.tsx'
 import { playSignal, unlockAudio } from '../../lib/audio.ts'
@@ -93,7 +93,7 @@ export function AlarmWatcher() {
         tick · alarm
       </p>
       <p className="text-8xl" style={{ color: 'var(--accent)' }}>
-        <FlipReadout text={ringing.time} />
+        <Readout text={ringing.time} live />
       </p>
       <div className="flex gap-3">
         <Button

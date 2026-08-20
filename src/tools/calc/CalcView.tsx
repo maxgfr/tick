@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { Readout } from '../../components/Readout.tsx'
 import { evaluateDuration } from '../../engine/calc.ts'
 import { formatClock, formatHuman } from '../../engine/duration.ts'
 
@@ -76,7 +76,7 @@ export function CalcView() {
       {ms !== null && (
         <section className="flex flex-col items-center gap-2 py-4" aria-label="Result">
           <p className="text-6xl" style={{ color: 'var(--ink)' }}>
-            <FlipReadout text={formatClock(ms)} />
+            <Readout text={formatClock(ms)} />
           </p>
           <p className="text-sm" style={{ color: 'var(--ink-3)' }}>
             {formatHuman(ms)} · {ms.toLocaleString('en-US')} ms

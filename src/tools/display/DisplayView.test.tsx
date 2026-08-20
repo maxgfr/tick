@@ -47,7 +47,7 @@ const mount = () =>
   )
 
 /**
- * The readout is a FlipReadout: its tiles are aria-hidden and a single
+ * The readout is a Readout: its tiles are aria-hidden and a single
  * sr-only twin carries the value, so plain getByText matches exactly once.
  */
 const readoutShowing = (text: string) => screen.getByText(text)

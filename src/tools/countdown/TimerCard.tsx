@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
-import { TileRow } from '../../components/TileRow.tsx'
+import { Readout } from '../../components/Readout.tsx'
+import { Gauge } from '../../components/Gauge.tsx'
 import { formatClock, formatHuman } from '../../engine/duration.ts'
 import { isDone, progress, remainingMs } from '../../engine/countdown.ts'
 import { useNow } from '../../hooks/useNow.tsx'
@@ -67,7 +67,7 @@ export function TimerCard({ id }: { id: string }) {
             {timer.label}
           </p>
           <p className="py-1 text-4xl" style={{ color: done ? 'var(--accent)' : 'var(--ink)' }}>
-            <FlipReadout text={formatClock(remaining)} />
+            <Readout text={formatClock(remaining)} live={done} />
           </p>
           {done && (
             <p className="text-xs" style={{ color: 'var(--ink-3)' }}>
@@ -107,7 +107,7 @@ export function TimerCard({ id }: { id: string }) {
           </Button>
         </div>
       </div>
-      <TileRow cells={24} filled={progress(timer, now) * 24} className="w-full" />
+      <Gauge cells={24} filled={progress(timer, now) * 24} className="w-full" />
     </li>
   )
 }

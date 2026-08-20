@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { Readout } from '../../components/Readout.tsx'
 import { formatClock } from '../../engine/duration.ts'
 import { useRafNow } from '../../hooks/useRafNow.ts'
 import { useWakeLock } from '../../hooks/useWakeLock.ts'
@@ -42,7 +42,7 @@ export function StopwatchView() {
         className="text-6xl sm:text-8xl"
         style={{ color: 'var(--ink)' }}
       >
-        <FlipReadout text={formatClock(elapsed, { tenths: true })} />
+        <Readout text={formatClock(elapsed, { tenths: true })} />
       </output>
 
       <div className="flex gap-2">

@@ -1,9 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- tick: one flap of the board, mid-turn — time, kept. -->
-  <rect width="512" height="512" rx="112" fill="#151b18"/>
-  <!-- The tile: bone, flat, one hinge seam. -->
-  <rect x="136" y="96" width="240" height="320" rx="12" fill="#ece5d3"/>
-  <rect x="136" y="253" width="240" height="6" fill="#000000" opacity="0.22"/>
-  <!-- The glyph: a 1, drawn as paths — never text. -->
-  <path d="M200 168 L240 136 L280 136 L280 376 L232 376 L232 192 L200 216 Z" fill="#1d231f"/>
+  <!--
+    tick: the instrument's window, two cells wide, mid-count.
+
+    The left cell is flooded by the safelight — live. The right cell is the
+    dark recess with one luminous figure standing in it, the one thing the
+    lamp does not reach. Rank is inversion, in a mark small enough to read at
+    16px: shapes only, never text.
+  -->
+  <rect width="512" height="512" rx="112" fill="#120b0c"/>
+
+  <!-- Live: the cell the lamp floods. -->
+  <rect x="88" y="128" width="152" height="256" rx="16" fill="#e0402a"/>
+  <!-- Its figure goes dark inside the flood. -->
+  <rect x="146" y="184" width="36" height="144" rx="8" fill="#1a0708"/>
+
+  <!-- Waiting: the dark recess, its top edge catching the light. -->
+  <rect x="272" y="128" width="152" height="256" rx="16" fill="#0c0708"/>
+  <rect x="272" y="128" width="152" height="7" rx="3.5" fill="#ffffff" opacity="0.16"/>
+  <!-- The luminous figure. -->
+  <rect x="330" y="184" width="36" height="144" rx="8" fill="#e9e7d3"/>
 </svg>

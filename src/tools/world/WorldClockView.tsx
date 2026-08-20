@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Button } from '../../components/Button.tsx'
-import { FlipReadout } from '../../components/FlipReadout.tsx'
+import { Readout } from '../../components/Readout.tsx'
 import { CURATED_ZONES, offsetMs, zonedParts } from '../../engine/timezones.ts'
 import { useNow } from '../../hooks/useNow.tsx'
 import { useDispatch, useStore } from '../../store/context.ts'
@@ -100,7 +100,7 @@ export function WorldClockView() {
                 </p>
               </div>
               <p className="text-3xl" style={{ color: 'var(--ink)' }}>
-                <FlipReadout text={time} />
+                <Readout text={time} />
               </p>
               <div className="flex shrink-0 gap-1">
                 <Button
