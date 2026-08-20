@@ -1,10 +1,10 @@
 import type { RouteName } from './router.ts'
-import { toolByKey } from './tools.ts'
+import { chromeByKey, toolByKey } from './tools.ts'
 
 /**
  * Global keyboard shortcuts. One pure function decides what a keypress
  * means, so the answers never disagree with the ones baked into the tool
- * grid: the digits are `tool.key`, straight from the same constant.
+ * registry: every key here is a `key` field from that same constant.
  *
  * Shortcuts yield to the user: any modifier-held combination belongs to the
  * browser, and anything typed into a field belongs to the field.
@@ -27,10 +27,18 @@ export function shortcutFor(event: KeyEventShape): Shortcut | null {
   if (event.metaKey || event.ctrlKey || event.altKey) return null
   if (isTypingTarget(event.target)) return null
 
-  const tool = toolByKey(event.key)
+  // One normalisation up front: single characters are matched case-insensitively
+  // (so `D` and `d` agree), named keys like 'Escape' are left alone.
+  const key = event.key.length === 1 ? event.key.toLowerCase() : event.key
+
+  const tool = toolByKey(key)
   if (tool !== undefined) return { kind: 'navigate', route: tool.id }
 
-  switch (event.key.toLowerCase()) {
+  // Display and Settings are destinations too, just not tools.
+  const chrome = chromeByKey(key)
+  if (chrome !== undefined) return { kind: 'navigate', route: chrome.id }
+
+  switch (key) {
     case '?':
       return { kind: 'help' }
     case 'm':

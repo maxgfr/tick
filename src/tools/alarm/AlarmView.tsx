@@ -157,7 +157,7 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
             type="button"
             aria-pressed={alarm.days.includes(day)}
             onClick={() => toggleDay(day)}
-            className="rounded-xs border px-2 py-1 text-xs font-medium"
+            className="touch-target rounded-xs border px-2 py-1 text-xs font-medium"
             style={{
               borderColor: alarm.days.includes(day) ? 'var(--accent)' : 'var(--line)',
               color: alarm.days.includes(day) ? 'var(--accent)' : 'var(--ink-3)',
@@ -190,7 +190,7 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
           // and it never said what the control does.
           aria-label={`Enable alarm ${alarm.time}`}
           onClick={() => dispatch({ type: 'alarm/toggle', id: alarm.id })}
-          className="h-6 w-11 rounded-full border transition-colors"
+          className="touch-target h-6 w-11 rounded-full border transition-colors"
           style={{
             borderColor: alarm.enabled ? 'var(--accent)' : 'var(--line)',
             background: alarm.enabled ? 'var(--accent)' : 'transparent',

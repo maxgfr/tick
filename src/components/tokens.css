@@ -206,6 +206,20 @@ button {
 }
 
 /*
+  Touch targets. The visual size of a control is a density decision and stays
+  as designed; the *hit area* is a physical one. On a coarse pointer every
+  control grows to the 44px minimum a fingertip needs — the small button was
+  about 30px tall, which is a miss waiting to happen on a phone and untouched
+  by any amount of desktop polish.
+*/
+@media (pointer: coarse) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/*
   The tile row: progress as a row of small tiles. Empty cells are track,
   filled cells are vermilion — the board filling up as time is spent. Never a
   bar, never a ring: the unit is the tile.

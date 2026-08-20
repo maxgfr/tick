@@ -18,6 +18,7 @@ export type RouteName =
   | 'interval'
   | 'metronome'
   | 'world'
+  | 'meeting'
   | 'calculator'
   | 'alarm'
   | 'display'
@@ -29,6 +30,7 @@ export const ROUTES: readonly RouteName[] = [
   'interval',
   'metronome',
   'world',
+  'meeting',
   'calculator',
   'alarm',
   'display',
@@ -37,15 +39,28 @@ export const ROUTES: readonly RouteName[] = [
 
 export const LANDING: RouteName = 'countdown'
 
-export const routeToHash = (route: RouteName): string => (route === LANDING ? '#/' : `#/${route}`)
+export const routeToHash = (route: RouteName, param?: string): string => {
+  const base = route === LANDING ? '#/' : `#/${route}`
+  if (param === undefined || param === '') return base
+  return route === LANDING ? `#/${LANDING}/${param}` : `${base}/${param}`
+}
+
+/**
+ * Everything after the route segment. The meeting tool carries a shared
+ * roster this way — in the fragment, which browsers never put on the wire, so
+ * a share link costs no network and passes the privacy gate untouched.
+ */
+export function parseParam(hash: string): string {
+  return hash.replace(/^#\/?/, '').split('/').slice(1).join('/')
+}
 
 export function parseHash(hash: string): RouteName {
   const head = hash.replace(/^#\/?/, '').split('/')[0] ?? ''
   return (ROUTES as readonly string[]).includes(head) ? (head as RouteName) : LANDING
 }
 
-export function navigate(route: RouteName): void {
-  const hash = routeToHash(route)
+export function navigate(route: RouteName, param?: string): void {
+  const hash = routeToHash(route, param)
   if (window.location.hash !== hash) window.location.hash = hash
 }
 
@@ -59,4 +74,17 @@ export function useRoute(): RouteName {
   }, [])
 
   return route
+}
+
+/** The route's payload segment, tracked like the route itself. */
+export function useHashParam(): string {
+  const [param, setParam] = useState(() => parseParam(window.location.hash))
+
+  useEffect(() => {
+    const sync = () => setParam(parseParam(window.location.hash))
+    window.addEventListener('hashchange', sync)
+    return () => window.removeEventListener('hashchange', sync)
+  }, [])
+
+  return param
 }

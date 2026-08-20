@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ROUTES, parseHash, routeToHash } from './router.ts'
+import { ROUTES, parseHash, parseParam, routeToHash } from './router.ts'
 
 describe('parseHash', () => {
   it('lands on countdown for empty and bare hashes', () => {
@@ -36,5 +36,30 @@ describe('routeToHash', () => {
 
   it("uses the bare hash for the countdown, the app's landing screen", () => {
     expect(routeToHash('countdown')).toBe('#/')
+  })
+})
+
+describe('the payload segment', () => {
+  it('returns everything after the route, and nothing when there is none', () => {
+    expect(parseParam('#/meeting/AbC-_123')).toBe('AbC-_123')
+    expect(parseParam('#/meeting')).toBe('')
+    expect(parseParam('#/')).toBe('')
+    expect(parseParam('')).toBe('')
+    // A payload with a slash in it survives intact.
+    expect(parseParam('#/meeting/a/b')).toBe('a/b')
+  })
+
+  it('builds a hash carrying a payload, and leaves the plain form alone', () => {
+    expect(routeToHash('meeting', 'AbC')).toBe('#/meeting/AbC')
+    expect(routeToHash('meeting')).toBe('#/meeting')
+    expect(routeToHash('countdown')).toBe('#/')
+    // The landing route needs its name back once it carries something.
+    expect(routeToHash('countdown', 'x')).toBe('#/countdown/x')
+  })
+
+  it('round-trips every route through a payload-bearing hash', () => {
+    for (const route of ROUTES) {
+      expect(parseHash(routeToHash(route, 'payload'))).toBe(route)
+    }
   })
 })

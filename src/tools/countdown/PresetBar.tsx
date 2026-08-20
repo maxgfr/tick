@@ -25,7 +25,7 @@ export function PresetBar({ presets, onStart, onRemove }: PresetBarProps) {
         >
           <button
             type="button"
-            className="px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--surface-2)]"
+            className="touch-target px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--surface-2)]"
             style={{ color: 'var(--ink)' }}
             onClick={() => onStart(preset)}
           >
@@ -38,7 +38,7 @@ export function PresetBar({ presets, onStart, onRemove }: PresetBarProps) {
             type="button"
             aria-label={`Remove ${preset.label} preset`}
             title={`Remove ${preset.label} preset`}
-            className="px-2 py-1.5 text-xs transition-colors hover:bg-[var(--surface-2)]"
+            className="touch-target px-2 py-1.5 text-xs transition-colors hover:bg-[var(--surface-2)]"
             style={{ color: 'var(--ink-3)' }}
             onClick={() => onRemove(preset.id)}
           >

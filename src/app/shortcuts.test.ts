@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { TOOLS } from './tools.ts'
+import { CHROME, TOOLS } from './tools.ts'
 import { shortcutFor } from './shortcuts.ts'
 
 /** Everything `shortcutFor` is allowed to look at — a KeyboardEvent stand-in. */
@@ -19,6 +19,14 @@ describe('shortcutFor', () => {
     for (const tool of TOOLS) {
       expect(shortcutFor(key(tool.key))).toEqual({ kind: 'navigate', route: tool.id })
     }
+  })
+
+  it('maps d and , to display and settings — destinations, not tools', () => {
+    for (const item of CHROME) {
+      expect(shortcutFor(key(item.key))).toEqual({ kind: 'navigate', route: item.id })
+    }
+    // Case does not matter for a letter shortcut.
+    expect(shortcutFor(key('D'))).toEqual({ kind: 'navigate', route: 'display' })
   })
 
   it('maps ? to help and m/f to mute/fullscreen', () => {

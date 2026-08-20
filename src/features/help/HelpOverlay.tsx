@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { TOOLS } from '../../app/tools.ts'
+import { CHROME, TOOLS } from '../../app/tools.ts'
 
 const GLOBAL_KEYS: readonly { key: string; does: string }[] = [
   { key: '?', does: 'Show or hide this help' },
@@ -9,7 +9,7 @@ const GLOBAL_KEYS: readonly { key: string; does: string }[] = [
 
 /**
  * The shortcuts cheat sheet. It answers "what was that key again" without a
- * manual: the tool rows come from the same constant that draws the top bar,
+ * manual: every row comes from the same constant that draws the navigation,
  * so the list can never drift from reality. Escape closes it, and so does a
  * click on the scrim.
  */
@@ -58,16 +58,18 @@ export function HelpOverlay({ onClose }: { onClose: () => void }) {
 
         <table className="w-full text-sm">
           <tbody>
-            {TOOLS.map((tool) => (
-              <tr key={tool.id}>
+            {[...TOOLS, ...CHROME].map((destination) => (
+              <tr key={destination.id}>
                 <th
                   scope="row"
                   className="py-1 pr-4 text-left font-normal"
                   style={{ color: 'var(--ink-2)' }}
                 >
-                  {tool.name}
+                  {destination.name}
                 </th>
-                <td className="tnum py-1 text-right font-semibold">{tool.key}</td>
+                <td className="tnum py-1 text-right font-semibold">
+                  {destination.key.toUpperCase()}
+                </td>
               </tr>
             ))}
             {GLOBAL_KEYS.map((shortcut) => (

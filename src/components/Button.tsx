@@ -30,6 +30,9 @@ interface ButtonProps {
 /**
  * The one button in the app — variant is a tone, size is a scale. Labels set
  * in the condensed face, uppercase, like the board's own controls.
+ *
+ * `touch-target` is always emitted: it costs nothing on a mouse and lifts the
+ * hit area to 44px on a finger, without changing how the control looks.
  */
 export function Button({
   children,
@@ -49,7 +52,7 @@ export function Button({
       title={title}
       aria-label={ariaLabel}
       disabled={disabled}
-      className={`font-display rounded-xs px-3 py-1.5 text-sm font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${SIZES[size]} ${STYLES[variant]} ${className}`}
+      className={`font-display touch-target rounded-xs px-3 py-1.5 text-sm font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${SIZES[size]} ${STYLES[variant]} ${className}`}
     >
       {children}
     </button>
