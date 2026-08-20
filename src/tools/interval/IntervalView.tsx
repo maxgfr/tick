@@ -3,7 +3,6 @@ import { Button } from '../../components/Button.tsx'
 import { buildTimeline, phaseAt, PRESETS, totalMs } from '../../engine/intervals.ts'
 import type { IntervalConfig, Phase } from '../../engine/intervals.ts'
 import { formatClock } from '../../engine/duration.ts'
-import { useDocumentTitle } from '../../hooks/useDocumentTitle.ts'
 import { useNow } from '../../hooks/useNow.tsx'
 import { useWakeLock } from '../../hooks/useWakeLock.ts'
 import { playSignal, unlockAudio } from '../../lib/audio.ts'
@@ -47,12 +46,6 @@ export function IntervalView() {
   }, [])
 
   useWakeLock(running)
-  useDocumentTitle(
-    phase && running
-      ? { interval: { phase: phase.kind, remainingMs: phaseRemaining }, timers: [] }
-      : { timers: [] },
-    now,
-  )
 
   // One beep per phase entry, keyed by run + phase so a restart re-beeps.
   const lastKey = useRef<string | null>(null)

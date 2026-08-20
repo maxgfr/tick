@@ -1,52 +1,31 @@
-import { useEffect, useRef } from 'react'
 import { Button } from '../../components/Button.tsx'
 import { Readout } from '../../components/Readout.tsx'
 import { Gauge } from '../../components/Gauge.tsx'
 import { formatClock, formatHuman } from '../../engine/duration.ts'
 import { isDone, progress, remainingMs } from '../../engine/countdown.ts'
 import { useNow } from '../../hooks/useNow.tsx'
-import { fireNotification } from '../../lib/notify.ts'
 import { useDispatch, useStore } from '../../store/context.ts'
 import { isRinging } from './ringing.ts'
 
 /**
  * One countdown. Everything on screen — readout, tile row, buttons — is
- * derived from `now` on each tick; the card holds no time of its own. The
- * completion side effects fire on the derived done-transition, so a throttled
- * background tab notifies exactly once when it catches up, never once per
- * skipped tick.
+ * derived from `now` on each tick; the card holds no time of its own.
  *
- * The card does not make the sound. A finished timer rings until it is
- * stopped, and three cards finishing together must not mean three overlapping
- * ring loops — so the board owns the ringing, and the card owns the Stop.
+ * Nothing happens here when a timer crosses zero — no beep, no notification,
+ * not even the `fired` mark. All of it belongs to `CountdownWatcher`, which
+ * is mounted whether or not this board is on screen; a card that owned its
+ * own alarm was an alarm that stopped existing when you changed tool. What
+ * the card owns is the Stop, one timer at a time.
  */
 export function TimerCard({ id }: { id: string }) {
   const now = useNow()
   const dispatch = useDispatch()
-  const { settings, countdown } = useStore()
+  const { countdown } = useStore()
 
   const timer = countdown.timers.find((candidate) => candidate.id === id)
-  const done = timer !== undefined && isDone(timer, now)
-
-  // Hooks stay unconditional; the guard lives inside the effect.
-  //
-  // The ref is keyed by the *run*, not the timer: `endAt` is re-stamped on
-  // restart while `id` never changes, so keying by id silenced every run
-  // after the first — no beep, no notification, and `countdown/fired` never
-  // dispatched, so `firedAt` stayed undefined forever.
-  const firedFor = useRef<string | null>(null)
-  useEffect(() => {
-    if (!timer || !done || timer.firedAt !== undefined) return
-    const run = `${timer.id}:${String(timer.endAt)}`
-    if (firedFor.current === run) return
-    firedFor.current = run
-    dispatch({ type: 'countdown/fired', id: timer.id, now: Date.now() })
-    if (settings.notifications) {
-      fireNotification(`tick · ${timer.label}`, `${formatHuman(timer.totalMs)} — time's up`)
-    }
-  }, [done, timer, settings.notifications, dispatch])
-
   if (!timer) return null
+
+  const done = isDone(timer, now)
 
   const running = !done && timer.pausedRemainingMs === undefined && timer.endAt !== undefined
   const ringing = isRinging(timer, now)

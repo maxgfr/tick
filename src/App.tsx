@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { AppTitle } from './app/AppTitle.tsx'
 import { navigate, useRoute } from './app/router.ts'
 import type { RouteName } from './app/router.ts'
 import { shortcutFor } from './app/shortcuts.ts'
@@ -19,6 +20,7 @@ import { AlarmWatcher } from './tools/alarm/AlarmWatcher.tsx'
 import { AlarmView } from './tools/alarm/AlarmView.tsx'
 import { CalcView } from './tools/calc/CalcView.tsx'
 import { CountdownView } from './tools/countdown/CountdownView.tsx'
+import { CountdownWatcher } from './tools/countdown/CountdownWatcher.tsx'
 import { DisplayView } from './tools/display/DisplayView.tsx'
 import { IntervalView } from './tools/interval/IntervalView.tsx'
 import { MeetingView } from './tools/meeting/MeetingView.tsx'
@@ -30,7 +32,9 @@ import { WorldClockView } from './tools/world/WorldClockView.tsx'
  * The shell: store and one shared clock underneath, the routed tool on top.
  * The countdown is the landing screen — the app opens on its main board — and
  * every other tool hangs off the navigation. Global concerns live here and
- * only here: theme, sound settings, keyboard shortcuts, the alarm watcher.
+ * only here: theme, sound settings, keyboard shortcuts, the tab title, and
+ * the two watchers — because an alarm and a finished countdown both have to
+ * reach you wherever you happen to be standing in the app.
  */
 export function App() {
   return (
@@ -101,7 +105,9 @@ function Shell() {
         </>
       )}
       {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
+      <CountdownWatcher />
       <AlarmWatcher />
+      <AppTitle />
     </>
   )
 }

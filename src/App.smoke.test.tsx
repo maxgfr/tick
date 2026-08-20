@@ -77,6 +77,28 @@ describe('every tool, end to end', () => {
     expect(running().getByText('1:10')).toBeTruthy()
   })
 
+  it('countdown: rings from another tool, and the bar stops it', () => {
+    render(<App />)
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Duration' }), { target: { value: '10' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    // Walk away — which is what a kitchen timer is for.
+    go('2', 'Stopwatch')
+
+    vi.setSystemTime(NOW + 11_000)
+    tick(300)
+
+    const bar = screen.getByRole('alert', { name: 'Timer ringing' })
+    expect(bar.textContent).toContain("time's up")
+    // And the tab says so too, from a route that knows nothing about timers.
+    expect(document.title).toContain('⏰')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Stop ringing' }))
+    tick(300)
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
   it('countdown: a preset starts a timer in one tap', () => {
     render(<App />)
     fireEvent.click(screen.getAllByRole('button', { name: /Tea · green/ })[0]!)

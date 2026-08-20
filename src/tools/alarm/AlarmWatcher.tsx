@@ -6,16 +6,13 @@ import { useNow } from '../../hooks/useNow.tsx'
 import { playSignal, unlockAudio } from '../../lib/audio.ts'
 import { fireNotification } from '../../lib/notify.ts'
 import { useDispatch, useStore } from '../../store/context.ts'
-
-const CATCH_UP_MS = 15 * 60_000
-const SNOOZE_MS = 5 * 60_000
+import { SNOOZE_MS, ringingAlarm } from './ringing.ts'
 
 /**
- * Headless and mounted once: alarms ring from any route. Nothing is
- * scheduled — every render asks the engine what already passed, so an
- * occurrence missed during a reload or a throttled tab still rings (within a
- * quarter hour) and never rings twice. Whether an alarm is ringing is
- * derived, never stored.
+ * Headless and mounted once: alarms ring from any route. What is ringing is
+ * a question for `ringingAlarm`, asked fresh on every tick; this component
+ * owns only what happens about it — the sound, the notification, and the
+ * screen that takes over until it is dealt with.
  *
  * The snooze is a persisted timestamp on the alarm, like every other run in
  * this app. Holding it in component state meant a reload cancelled it and the
@@ -32,21 +29,7 @@ export function AlarmWatcher() {
     return () => window.removeEventListener('pointerdown', unlock)
   }, [])
 
-  const ringing = alarms.alarms.find((alarm) => {
-    if (!alarm.enabled) return false
-    const last = lastTrigger(alarm, new Date(now))
-    if (last === null || last <= (alarm.lastRangAt ?? 0)) return false
-
-    const snoozedUntil = alarm.snoozedUntil ?? 0
-    if (now < snoozedUntil) return false
-
-    // The catch-up window runs from whatever is due — the occurrence, or the
-    // end of a snooze. Measuring it from the original occurrence meant the
-    // third snooze walked the alarm past its own fifteen-minute window, and
-    // it never rang again, with nothing on screen to say so.
-    if (now - Math.max(last, snoozedUntil) > CATCH_UP_MS) return false
-    return true
-  })
+  const ringing = ringingAlarm(alarms.alarms, now)
 
   // One notification per ring — including the wake-up after a snooze.
   const ringKey = ringing === undefined ? null : `${ringing.id}:${ringing.time}`
