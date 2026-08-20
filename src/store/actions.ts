@@ -24,7 +24,7 @@ export type Action =
   | { type: 'interval/pause'; now: number }
   | { type: 'interval/resume'; now: number }
   | { type: 'interval/reset' }
-  | { type: 'metronome/set'; bpm?: number; beatsPerBar?: number }
+  | { type: 'metronome/set'; bpm?: number; beatsPerBar?: number; now: number }
   | { type: 'metronome/start'; now: number }
   | { type: 'metronome/stop' }
   | { type: 'world/add'; zoneId: string }

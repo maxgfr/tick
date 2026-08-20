@@ -6,6 +6,7 @@
  * background tabs. The reducer is pure: `now` arrives inside the action.
  */
 import { pause, resume, start } from '../engine/countdown.ts'
+import { reanchor } from '../engine/metronome.ts'
 import { makeId } from '../lib/id.ts'
 import type { Action } from './actions.ts'
 import type { AppState, CountdownItem } from './types.ts'
@@ -43,6 +44,10 @@ const omit = <T extends object, K extends keyof T>(object: T, ...keys: K[]): Omi
   for (const key of keys) delete copy[key]
   return copy
 }
+
+/** A finite number pulled into range; anything else keeps the old value. */
+const clamped = (value: number | undefined, min: number, max: number, fallback: number): number =>
+  value === undefined || !Number.isFinite(value) ? fallback : Math.min(max, Math.max(min, value))
 
 const mapTimer = (
   state: AppState,
@@ -171,16 +176,28 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'interval/reset':
       return { ...state, interval: { config: state.interval.config } }
 
-    case 'metronome/set':
+    case 'metronome/set': {
       // Spread, not rebuild: a tempo edit must not stop a running pulse.
+      const bpm = clamped(action.bpm, 20, 300, state.metronome.bpm)
+      const beatsPerBar = clamped(action.beatsPerBar, 1, 12, state.metronome.beatsPerBar)
+      const { runningSince } = state.metronome
+      // And it must not restart the bar either: the origin moves so that the
+      // beat index and its fraction are the same on both sides of the change.
+      // Without this, every step of a tempo slider drops you back on beat one.
+      const anchored =
+        runningSince !== undefined && bpm !== state.metronome.bpm
+          ? reanchor(runningSince, state.metronome.bpm, bpm, action.now)
+          : runningSince
       return {
         ...state,
         metronome: {
           ...state.metronome,
-          bpm: action.bpm ?? state.metronome.bpm,
-          beatsPerBar: action.beatsPerBar ?? state.metronome.beatsPerBar,
+          bpm,
+          beatsPerBar,
+          ...(anchored === undefined ? {} : { runningSince: anchored }),
         },
       }
+    }
     case 'metronome/start':
       if (state.metronome.runningSince !== undefined) return state
       return { ...state, metronome: { ...state.metronome, runningSince: action.now } }

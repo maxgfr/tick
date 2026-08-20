@@ -9,18 +9,25 @@ import type { AppState } from '../../store/types.ts'
 import { MetronomeView } from './MetronomeView.tsx'
 
 const stopMetronome = vi.fn()
+const setTempo = vi.fn()
 vi.mock('../../lib/audio.ts', () => ({
   playSignal: vi.fn(),
   unlockAudio: vi.fn(),
   configureAudio: vi.fn(),
-  startMetronome: vi.fn(() => stopMetronome),
+  audioReady: vi.fn(() => true),
+  startMetronome: vi.fn(() => ({ stop: stopMetronome, setTempo })),
 }))
+
 vi.mock('../../lib/notify.ts', () => ({
   fireNotification: vi.fn(),
   notificationsSupported: () => false,
   notificationPermission: () => 'unsupported' as const,
   requestNotificationPermission: vi.fn(),
 }))
+
+/** The scheduler's `onBeat`, from the run at `call`. */
+const onBeatOf = (call: number): ((beat: number) => void) =>
+  vi.mocked(startMetronome).mock.calls[call]![0].onBeat!
 
 const NOW = 1_760_000_000_000
 
@@ -44,6 +51,7 @@ describe('MetronomeView', () => {
     vi.useFakeTimers()
     vi.setSystemTime(NOW)
     stopMetronome.mockClear()
+    setTempo.mockClear()
   })
   afterEach(() => {
     vi.useRealTimers()
@@ -55,7 +63,9 @@ describe('MetronomeView', () => {
     mount()
 
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
-    expect(startMetronome).toHaveBeenCalledWith(144, 3, expect.any(Function))
+    expect(startMetronome).toHaveBeenCalledWith(
+      expect.objectContaining({ bpm: 144, beatsPerBar: 3, startedAt: NOW }),
+    )
     expect(screen.getByRole('button', { name: 'Stop' })).toBeTruthy()
   })
 
@@ -77,17 +87,17 @@ describe('MetronomeView', () => {
     mount()
 
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
-    const onBeat = vi.mocked(startMetronome).mock.calls[0]![2]!
+    const onBeat = onBeatOf(0)
 
     act(() => {
-      onBeat(0, 0)
+      onBeat(0)
     })
     expect(screen.getByLabelText('Beat 1').dataset.active).toBe('true')
     expect(screen.getByLabelText('Beat 1').dataset.accent).toBe('true')
     expect(screen.getByLabelText('Beat 2').dataset.active).toBe('false')
 
     act(() => {
-      onBeat(1, 0.5)
+      onBeat(1)
     })
     expect(screen.getByLabelText('Beat 1').dataset.active).toBe('false')
     expect(screen.getByLabelText('Beat 2').dataset.active).toBe('true')
@@ -102,16 +112,40 @@ describe('MetronomeView', () => {
     expect(screen.getByText('208 BPM')).toBeTruthy()
 
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
-    expect(startMetronome).toHaveBeenLastCalledWith(208, 4, expect.any(Function))
+    expect(startMetronome).toHaveBeenLastCalledWith(
+      expect.objectContaining({ bpm: 208, beatsPerBar: 4 }),
+    )
   })
 
-  it('resumes a run found in storage — from now, not from where it left off', () => {
-    // A run started a minute ago (e.g. before a reload): the scheduler must
-    // start fresh at beat 0 with no catch-up burst.
+  it('pushes a tempo edit into the live scheduler instead of rebuilding it', () => {
+    seed()
+    mount()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    expect(startMetronome).toHaveBeenCalledTimes(1)
+
+    // A drag: sixty change events, none of which may tear the scheduler down.
+    for (let bpm = 100; bpm <= 160; bpm += 1) {
+      fireEvent.change(screen.getByRole('slider', { name: 'Tempo' }), {
+        target: { value: String(bpm) },
+      })
+    }
+
+    expect(startMetronome).toHaveBeenCalledTimes(1)
+    expect(stopMetronome).not.toHaveBeenCalled()
+    expect(setTempo).toHaveBeenLastCalledWith(expect.objectContaining({ bpm: 160 }))
+  })
+
+  it('resumes a run found in storage on the beat it is actually on', () => {
+    // A run started a minute ago, before a reload. The origin is handed to
+    // the scheduler untouched, so the bar picks up where it really is rather
+    // than restarting on one.
     seed({ metronome: { bpm: 96, beatsPerBar: 3, runningSince: NOW - 60_000 } })
     mount()
 
-    expect(startMetronome).toHaveBeenCalledWith(96, 3, expect.any(Function))
+    expect(startMetronome).toHaveBeenCalledWith(
+      expect.objectContaining({ bpm: 96, beatsPerBar: 3, startedAt: NOW - 60_000 }),
+    )
     expect(screen.getByRole('button', { name: 'Stop' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Start' })).toBeNull()
   })

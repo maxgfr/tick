@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { beatPositionAt } from '../engine/metronome.ts'
 import { defaultState, reducer } from './reducer.ts'
 import type { AppState } from './types.ts'
 
@@ -143,7 +144,7 @@ describe('interval', () => {
 
 describe('metronome, world clock, alarms, settings', () => {
   it('sets metronome tempo and bar length', () => {
-    const next = reducer(state(), { type: 'metronome/set', bpm: 144, beatsPerBar: 3 })
+    const next = reducer(state(), { type: 'metronome/set', bpm: 144, beatsPerBar: 3, now: NOW })
     expect(next.metronome).toEqual({ bpm: 144, beatsPerBar: 3 })
   })
 
@@ -162,12 +163,43 @@ describe('metronome, world clock, alarms, settings', () => {
 
   it('a tempo edit survives a running metronome, and a stop never adds the key', () => {
     const started = reducer(state(), { type: 'metronome/start', now: NOW })
-    const retuned = reducer(started, { type: 'metronome/set', bpm: 208 })
+    const retuned = reducer(started, { type: 'metronome/set', bpm: 208, now: NOW })
+    // Edited on the downbeat itself, so the re-anchored origin is still NOW.
     expect(retuned.metronome).toEqual({ bpm: 208, beatsPerBar: 4, runningSince: NOW })
 
     const stopped = reducer(retuned, { type: 'metronome/stop' })
-    const edited = reducer(stopped, { type: 'metronome/set', bpm: 96 })
+    const edited = reducer(stopped, { type: 'metronome/set', bpm: 96, now: NOW })
     expect('runningSince' in edited.metronome).toBe(false)
+  })
+
+  it('re-phases a running bar on a tempo change instead of restarting it', () => {
+    // Two and a half beats into a 120 BPM run (500 ms a beat) when the tempo
+    // halves. The bar must not jump back to one.
+    const started = reducer(
+      { ...state(), metronome: { bpm: 120, beatsPerBar: 4 } },
+      { type: 'metronome/start', now: NOW },
+    )
+    const at = NOW + 1_250
+    const retuned = reducer(started, { type: 'metronome/set', bpm: 60, now: at })
+
+    // Still 2.5 beats in, now measured in 1000 ms beats: the origin moved back.
+    expect(beatPositionAt(retuned.metronome.runningSince!, 60, at)).toBeCloseTo(2.5, 9)
+  })
+
+  it('refuses a tempo outside the dial, and never lets a zero bar through', () => {
+    const wild = reducer(state(), { type: 'metronome/set', bpm: 9_000, now: NOW })
+    expect(wild.metronome.bpm).toBe(300)
+
+    const slow = reducer(state(), { type: 'metronome/set', bpm: 1, now: NOW })
+    expect(slow.metronome.bpm).toBe(20)
+
+    // A NaN out of a cleared number field keeps the old value rather than
+    // poisoning every later modulo.
+    const nan = reducer(state(), { type: 'metronome/set', beatsPerBar: Number.NaN, now: NOW })
+    expect(nan.metronome.beatsPerBar).toBe(4)
+
+    const zero = reducer(state(), { type: 'metronome/set', beatsPerBar: 0, now: NOW })
+    expect(zero.metronome.beatsPerBar).toBe(1)
   })
 
   it('adds and removes world zones without duplicates', () => {

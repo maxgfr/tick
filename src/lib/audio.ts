@@ -7,8 +7,10 @@
  * ends a countdown fires at `ctx.currentTime` precision even if the render
  * tick was throttled.
  */
+import { beatIntervalMs, isDownbeat } from '../engine/metronome.ts'
+
 let ctx: AudioContext | null = null
-let unlocking = false
+let visibilityBound = false
 
 let enabled = true
 let volume = 0.7
@@ -26,13 +28,20 @@ const context = (): AudioContext | null => {
   return ctx
 }
 
-/** Call from any first user gesture: creates and resumes the context. */
+/**
+ * Call from any first user gesture: creates and resumes the context.
+ *
+ * Every gesture retries. Latching after one attempt would strand the app
+ * silent for the rest of the session whenever the first `resume()` is
+ * rejected — Safari is particular about which gesture the call is nested in.
+ */
 export function unlockAudio(): void {
-  if (unlocking) return
-  unlocking = true
   const audio = context()
   if (audio && audio.state === 'suspended') void audio.resume()
+
   // Browsers can suspend the context again after a tab is hidden.
+  if (visibilityBound) return
+  visibilityBound = true
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && ctx && ctx.state === 'suspended') {
       void ctx.resume()
@@ -40,20 +49,23 @@ export function unlockAudio(): void {
   })
 }
 
+/** True once the context exists and is actually running. */
+export function audioReady(): boolean {
+  return ctx !== null && ctx.state === 'running'
+}
+
 interface Tone {
-  /** Delay from now, in milliseconds. */
+  /** Delay from the signal's own start, in milliseconds. */
   atMs: number
   frequency: number
   durationMs: number
   gain: number
 }
 
-const tone = (t: Tone): void => {
+/** Schedules one tone at an absolute time on the audio clock. */
+const toneAt = (audio: AudioContext, t: Omit<Tone, 'atMs'>, start: number): void => {
   if (!enabled || volume <= 0) return
-  const audio = context()
-  if (!audio || audio.state !== 'running') return
 
-  const start = audio.currentTime + t.atMs / 1000
   const oscillator = audio.createOscillator()
   const amplifier = audio.createGain()
 
@@ -103,48 +115,108 @@ const SIGNALS: Record<Signal, readonly Tone[]> = {
 }
 
 export function playSignal(signal: Signal): void {
-  for (const t of SIGNALS[signal]) tone(t)
+  const audio = context()
+  if (!audio || audio.state !== 'running') return
+  for (const t of SIGNALS[signal]) toneAt(audio, t, audio.currentTime + t.atMs / 1000)
 }
 
+export interface MetronomeRun {
+  /** Tempo or meter changed. The bar is re-phased, never restarted. */
+  setTempo(options: { bpm: number; beatsPerBar: number; startedAt: number }): void
+  stop(): void
+}
+
+/** How far ahead of the audio clock beats are queued, in seconds. */
+const LOOKAHEAD_S = 0.12
+/** How often the queue is topped up. Independent of tempo, by design. */
+const TICK_MS = 25
+
 /**
- * Metronome scheduler: look ahead on the audio clock and schedule beats
- * before they are due, so the pulse is immune to render-tick jitter.
- * `onBeat` fires (slightly early, at schedule time) for the visual pulse.
+ * Metronome scheduler: queue beats on the audio clock ahead of time, so the
+ * pulse is immune to render-tick jitter.
+ *
+ * The beat index is *derived* from `startedAt`, never counted: the origin is
+ * anchored once against the audio clock, and every beat's time is a function
+ * of it. That is what makes a tempo change re-phase instead of restarting the
+ * bar, and what lets a run picked up from storage resume on the right beat.
+ *
+ * `onBeat` fires at schedule time — a lookahead early — for the visual pulse.
  */
-export function startMetronome(
-  bpm: number,
-  beatsPerBar: number,
-  onBeat?: (beat: number, audioTime: number) => void,
-): () => void {
+export function startMetronome(options: {
+  bpm: number
+  beatsPerBar: number
+  /** Wall-clock ms the run began at; the beat phase is derived from it. */
+  startedAt: number
+  onBeat?: (beat: number) => void
+}): MetronomeRun {
   const audio = context()
-  const intervalMs = 60_000 / bpm
-  let beat = 0
+  const onBeat = options.onBeat
+  let { bpm, beatsPerBar, startedAt } = options
   let stopped = false
-  let timer = 0
+
+  /** Audio-clock time of beat 0. The one place the two clocks meet. */
+  let origin = 0
+  /** The first beat not yet queued. Lives here, not inside `schedule`. */
+  let nextBeat = 0
+  /** Audio time of the last beat handed to the context. Already committed. */
+  let queuedThrough = Number.NEGATIVE_INFINITY
+
+  const intervalS = (): number => beatIntervalMs(bpm) / 1000
+  const beatTime = (beat: number): number => origin + beat * intervalS()
+
+  /**
+   * Re-derive the origin from `startedAt`, then pick up after whatever is
+   * already queued. A tone handed to the audio clock cannot be recalled, so a
+   * tempo change must resume past it — re-queueing the lookahead window on
+   * every slider step is what turns a drag into a flam.
+   */
+  const anchor = (): void => {
+    if (!audio) return
+    origin = audio.currentTime - (Date.now() - startedAt) / 1000
+    const fromClock = Math.ceil((audio.currentTime - origin) / intervalS())
+    const fromQueue =
+      queuedThrough === Number.NEGATIVE_INFINITY
+        ? 0
+        : Math.floor((queuedThrough - origin) / intervalS() + 1e-9) + 1
+    nextBeat = Math.max(0, fromClock, fromQueue)
+  }
 
   const schedule = (): void => {
     if (stopped || !audio || audio.state !== 'running') return
-    const lookaheadMs = 120
-    // nextDue is on the wall clock, converted to audio time at schedule time.
-    let due = performance.now()
-    const horizon = due + lookaheadMs
-    while (due < horizon) {
-      const audioTime = audio.currentTime + (due - performance.now()) / 1000
-      const signal = beat % beatsPerBar === 0 ? 'beat-down' : 'beat'
-      for (const t of SIGNALS[signal]) {
-        tone({ ...t, atMs: Math.max(0, due - performance.now()) })
-      }
-      onBeat?.(beat, audioTime)
-      beat += 1
-      due += intervalMs
+
+    // A throttled or suspended tab leaves the queue far behind. Skip to the
+    // present instead of firing a burst of late clicks.
+    const earliest = Math.ceil((audio.currentTime - origin) / intervalS())
+    if (nextBeat < earliest) nextBeat = earliest
+
+    const horizon = audio.currentTime + LOOKAHEAD_S
+    while (beatTime(nextBeat) < horizon) {
+      const signal = isDownbeat(nextBeat, beatsPerBar) ? 'beat-down' : 'beat'
+      const at = beatTime(nextBeat)
+      for (const t of SIGNALS[signal]) toneAt(audio, t, at + t.atMs / 1000)
+      onBeat?.(nextBeat)
+      queuedThrough = at
+      nextBeat += 1
     }
   }
 
+  anchor()
   schedule()
-  timer = window.setInterval(schedule, Math.min(25, intervalMs))
+  const timer = window.setInterval(schedule, TICK_MS)
 
-  return () => {
-    stopped = true
-    window.clearInterval(timer)
+  return {
+    setTempo(next) {
+      bpm = next.bpm
+      beatsPerBar = next.beatsPerBar
+      startedAt = next.startedAt
+      // Re-anchor against the new origin the store already re-phased, and
+      // top the queue up now so the change is heard on the next beat.
+      anchor()
+      schedule()
+    },
+    stop() {
+      stopped = true
+      window.clearInterval(timer)
+    },
   }
 }
