@@ -257,6 +257,13 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'settings/set':
       return { ...state, settings: { ...state.settings, ...action.patch } }
 
+    // The settings view's whole-state levers: import (already sanitized
+    // through loadState before it gets here) and the reset button.
+    case 'state/replace':
+      return action.state
+    case 'state/clear':
+      return defaultState(action.localZone)
+
     default:
       return state
   }

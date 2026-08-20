@@ -1,5 +1,5 @@
 import type { IntervalConfig } from '../engine/intervals.ts'
-import type { SettingsState, Theme } from './types.ts'
+import type { AppState, SettingsState, Theme } from './types.ts'
 
 /**
  * Every action that can change app state. Time-dependent actions carry their
@@ -38,3 +38,5 @@ export type Action =
       type: 'settings/set'
       patch: Partial<Pick<SettingsState, 'sound' | 'volume' | 'notifications'>> | { theme: Theme }
     }
+  | { type: 'state/replace'; state: AppState }
+  | { type: 'state/clear'; localZone: string }

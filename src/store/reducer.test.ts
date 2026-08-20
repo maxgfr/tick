@@ -219,3 +219,27 @@ describe('alarm ringing bookkeeping', () => {
     expect(older.alarms.alarms[0]!.lastRangAt).toBe(1_000)
   })
 })
+
+describe('whole-state replace and clear', () => {
+  it('replaces the state wholesale — the import path', () => {
+    const imported = state({
+      countdown: { timers: [], presets: [{ id: 'p1', label: 'Steep', durationMs: 2 * MIN }] },
+      world: { zoneIds: ['Asia/Tokyo'] },
+    })
+    const next = reducer(state(), { type: 'state/replace', state: imported })
+    expect(next).toBe(imported)
+  })
+
+  it('clears back to defaults, presets restored', () => {
+    const dirty = reducer(state(), {
+      type: 'countdown/add',
+      label: 'Tea',
+      durationMs: MIN,
+      now: NOW,
+    })
+    expect(dirty.countdown.timers).toHaveLength(1)
+
+    const cleared = reducer(dirty, { type: 'state/clear', localZone: 'Europe/Paris' })
+    expect(cleared).toEqual(defaultState('Europe/Paris'))
+  })
+})
