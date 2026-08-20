@@ -70,20 +70,54 @@ describe('countdown', () => {
     expect(reducer(added, { type: 'countdown/remove', id }).countdown.timers).toHaveLength(0)
   })
 
-  it('manages presets: default presets ship, custom ones add and remove', () => {
+  it('ships default presets, and lets any of them be pruned', () => {
     const initial = state()
     expect(initial.countdown.presets.length).toBeGreaterThan(3)
 
-    const withCustom = reducer(initial, {
-      type: 'countdown/preset/add',
-      label: 'Sourdough',
-      durationMs: 45 * MIN,
-    })
-    const custom = withCustom.countdown.presets.find((preset) => preset.label === 'Sourdough')
-    expect(custom).toBeTruthy()
+    const first = initial.countdown.presets[0]!
+    const pruned = reducer(initial, { type: 'countdown/preset/remove', id: first.id })
+    expect(pruned.countdown.presets.find((preset) => preset.id === first.id)).toBeUndefined()
+  })
 
-    const withoutCustom = reducer(withCustom, { type: 'countdown/preset/remove', id: custom!.id })
-    expect(withoutCustom.countdown.presets.find((p) => p.label === 'Sourdough')).toBeUndefined()
+  it('records recent durations, and forgets the one you drop', () => {
+    const once = reducer(state(), {
+      type: 'countdown/add',
+      label: 'Tea',
+      durationMs: 3 * MIN,
+      now: NOW,
+    })
+    const twice = reducer(once, {
+      type: 'countdown/add',
+      label: 'Eggs',
+      durationMs: 6 * MIN,
+      now: NOW,
+    })
+    expect(twice.countdown.recents).toEqual([6 * MIN, 3 * MIN])
+
+    // Starting the same duration again moves it to the front, never duplicates.
+    const again = reducer(twice, {
+      type: 'countdown/add',
+      label: 'Tea',
+      durationMs: 3 * MIN,
+      now: NOW,
+    })
+    expect(again.countdown.recents).toEqual([3 * MIN, 6 * MIN])
+
+    const dropped = reducer(again, { type: 'countdown/recent/remove', durationMs: 3 * MIN })
+    expect(dropped.countdown.recents).toEqual([6 * MIN])
+  })
+
+  it('keeps only the last six durations', () => {
+    let next = state()
+    for (let minutes = 1; minutes <= 9; minutes += 1) {
+      next = reducer(next, {
+        type: 'countdown/add',
+        label: 'T',
+        durationMs: minutes * MIN,
+        now: NOW,
+      })
+    }
+    expect(next.countdown.recents).toEqual([9, 8, 7, 6, 5, 4].map((m) => m * MIN))
   })
 
   it('refuses to add a zero-duration timer', () => {

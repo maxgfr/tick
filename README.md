@@ -36,7 +36,8 @@ second accent colour. Nothing animates, anywhere.
 Setting a timer is a keypad, not a text field: digits shift in from the right,
 so `1` `3` `0` is a minute and a half, and the readout shows what it means
 before anything starts. Typing still works — `1:30`, `2m30s` — for whoever
-would rather. Durations you have used recently sit one tap away.
+would rather. The last six durations you used sit one tap away, each with a cross to forget
+it — there is no save step, because starting a timer is the save.
 
 ## Time that doesn't drift
 

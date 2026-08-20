@@ -14,8 +14,8 @@ export type Action =
   | { type: 'countdown/resume'; id: string; now: number }
   | { type: 'countdown/restart'; id: string; now: number }
   | { type: 'countdown/fired'; id: string; now: number }
-  | { type: 'countdown/preset/add'; label: string; durationMs: number }
   | { type: 'countdown/preset/remove'; id: string }
+  | { type: 'countdown/recent/remove'; durationMs: number }
   | { type: 'stopwatch/start'; now: number }
   | { type: 'stopwatch/pause'; now: number }
   | { type: 'stopwatch/lap'; now: number }

@@ -35,6 +35,13 @@ const mount = () =>
     </StoreProvider>,
   )
 
+/** Tap a key on the pad, by its visible digit or its accessible name. */
+const press = (name: string): void => {
+  fireEvent.click(
+    within(screen.getByRole('group', { name: 'Duration keypad' })).getByRole('button', { name }),
+  )
+}
+
 describe('CountdownView', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -97,7 +104,7 @@ describe('CountdownView', () => {
     expect(within(list).getByText('40:00')).toBeTruthy()
   })
 
-  it('saves a custom preset and starts it in one gesture', async () => {
+  it('starts a labelled timer without any save step — recents keep the duration', () => {
     seed()
     mount()
 
@@ -107,32 +114,16 @@ describe('CountdownView', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Label' }), {
       target: { value: 'Sourdough' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Save preset' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
 
-    // Preset persisted as a chip, and its timer is running.
-    expect(screen.getAllByRole('button', { name: /Sourdough/ }).length).toBeGreaterThan(0)
-    expect(
-      within(screen.getByRole('list', { name: 'Running timers' })).getByText('12:00'),
-    ).toBeTruthy()
-  })
-})
+    const running = within(screen.getByRole('list', { name: 'Running timers' }))
+    expect(running.getByText('12:00')).toBeTruthy()
+    expect(running.getByText('Sourdough')).toBeTruthy()
 
-describe('the keypad', () => {
-  beforeEach(() => {
-    localStorage.clear()
-    vi.useFakeTimers()
-    vi.setSystemTime(NOW)
+    // The duration is remembered on its own; there is nothing to save.
+    const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
+    expect(recent.getByRole('button', { name: '12:00' })).toBeTruthy()
   })
-  afterEach(() => {
-    vi.useRealTimers()
-    vi.clearAllMocks()
-  })
-
-  const press = (name: string): void => {
-    fireEvent.click(
-      within(screen.getByRole('group', { name: 'Duration keypad' })).getByRole('button', { name }),
-    )
-  }
 
   it('shifts digits in from the right, and shows what they mean', () => {
     seed()
@@ -211,7 +202,11 @@ describe('recent durations', () => {
     }
 
     const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
-    const chips = recent.getAllByRole('button').map((node) => node.textContent)
+    // Every chip carries its own remove button, hence the crosses.
+    const chips = recent
+      .getAllByRole('button')
+      .map((node) => node.textContent)
+      .filter((text) => text !== '×')
     expect(chips).toEqual(['1:00', '2:00'])
   })
 
@@ -227,5 +222,48 @@ describe('recent durations', () => {
 
     const running = within(screen.getByRole('list', { name: 'Running timers' }))
     expect(running.getAllByText('3:00')).toHaveLength(2)
+  })
+})
+
+describe('pruning a recent duration', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  it('drops the chip you cross out and leaves the others', () => {
+    seed()
+    mount()
+
+    for (const value of ['1:00', '2:00']) {
+      fireEvent.change(screen.getByLabelText('Duration'), { target: { value } })
+      fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    }
+
+    const recent = () => within(screen.getByRole('region', { name: 'Recent durations' }))
+    fireEvent.click(recent().getByRole('button', { name: 'Forget 1:00' }))
+
+    expect(recent().queryByRole('button', { name: '1:00' })).toBeNull()
+    expect(recent().getByRole('button', { name: '2:00' })).toBeTruthy()
+  })
+
+  it('takes the whole row away once the last one is gone', () => {
+    seed()
+    mount()
+
+    fireEvent.change(screen.getByLabelText('Duration'), { target: { value: '4:00' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Recent durations' })).getByRole('button', {
+        name: 'Forget 4:00',
+      }),
+    )
+    expect(screen.queryByRole('region', { name: 'Recent durations' })).toBeNull()
   })
 })

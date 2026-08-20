@@ -164,15 +164,12 @@ export function reducer(state: AppState, action: Action): AppState {
         timer.firedAt === undefined ? { ...timer, firedAt: action.now } : timer,
       )
 
-    case 'countdown/preset/add':
+    case 'countdown/recent/remove':
       return {
         ...state,
         countdown: {
           ...state.countdown,
-          presets: [
-            ...state.countdown.presets,
-            { id: makeId(), label: action.label, durationMs: action.durationMs },
-          ],
+          recents: state.countdown.recents.filter((ms) => ms !== action.durationMs),
         },
       }
     case 'countdown/preset/remove':

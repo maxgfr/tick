@@ -7,6 +7,7 @@ import { useWakeLock } from '../../hooks/useWakeLock.ts'
 import { unlockAudio } from '../../lib/audio.ts'
 import { useDispatch, useStore } from '../../store/context.ts'
 import { Readout } from '../../components/Readout.tsx'
+import { DurationChip } from './DurationChip.tsx'
 import { DurationPad } from './DurationPad.tsx'
 import { PresetBar } from './PresetBar.tsx'
 import { TimerCard } from './TimerCard.tsx'
@@ -106,15 +107,6 @@ export function CountdownView() {
     resetInputs()
   }
 
-  const onSavePreset = (): void => {
-    const ms = parse()
-    if (ms === null) return
-    const label = labelText.trim() || 'Preset'
-    dispatch({ type: 'countdown/preset/add', label, durationMs: ms })
-    startTimer(label, ms)
-    resetInputs()
-  }
-
   return (
     <div className="flex flex-col gap-6">
       <form
@@ -173,18 +165,9 @@ export function CountdownView() {
               color: 'var(--ink)',
             }}
           />
-          <div className="flex gap-2">
-            <Button type="submit" variant="primary" size="lg" className="flex-1">
-              Start
-            </Button>
-            <Button
-              size="lg"
-              onClick={onSavePreset}
-              title="Save this duration as a preset and start it"
-            >
-              Save preset
-            </Button>
-          </div>
+          <Button type="submit" variant="primary" size="lg" className="w-full">
+            Start
+          </Button>
         </div>
       </form>
 
@@ -206,11 +189,13 @@ export function CountdownView() {
           </h2>
           <ul className="flex flex-wrap gap-2">
             {countdown.recents.map((durationMs) => (
-              <li key={durationMs}>
-                <Button onClick={() => startTimer(labelText, durationMs)}>
-                  {formatClock(durationMs)}
-                </Button>
-              </li>
+              <DurationChip
+                key={durationMs}
+                durationMs={durationMs}
+                removeLabel={`Forget ${formatClock(durationMs)}`}
+                onStart={() => startTimer(labelText, durationMs)}
+                onRemove={() => dispatch({ type: 'countdown/recent/remove', durationMs })}
+              />
             ))}
           </ul>
         </section>
