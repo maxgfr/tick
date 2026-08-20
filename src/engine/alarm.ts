@@ -44,3 +44,35 @@ export function nextTrigger(config: AlarmConfig, now: Date): number | null {
   }
   return null
 }
+
+/**
+ * The mirror of `nextTrigger`: the most recent scheduled occurrence strictly
+ * before `now`, at most six days back. This is how the watcher knows an alarm
+ * fired while the app was closed — and where the "Missed" badge comes from.
+ */
+export function lastTrigger(config: AlarmConfig, now: Date): number | null {
+  if (!config.enabled) return null
+
+  const match = config.time.match(TIME)
+  if (!match) return null
+  const hours = Number(match[1])
+  const minutes = Number(match[2])
+
+  const enabledDays = new Set(config.days)
+  for (let offset = 0; offset <= 6; offset += 1) {
+    const candidate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - offset,
+      hours,
+      minutes,
+      0,
+      0,
+    )
+    if (candidate.getTime() >= now.getTime()) continue
+    if (enabledDays.size === 0 || enabledDays.has(candidate.getDay())) {
+      return candidate.getTime()
+    }
+  }
+  return null
+}

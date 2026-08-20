@@ -224,6 +224,17 @@ export function reducer(state: AppState, action: Action): AppState {
           ),
         },
       }
+    case 'alarm/fired':
+      return {
+        ...state,
+        alarms: {
+          alarms: state.alarms.alarms.map((alarm) =>
+            alarm.id === action.id && action.at > (alarm.lastRangAt ?? 0)
+              ? { ...alarm, lastRangAt: action.at }
+              : alarm,
+          ),
+        },
+      }
     case 'alarm/setTime':
       return {
         ...state,

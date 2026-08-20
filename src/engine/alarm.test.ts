@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { nextTrigger } from './alarm.ts'
+import { nextTrigger, lastTrigger } from './alarm.ts'
 
 // Monday 2026-08-17, 08:00 local (jsdom runs in the host timezone; pin instants
 // relative to a Monday so day-of-week math is deterministic).
@@ -49,5 +49,37 @@ describe('nextTrigger', () => {
     expect(nextTrigger({ time: '9', days: [], enabled: true }, MONDAY_8AM)).toBeNull()
     expect(nextTrigger({ time: '25:00', days: [], enabled: true }, MONDAY_8AM)).toBeNull()
     expect(nextTrigger({ time: '12:60', days: [], enabled: true }, MONDAY_8AM)).toBeNull()
+  })
+})
+
+describe('lastTrigger', () => {
+  // Wednesday 2025-10-08T08:00:00 local.
+  const now = new Date(2025, 9, 8, 8, 0, 0, 0)
+  const config = { time: '07:30', days: [], enabled: true }
+
+  it('finds today’s occurrence when it has already passed', () => {
+    const last = lastTrigger(config, now)
+    expect(last).not.toBeNull()
+    expect(new Date(last!).getHours()).toBe(7)
+    expect(new Date(last!).getMinutes()).toBe(30)
+    expect(new Date(last!).getDate()).toBe(8)
+  })
+
+  it('falls back to the previous day when today’s has not rung yet', () => {
+    const early = new Date(2025, 9, 8, 6, 0, 0, 0)
+    const last = lastTrigger(config, early)
+    expect(new Date(last!).getDate()).toBe(7)
+  })
+
+  it('scans back to the latest enabled weekday', () => {
+    const mondays = { time: '07:30', days: [1], enabled: true }
+    const last = lastTrigger(mondays, now)
+    expect(last).not.toBeNull()
+    expect(new Date(last!).getDate()).toBe(6) // Monday 2025-10-06
+  })
+
+  it('returns null when disabled or malformed', () => {
+    expect(lastTrigger({ ...config, enabled: false }, now)).toBeNull()
+    expect(lastTrigger({ ...config, time: '9:99' }, now)).toBeNull()
   })
 })

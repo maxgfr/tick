@@ -22,6 +22,8 @@ export interface AlarmItem {
   /** 0 (Sunday) to 6 (Saturday). Empty means every day. */
   days: number[]
   enabled: boolean
+  /** Timestamp of the occurrence this alarm last rang for (dismiss/snooze). */
+  lastRangAt?: number
 }
 
 export interface StopwatchState {

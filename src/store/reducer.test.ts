@@ -206,3 +206,16 @@ describe('reducer hygiene', () => {
     expect(initial.countdown.timers).toHaveLength(0)
   })
 })
+
+describe('alarm ringing bookkeeping', () => {
+  it('records when an alarm last rang, never moving backwards', () => {
+    const added = reducer(state(), { type: 'alarm/add', time: '07:30' })
+    const id = added.alarms.alarms[0]!.id
+
+    const rang = reducer(added, { type: 'alarm/fired', id, at: 1_000 })
+    expect(rang.alarms.alarms[0]!.lastRangAt).toBe(1_000)
+
+    const older = reducer(rang, { type: 'alarm/fired', id, at: 500 })
+    expect(older.alarms.alarms[0]!.lastRangAt).toBe(1_000)
+  })
+})
