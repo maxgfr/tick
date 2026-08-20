@@ -1,10 +1,11 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TickerProvider } from '../../hooks/useNow.tsx'
+import { playSignal } from '../../lib/audio.ts'
 import { STORAGE_KEY, serialize } from '../../store/persist.ts'
 import { defaultState } from '../../store/reducer.ts'
 import { StoreProvider } from '../../store/StoreProvider.tsx'
-import type { AppState } from '../../store/types.ts'
+import type { AppState, CountdownItem } from '../../store/types.ts'
 import { CountdownView } from './CountdownView.tsx'
 
 vi.mock('../../lib/audio.ts', () => ({
@@ -322,5 +323,110 @@ describe('a remembered duration keeps its name', () => {
     start('11:00', 'Pasta')
     const recent = within(screen.getByRole('region', { name: 'Recent durations' }))
     expect(recent.getByRole('button', { name: 'Forget Pasta 11:00' })).toBeTruthy()
+  })
+})
+
+describe('a countdown that runs out', () => {
+  /** Seed timers only — presets and recents are not what these tests watch. */
+  const board = (timers: CountdownItem[]): void => {
+    seed({ countdown: { timers, presets: [], recents: [] } })
+  }
+
+  /** How many rings have been heard so far. */
+  const rings = (): number => vi.mocked(playSignal).mock.calls.length
+
+  beforeEach(() => {
+    localStorage.clear()
+    vi.useFakeTimers()
+    vi.setSystemTime(NOW)
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  it('keeps ringing until it is stopped', () => {
+    board([{ id: 'r1', label: 'Eggs', totalMs: 2_000, endAt: NOW + 1_000 }])
+    mount()
+
+    expect(playSignal).not.toHaveBeenCalled()
+
+    act(() => {
+      vi.setSystemTime(NOW + 1_200)
+      vi.advanceTimersByTime(300)
+    })
+    expect(playSignal).toHaveBeenCalledWith('countdown-done')
+    expect(rings()).toBe(1)
+
+    // The whole point: one beep is a beep you miss.
+    act(() => {
+      vi.setSystemTime(NOW + 6_200)
+      vi.advanceTimersByTime(5_000)
+    })
+    expect(rings()).toBeGreaterThan(2)
+
+    const heard = rings()
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    act(() => {
+      vi.setSystemTime(NOW + 16_200)
+      vi.advanceTimersByTime(10_000)
+    })
+    expect(rings()).toBe(heard)
+  })
+
+  it('rings once for two timers finishing together, not twice', () => {
+    board([
+      { id: 'r1', label: 'Eggs', totalMs: 2_000, endAt: NOW + 1_000 },
+      { id: 'r2', label: 'Toast', totalMs: 2_000, endAt: NOW + 1_000 },
+    ])
+    mount()
+
+    act(() => {
+      vi.setSystemTime(NOW + 1_200)
+      vi.advanceTimersByTime(300)
+    })
+    act(() => {
+      vi.setSystemTime(NOW + 4_200)
+      vi.advanceTimersByTime(3_000)
+    })
+
+    // Two cards, one voice — 1.5s apart, not two overlapping loops.
+    expect(screen.getAllByRole('button', { name: 'Stop' })).toHaveLength(2)
+    expect(rings()).toBe(3)
+  })
+
+  it('says nothing about a timer that ran out while the tab was closed', () => {
+    board([{ id: 'r3', label: 'Laundry', totalMs: 45 * 60_000, endAt: NOW - 30 * 60_000 }])
+    mount()
+
+    act(() => {
+      vi.setSystemTime(NOW + 2_000)
+      vi.advanceTimersByTime(2_000)
+    })
+
+    expect(playSignal).not.toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: 'Stop' })).toBeNull()
+  })
+
+  it('stays silent when sound is off', () => {
+    const base = defaultState('UTC')
+    seed({
+      settings: { ...base.settings, sound: false },
+      countdown: {
+        timers: [{ id: 'r4', label: 'Eggs', totalMs: 2_000, endAt: NOW + 1_000 }],
+        presets: [],
+        recents: [],
+      },
+    })
+    mount()
+
+    act(() => {
+      vi.setSystemTime(NOW + 4_200)
+      vi.advanceTimersByTime(3_300)
+    })
+
+    expect(playSignal).not.toHaveBeenCalled()
+    // Muted is not unattended: the card still says it is ringing.
+    expect(screen.getByRole('button', { name: 'Stop' })).toBeTruthy()
   })
 })

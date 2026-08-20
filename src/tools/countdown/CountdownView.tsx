@@ -4,12 +4,13 @@ import { durationFromDigits, formatClock, parseDuration } from '../../engine/dur
 import { useDocumentTitle } from '../../hooks/useDocumentTitle.ts'
 import { useNow } from '../../hooks/useNow.tsx'
 import { useWakeLock } from '../../hooks/useWakeLock.ts'
-import { unlockAudio } from '../../lib/audio.ts'
+import { playSignal, unlockAudio } from '../../lib/audio.ts'
 import { useDispatch, useStore } from '../../store/context.ts'
 import { Readout } from '../../components/Readout.tsx'
 import { DurationChip } from './DurationChip.tsx'
 import { DurationPad } from './DurationPad.tsx'
 import { PresetBar } from './PresetBar.tsx'
+import { RING_INTERVAL_MS, isRinging } from './ringing.ts'
 import { TimerCard } from './TimerCard.tsx'
 
 const BAD_INPUT = "Couldn't understand that — try the keypad, or 1:30, or 2m30s."
@@ -37,9 +38,12 @@ const interpret = (text: string): number | null => {
  * keypad (or tap a preset, or a duration you used recently), get a card;
  * every card keeps running across reloads, background tabs and system sleep
  * because none of them count — they all derive.
+ *
+ * When one finishes it rings the way a bedside alarm rings: over and over,
+ * until it is stopped.
  */
 export function CountdownView() {
-  const { countdown } = useStore()
+  const { countdown, settings } = useStore()
   const dispatch = useDispatch()
   const now = useNow()
 
@@ -60,8 +64,25 @@ export function CountdownView() {
     (timer) =>
       timer.pausedRemainingMs === undefined && timer.endAt !== undefined && timer.endAt > now,
   )
-  useWakeLock(anyRunning)
-  useDocumentTitle({ timers }, now)
+  // The board rings, not the card: however many timers hit zero together,
+  // there is one loop and one voice. And it keeps ringing — a countdown heard
+  // once is a countdown missed, so it nags like an alarm clock until every
+  // finished timer has been stopped (or the ring window runs out).
+  const ringer = timers.find((timer) => isRinging(timer, now))
+  const ringing = ringer !== undefined
+
+  // A ringing timer holds the screen too: the alarm is only useful if the
+  // thing that stops it is right there when you come back. And it takes the
+  // tab title, for the times the sound is the channel that fails.
+  useWakeLock(anyRunning || ringing)
+  useDocumentTitle(ringer ? { timers, ringingTimer: ringer.label } : { timers }, now)
+
+  useEffect(() => {
+    if (!ringing || !settings.sound) return
+    playSignal('countdown-done')
+    const id = window.setInterval(() => playSignal('countdown-done'), RING_INTERVAL_MS)
+    return () => window.clearInterval(id)
+  }, [ringing, settings.sound])
 
   const composed = interpret(entry)
 

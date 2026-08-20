@@ -51,6 +51,18 @@ describe('countdown', () => {
     expect(firedAgain.countdown.timers[0]!.firedAt).toBe(NOW + MIN)
   })
 
+  it('stops the ringing without touching the timer, once', () => {
+    const added = reducer(state(), { type: 'countdown/add', label: 'X', durationMs: MIN, now: NOW })
+    const id = added.countdown.timers[0]!.id
+
+    const silenced = reducer(added, { type: 'countdown/silence', id, now: NOW + MIN })
+    const again = reducer(silenced, { type: 'countdown/silence', id, now: NOW + MIN + 5_000 })
+    expect(silenced.countdown.timers[0]!.silencedAt).toBe(NOW + MIN)
+    expect(again.countdown.timers[0]!.silencedAt).toBe(NOW + MIN)
+    // The card is still there, still finished — only the sound stopped.
+    expect(again.countdown.timers[0]).toMatchObject({ endAt: NOW + MIN })
+  })
+
   it('restarts from the original duration', () => {
     const added = reducer(state(), {
       type: 'countdown/add',
@@ -59,9 +71,12 @@ describe('countdown', () => {
       now: NOW,
     })
     const id = added.countdown.timers[0]!.id
-    const restarted = reducer(added, { type: 'countdown/restart', id, now: NOW + 90_000 })
+    const silenced = reducer(added, { type: 'countdown/silence', id, now: NOW + MIN })
+    const restarted = reducer(silenced, { type: 'countdown/restart', id, now: NOW + 90_000 })
     expect(restarted.countdown.timers[0]).toMatchObject({ endAt: NOW + 90_000 + 2 * MIN })
     expect(restarted.countdown.timers[0]!.firedAt).toBeUndefined()
+    // A run that was stopped last time still gets to ring the next time.
+    expect(restarted.countdown.timers[0]!.silencedAt).toBeUndefined()
   })
 
   it('removes a timer', () => {

@@ -29,6 +29,11 @@ describe('buildTitle', () => {
     expect(buildTitle({ timers }, NOW)).toBe('tick')
   })
 
+  it('a ringing countdown takes the tab from a running one', () => {
+    const timers = [running('Tea', MIN)]
+    expect(buildTitle({ timers, ringingTimer: 'Eggs' }, NOW)).toBe('⏰ Eggs · tick')
+  })
+
   it('a running interval outranks countdowns', () => {
     const timers = [running('Tea', MIN)]
     expect(buildTitle({ timers, interval: { phase: 'work', remainingMs: 12_000 } }, NOW)).toBe(

@@ -161,7 +161,7 @@ export function reducer(state: AppState, action: Action): AppState {
     // invariant hold no matter which field a transition happens to return.
     case 'countdown/start':
       return mapTimer(state, action.id, (timer) => ({
-        ...omit(timer, 'firedAt', 'endAt', 'pausedRemainingMs'),
+        ...omit(timer, 'firedAt', 'silencedAt', 'endAt', 'pausedRemainingMs'),
         ...start(timer, action.now),
       }))
     case 'countdown/pause':
@@ -176,12 +176,18 @@ export function reducer(state: AppState, action: Action): AppState {
       }))
     case 'countdown/restart':
       return mapTimer(state, action.id, (timer) => ({
-        ...omit(timer, 'firedAt', 'endAt', 'pausedRemainingMs'),
+        ...omit(timer, 'firedAt', 'silencedAt', 'endAt', 'pausedRemainingMs'),
         ...start(timer, action.now),
       }))
     case 'countdown/fired':
       return mapTimer(state, action.id, (timer) =>
         timer.firedAt === undefined ? { ...timer, firedAt: action.now } : timer,
+      )
+    // Stopping the ringing, not the timer: the card stays on the board,
+    // finished, with its Restart still there.
+    case 'countdown/silence':
+      return mapTimer(state, action.id, (timer) =>
+        timer.silencedAt === undefined ? { ...timer, silencedAt: action.now } : timer,
       )
 
     case 'countdown/recent/remove':

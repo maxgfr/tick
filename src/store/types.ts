@@ -21,6 +21,12 @@ export interface CountdownItem extends CountdownTimer {
   label: string
   /** Set once when the timer fires — the notification dedupe. */
   firedAt?: number
+  /**
+   * When the user stopped the ringing. Persisted, like the alarm's snooze:
+   * a finished timer rings until it is stopped, and a reload must not start
+   * it up again on a timer that was already dealt with.
+   */
+  silencedAt?: number
 }
 
 export interface AlarmItem {
