@@ -4,10 +4,15 @@ interface FlipReadoutProps {
 }
 
 /**
- * The board's readout: one flap per digit, flat separators between groups.
+ * The board's readout: one tile per character, flat separators between groups.
  * The visible row is aria-hidden — a screen-reader twin carries the value in
- * one utterance — and every tile is keyed by position and digit, so only a
- * changed digit remounts and flips.
+ * one utterance.
+ *
+ * Tiles are keyed by position alone. Keying them by position *and* character
+ * made every changed digit a new element so it could replay a flip animation,
+ * which also meant a whole readout remounted on every route change and the
+ * entire board turned over at once. There is no animation now, and nothing
+ * remounts: the text inside a tile simply changes.
  */
 export function FlipReadout({ text, className = '' }: FlipReadoutProps) {
   return (
@@ -15,16 +20,15 @@ export function FlipReadout({ text, className = '' }: FlipReadoutProps) {
       <span className={`flip-row ${className}`.trim()} aria-hidden="true">
         {[...text].map((char, index) =>
           char === ':' || char === '.' || char === ' ' ? (
-            // The list is positional by construction (clock columns never
-            // reorder) and the key must change with the digit — position and
-            // character together are the identity of a flipping tile.
+            // The row is positional by construction — clock columns never
+            // reorder — so the index is the identity of the slot.
             // oxlint-disable-next-line react/no-array-index-key
-            <span key={`${index}-${char}`} className="flip-sep">
+            <span key={index} className="flip-sep">
               {char}
             </span>
           ) : (
             // oxlint-disable-next-line react/no-array-index-key
-            <span key={`${index}-${char}`} className="flap flap-turn">
+            <span key={index} className="flap">
               {char}
             </span>
           ),

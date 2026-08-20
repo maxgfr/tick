@@ -24,25 +24,26 @@ describe('FlipReadout', () => {
     expect(screen.getByText('12:05')).toBeTruthy()
   })
 
-  it('remounts only the tiles whose digit changed', () => {
+  it('keeps every tile in place when a digit changes — nothing remounts', () => {
     const { container, rerender } = render(<FlipReadout text="1:00" />)
     const before = container.querySelectorAll('.flap')
 
     rerender(<FlipReadout text="1:01" />)
     const after = container.querySelectorAll('.flap')
     expect(after.length).toBe(3)
-    // Unchanged digits keep their DOM node — steady, no flicker.
+    // Every tile is the same DOM node, the changed one included. Keying by
+    // character used to make it a new element so it could replay a flip —
+    // which is also why a route change turned the whole board over at once.
     expect(after[0]).toBe(before[0])
     expect(after[1]).toBe(before[1])
-    // The changed digit is a new tile, so the flip animation replays.
-    expect(after[2]).not.toBe(before[2])
+    expect(after[2]).toBe(before[2])
     expect(after[2]?.textContent).toBe('1')
   })
 
-  it('marks tiles as flipping and treats the dot as a separator', () => {
+  it('carries no animation class, and treats the dot as a separator', () => {
     const { container } = render(<FlipReadout text="5.4" />)
     const flaps = container.querySelectorAll('.flap')
-    expect(flaps[0]?.className).toContain('flap-turn')
+    expect(flaps[0]?.className).not.toContain('flap-turn')
     expect(flaps.length).toBe(2)
     expect(container.querySelector('.flip-sep')?.textContent).toBe('.')
   })

@@ -96,6 +96,7 @@ not fabricate any.
 ## Accessibility & Inclusion
 
 Keyboard-first: every tool reachable by single keys, shortcuts listed in an
-in-app overlay. `prefers-reduced-motion` disables the one animation (the
-breathing colon). Focus is a 2px amber outline; color is never the only signal
-(icons/labels accompany state). Numerals use tabular figures for readability.
+in-app overlay. There is no animation to opt out of — nothing in the app
+moves, so `prefers-reduced-motion` has nothing left to disable. Focus is a 2px
+accent outline; color is never the only signal (icons/labels accompany state).
+Numerals use tabular figures for readability.

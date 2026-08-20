@@ -186,7 +186,9 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
           type="button"
           role="switch"
           aria-checked={alarm.enabled}
-          aria-label={alarm.time}
+          // Not just the time: that is the row's label and the readout too,
+          // and it never said what the control does.
+          aria-label={`Enable alarm ${alarm.time}`}
           onClick={() => dispatch({ type: 'alarm/toggle', id: alarm.id })}
           className="h-6 w-11 rounded-full border transition-colors"
           style={{
@@ -195,8 +197,11 @@ function AlarmRow({ alarm, now }: { alarm: AlarmItem; now: number }) {
             position: 'relative',
           }}
         >
+          {/* The knob moves between two positions; it does not travel there.
+              This was the one real displacement left in the app, and it was
+              never gated on prefers-reduced-motion. */}
           <span
-            className="absolute top-0.5 h-4 w-4 rounded-full transition-all"
+            className="absolute top-0.5 h-4 w-4 rounded-full"
             style={{
               left: alarm.enabled ? 'calc(100% - 1.125rem)' : '0.125rem',
               background: alarm.enabled ? 'var(--accent-ink)' : 'var(--ink-3)',

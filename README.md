@@ -22,9 +22,9 @@ countdowns — no home screen between you and your timers.
 | `8` | **Display**     | Fullscreen across-the-room view — picks its own source: soonest countdown, running interval, or the clock |
 
 Global keys: `?` shortcuts, `M` mute, `F` fullscreen. Readouts are a
-departure board: each digit on its own tile, and when a value changes, only
-the changed tiles flip — the one motion in the app. Progress is a row of
-tiles filling with vermilion, never a bar or a ring.
+departure board: each digit on its own tile. Nothing animates — values change
+instantly, and no route change stirs the board. Progress is a row of tiles
+filling with vermilion, never a bar or a ring.
 
 ## Time that doesn't drift
 

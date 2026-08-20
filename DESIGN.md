@@ -100,8 +100,8 @@ row of small tiles filling with vermilion, the board spending itself.
   or labelled; IBM Plex Sans for everything said.
 - Flat: depth comes from tonal steps (`bg` → `surface` → `surface-2`) and 1px
   lines, never shadows.
-- One authored motion: the mechanical flip of the digit that changes; nothing
-  else in the app moves.
+- No motion: values change instantly. Nothing in the app animates, and the
+  interface never moves to explain itself.
 
 ## Colors
 
@@ -264,8 +264,8 @@ vermilion. The fullscreen display drops the bar — its only way back is the
 The readout: each character on its own bone tile with the hinge seam; `:` and
 `.` are bare separators in the same voice. The visible row is `aria-hidden`
 and paired with one `sr-only` twin carrying the whole string, so screens
-readers hear "1:00", not "one colon zero zero". When the value changes, only
-the tiles whose character changed remount (keyed remount) and flip.
+readers hear "1:00", not "one colon zero zero". Tiles are keyed by position,
+so a changing value rewrites the character in place — no remount, no motion.
 
 ### TileRow (signature)
 
@@ -276,11 +276,19 @@ and the display. Never a bar, never a ring — the unit is the tile.
 
 ### Named Rules
 
-**The One Motion Rule.** The flap flip (`flap-turn`, 260ms, `steps(6, end)` —
-a half-turn through 90°, quantized like a motor stepping through its cams) is
-the only animation in the app. Everything else changes by state-color
-transition. `prefers-reduced-motion: reduce` turns the flip into an instant
-change; no motion is ever load-bearing.
+**The No Motion Rule.** Nothing in the app animates. There is no keyframe
+anywhere in the stylesheet, and no element ever changes position, size or
+rotation over time. State changes are instant.
+
+The one exception is a 150ms colour fade on hover and focus, which is not
+motion in the sense that matters: nothing travels, nothing redraws its layout,
+and without it interactive controls read as unresponsive.
+
+This replaced a mechanical digit flip. Each tile was keyed by its character so
+a changed digit would remount and replay the animation — which meant that on
+every route change React remounted the whole readout and the entire board
+turned over at once. That was never the intent, and the flip is gone rather
+than patched.
 
 ## Do's and Don'ts
 
@@ -296,7 +304,8 @@ change; no motion is ever load-bearing.
   tokens.
 - **Do** size display readouts by `vmin`/`clamp`, so the number owns the
   viewport.
-- **Do** honor `prefers-reduced-motion` and `prefers-color-scheme`.
+- **Do** honor `prefers-color-scheme`. (`prefers-reduced-motion` needs no
+  handling: there is no motion to reduce.)
 
 ### Don't:
 
@@ -305,8 +314,8 @@ change; no motion is ever load-bearing.
   white.
 - **Don't** add a progress bar, an arc, a ring, or a dial — or any circle at
   all — where a TileRow belongs.
-- **Don't** animate anything beyond the flap flip and state-color transitions
-  (The One Motion Rule).
+- **Don't** animate. No keyframes, no transitions beyond hover/focus colour
+  (The No Motion Rule).
 - **Don't** use a proportional (non-tabular) figure in a running readout, or
   a mono face: the condensed grotesque is the voice.
 - **Don't** load a font or asset from a network origin — assets are

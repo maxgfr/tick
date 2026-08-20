@@ -5,10 +5,12 @@
 
   The world: a departure board. Time is printed matter — slate-green ground,
   bone tiles, one vermilion signal. Numerals live on tiles with a center seam,
-  progress is a row of small tiles filling with vermilion, and the only motion
-  in the app is the mechanical flip of a changing digit. No gradients, no
+  progress is a row of small tiles filling with vermilion. No gradients, no
   glass, no glow, no circles: the board carries the design, the vermilion says
   "now".
+
+  Nothing moves. Values change instantly — the digit flip is gone, and no
+  animation replaces it.
 */
 
 /* Numerals and headings: IBM Plex Sans Condensed, self-hosted (see
@@ -165,6 +167,8 @@ button {
   The flap: one tile of the board. Bone plate, ink digit, a 1px seam across
   the middle where the two halves meet. Width is a fraction of the em so a
   readout scales as one voice; the fixed box is what keeps columns steady.
+
+  The seam is the only thing left of the split-flap; the tile no longer turns.
 */
 .flip-row {
   display: inline-flex;
@@ -199,35 +203,6 @@ button {
   font-weight: 600;
   line-height: 1;
   color: inherit;
-}
-
-/*
-  The authored moment: the digit that changes, flips. Remounted tiles replay
-  this animation — a half-turn through 90°, quantized in six frames like a
-  motor stepping through its cams. It is the only motion in the app;
-  reduced-motion users get an instant change instead.
-*/
-@keyframes flap-turn {
-  0% {
-    transform: perspective(0.6em) rotateX(0deg);
-    filter: brightness(1);
-  }
-  50% {
-    transform: perspective(0.6em) rotateX(-90deg);
-    filter: brightness(0.55);
-  }
-  100% {
-    transform: perspective(0.6em) rotateX(0deg);
-    filter: brightness(1);
-  }
-}
-.flap-turn {
-  animation: flap-turn 260ms steps(6, end) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .flap-turn {
-    animation: none;
-  }
 }
 
 /*
