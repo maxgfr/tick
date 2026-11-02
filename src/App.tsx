@@ -12,7 +12,7 @@ import { useAudioSettings } from './hooks/useAudioSettings.ts'
 import { DESKTOP_NAV, useMediaQuery } from './hooks/useMediaQuery.ts'
 import { TickerProvider } from './hooks/useNow.tsx'
 import { toggleFullscreen } from './lib/fullscreen.ts'
-import { useDispatch, useStore } from './store/context.ts'
+import { useDispatch, usePersisted, useStore } from './store/context.ts'
 import { StoreProvider } from './store/StoreProvider.tsx'
 import { MobileNav } from './components/MobileNav.tsx'
 import { SideNav } from './components/SideNav.tsx'
@@ -114,6 +114,7 @@ function Shell() {
 
 function ToolPage({ route, desktop }: { route: RouteName; desktop: boolean }) {
   const destination = destinationById(route)
+  const persisted = usePersisted()
   const view = route === 'display' ? null : VIEWS[route]()
 
   return (
@@ -134,6 +135,15 @@ function ToolPage({ route, desktop }: { route: RouteName; desktop: boolean }) {
           <p className="text-sm" style={{ color: 'var(--ink-2)' }}>
             {destination?.tagline}
           </p>
+          {!persisted && (
+            <p
+              role="alert"
+              className="mt-3 rounded-md border px-3 py-2 text-sm"
+              style={{ borderColor: 'var(--accent)', color: 'var(--ink)' }}
+            >
+              Storage for this site is full or unavailable — your changes will be lost on reload.
+            </p>
+          )}
         </header>
         <section aria-label={`${destination?.name ?? 'Tool'} tool`} className="pt-4 pb-8">
           {view}

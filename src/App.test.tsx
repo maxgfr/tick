@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App.tsx'
 
 describe('App shell', () => {
@@ -9,6 +9,25 @@ describe('App shell', () => {
   })
   afterEach(() => {
     window.location.hash = ''
+    vi.restoreAllMocks()
+  })
+
+  it('says so when the state cannot be saved, instead of losing it silently', async () => {
+    // Another site of maxgfr.github.io filled the shared quota.
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('quota', 'QuotaExceededError')
+    })
+    render(<App />)
+    expect(await screen.findByRole('alert')).toHaveProperty(
+      'textContent',
+      'Storage for this site is full or unavailable — your changes will be lost on reload.',
+    )
+  })
+
+  it('shows no storage warning when saving works', async () => {
+    render(<App />)
+    await waitFor(() => expect(localStorage.getItem('tick:state:v1')).not.toBeNull())
+    expect(screen.queryByRole('alert')).toBeNull()
   })
 
   it('lands directly on the countdown board, no hash needed', () => {
